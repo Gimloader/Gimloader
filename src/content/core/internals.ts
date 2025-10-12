@@ -1,6 +1,6 @@
 import EventEmitter2 from "eventemitter2";
 import Rewriter from "./rewriter";
-import type { Stores } from "$types/stores";
+import type { Stores } from "$types/stores/stores";
 
 export default class GimkitInternals {
     static stores: Stores;
