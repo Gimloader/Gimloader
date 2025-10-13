@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Plugin } from "$content/core/scripts/scripts.svelte";
+    import type { Plugin } from "$core/scripts/scripts.svelte";
     import LibManager from "$core/scripts/libManager.svelte";
     import { checkLibUpdate } from "$core/net/checkUpdates";
     import Net from "$core/net/net";

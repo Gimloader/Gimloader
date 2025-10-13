@@ -4,7 +4,7 @@
     import Card from "../components/Card.svelte";
     import { Button } from "flowbite-svelte";
     import { officialPluginsOpen } from "../stores";
-    import PluginManager from "$content/core/scripts/pluginManager.svelte";
+    import PluginManager from "$core/scripts/pluginManager.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import Download from "svelte-material-icons/Download.svelte";
     import toast from "svelte-5-french-toast";

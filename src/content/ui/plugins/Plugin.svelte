@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Plugin } from "$content/core/scripts/scripts.svelte";
+    import type { Plugin } from "$core/scripts/scripts.svelte";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import { checkPluginUpdate } from "$core/net/checkUpdates";
     import { Toggle, Modal } from "flowbite-svelte";

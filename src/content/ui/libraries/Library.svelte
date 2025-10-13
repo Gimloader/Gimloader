@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Lib } from "$content/core/scripts/scripts.svelte";
+    import type { Lib } from "$core/scripts/scripts.svelte";
     import Card from "../components/Card.svelte";
     import LibManager from "$core/scripts/libManager.svelte";
     import Delete from "svelte-material-icons/Delete.svelte";
