@@ -13,6 +13,7 @@
     import Import from 'svelte-material-icons/Import.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ViewControl from "../components/ViewControl.svelte";
+    import UI from '$content/core/ui/ui';
     
     let { onDrop }: { onDrop: (callback: (text: string) => void) => void } = $props();
 
@@ -89,16 +90,21 @@
     {#if LibManager.libs.length === 0}
         <h2 class="text-xl">No libraries installed!</h2>
     {/if}
-    <div class="overflow-y-auto grid gap-4 view-{Storage.settings.menuView} pb-1 flex-grow"
-    use:dndzone={{ items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
-    onconsider={handleDndConsider} onfinalize={handleDndFinalize}>
-        {#key searchValue}
-            {#each items as item (item.id)}
-                {@const library = LibManager.getLib(item.id)}
-                <div animate:flip={{ duration: flipDurationMs }}>
-                    <Library {library} {startDrag} {dragDisabled} dragAllowed={searchValue == ''} />
-                </div>
-            {/each}
-        {/key}
-    </div>
+    {#await UI.gamemodesRes then gamemodes}
+        <div
+            class="overflow-y-auto grid gap-4 view-{Storage.settings.menuView} pb-1 flex-grow"
+            use:dndzone={{ items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
+            onconsider={handleDndConsider}
+            onfinalize={handleDndFinalize}
+        >
+            {#key searchValue}
+                {#each items as item (item.id)}
+                    {@const library = LibManager.getLib(item.id)}
+                    <div animate:flip={{ duration: flipDurationMs }}>
+                        <Library {library} {gamemodes} {startDrag} {dragDisabled} dragAllowed={searchValue == ''} />
+                    </div>
+                {/each}
+            {/key}
+        </div>
+    {/await}
 </div>

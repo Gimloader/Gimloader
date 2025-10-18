@@ -15,8 +15,13 @@
     import PlusBoxOutline from 'svelte-material-icons/PlusBoxOutline.svelte';
     import Import from 'svelte-material-icons/Import.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import UI from '$content/core/ui/ui';
 
-    let { onDrop }: { onDrop: (callback: (text: string) => void) => void } = $props();
+    interface Props {
+        onDrop: (callback: (text: string) => void) => void
+    }
+
+    let { onDrop }: Props = $props();
 
     onDrop((text: string) => {
         PluginManager.createPlugin(text);
@@ -121,16 +126,21 @@
             or import or create your own.
         </h2>
     {/if}
-    <div class="overflow-y-auto grid gap-4 pb-1 flex-grow view-{Storage.settings.menuView}"
-    use:dndzone={{ items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
-    onconsider={handleDndConsider} onfinalize={handleDndFinalize}>
-        {#key searchValue}
-            {#each items as item (item.id)}
-                {@const plugin = PluginManager.getPlugin(item.id)}
-                <div animate:flip={{ duration: flipDurationMs }}>
-                    <Plugin {plugin} {startDrag} {dragDisabled} dragAllowed={searchValue == ""} />
-                </div>
-            {/each}
-        {/key}
-    </div>
+    {#await UI.gamemodesRes then gamemodes}
+        <div
+            class="overflow-y-auto grid gap-4 pb-1 flex-grow view-{Storage.settings.menuView}"
+            use:dndzone={{ items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
+            onconsider={handleDndConsider}
+            onfinalize={handleDndFinalize}
+        >
+            {#key searchValue}
+                {#each items as item (item.id)}
+                    {@const plugin = PluginManager.getPlugin(item.id)}
+                    <div animate:flip={{ duration: flipDurationMs }}>
+                        <Plugin {plugin} {gamemodes} {startDrag} {dragDisabled} dragAllowed={searchValue == ""} />
+                    </div>
+                {/each}
+            {/key}
+        </div>
+    {/await}
 </div>
