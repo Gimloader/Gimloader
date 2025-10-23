@@ -12,6 +12,7 @@
         toggle?: Snippet;
         author?: Snippet;
         description?: Snippet;
+        gamemodes?: Snippet;
         buttons?: Snippet;
         border?: string;
         hasDrag?: boolean;
@@ -27,6 +28,7 @@
         toggle,
         author,
         description,
+        gamemodes,
         buttons,
         border,
         hasDrag = true
@@ -54,8 +56,15 @@ h-full relative bg-white min-h-[150px] rounded-xl preflight flex flex-col p-3">
     <div class="flex-grow text-sm pr-7 overflow-hidden overflow-ellipsis line-clamp-6">
         {@render description?.()}
     </div>
-    <div class="flex flex-row-reverse items-end">
-        {@render buttons?.()}
+    <div class="flex flex-row overflow-hidden">
+        <div class="flex-1 overflow-x-auto whitespace-nowrap">
+            <div class="flex flex-row gap-1 inline-block min-w-max">
+                {@render gamemodes?.()}
+            </div>
+        </div>
+        <div class="flex flex-none flex-row-reverse items-end">
+            {@render buttons?.()}
+        </div>
     </div>
     {#if hasDrag}
         <div class="absolute right-3 top-1/2 transform -translate-y-1/2"

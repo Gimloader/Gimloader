@@ -17,11 +17,14 @@
     import ScriptTextOutline from 'svelte-material-icons/ScriptTextOutline.svelte';
     import AlertCircleOutline from 'svelte-material-icons/AlertCircleOutline.svelte';
     import { showEditor } from "$content/utils";
+    import type { ParsedGamemode } from '$content/core/ui/ui';
+    import modeDescriptions from '../modeDescriptions';
 
     interface Props {
         startDrag: () => void;
         dragDisabled: boolean;
         plugin: Plugin;
+        gamemodes: ParsedGamemode[];
         dragAllowed: boolean;
     }
 
@@ -29,6 +32,7 @@
         startDrag,
         dragDisabled,
         plugin,
+        gamemodes: parsedGamemodes,
         dragAllowed
     }: Props = $props();
 
@@ -58,6 +62,8 @@
 
     let component = $derived(Storage.settings.menuView === 'grid' ? Card : ListItem);
     const SvelteComponent = $derived(component);
+
+    
 </script>
 
 {#if libInfoOpen}
@@ -87,6 +93,16 @@
     {/snippet}
     {#snippet description()}
         {plugin?.headers.description}
+    {/snippet}
+    {#snippet gamemodes()}
+        {#each plugin?.headers.gamemode as gamemode}
+            {#if gamemode.toLowerCase() in modeDescriptions}
+                <div class="bg-gray-400 px-2 bold rounded-full">{modeDescriptions[gamemode.toLowerCase()]}</div>
+            {:else}
+                {@const parsedGamemode = parsedGamemodes.find(gm => gm.id.toLowerCase() === gamemode.toLowerCase())}
+                <img src={parsedGamemode.image} title={parsedGamemode.name} alt={parsedGamemode.name}>
+            {/if}
+        {/each}
     {/snippet}
     {#snippet buttons()}
         <button onclick={() => deletePlugin(plugin)}>

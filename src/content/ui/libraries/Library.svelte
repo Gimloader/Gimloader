@@ -10,6 +10,8 @@
     import ListItem from "../components/ListItem.svelte";
     import Storage from "$core/storage.svelte";
     import { showEditor } from "$content/utils";
+    import modeDescriptions from '../modeDescriptions';
+    import type { ParsedGamemode } from '$content/core/ui/ui';
 
     function deleteLib() {
         let conf = confirm(`Are you sure you want to delete ${library.headers.name}?`);
@@ -22,6 +24,7 @@
         startDrag: () => void;
         dragDisabled: boolean;
         library: Lib;
+        gamemodes: ParsedGamemode[];
         dragAllowed: boolean;
     }
 
@@ -29,6 +32,7 @@
         startDrag,
         dragDisabled,
         library,
+        gamemodes: parsedGamemodes,
         dragAllowed
     }: Props = $props();
 
@@ -50,6 +54,16 @@
     {/snippet}
     {#snippet description()}
         {library?.headers.description}
+    {/snippet}
+    {#snippet gamemodes()}
+        {#each library?.headers.gamemode as gamemode}
+            {#if gamemode.toLowerCase() in modeDescriptions}
+                <div class="bg-gray-400 px-2 bold rounded-full">{modeDescriptions[gamemode.toLowerCase()]}</div>
+            {:else}
+                {@const parsedGamemode = parsedGamemodes.find(gm => gm.id.toLowerCase() === gamemode.toLowerCase())}
+                <img src={parsedGamemode.image} title={parsedGamemode.name} alt={parsedGamemode.name}>
+            {/if}
+        {/each}
     {/snippet}
     {#snippet buttons()}
         <button onclick={deleteLib}>

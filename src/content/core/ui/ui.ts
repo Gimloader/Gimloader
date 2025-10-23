@@ -4,11 +4,43 @@ import { addPluginButtons } from './addPluginButtons';
 import styles from "../../css/styles.scss";
 import { domLoaded } from '$content/utils';
 import Rewriter from '../rewriter';
+import type { Experiences } from '$types/fetch';
+import net from '../net/net';
+import circleImage from './circleImage';
+
+
+export interface ParsedGamemode {
+    name: string;
+    id: string;
+    image: string;
+}
+
+async function parseGamemodes(experiences: Experiences): Promise<ParsedGamemode[]> {
+    let gamemodes = experiences.flatMap(exp => exp.items);
+
+    return Promise.all(
+        gamemodes.map(async gm => ({
+            name: gm.name,
+            id: net.gamemodeFromUrl(gm.imageUrl),
+            image: await circleImage(gm.imageUrl)
+        }))
+    );
+}
 
 export default class UI {
     static React: typeof React;
     static ReactDOM: typeof ReactDOM;
     static styles: Map<string, HTMLStyleElement[]> = new Map();
+    static gamemodesRes = fetch("/api/experiences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            "mode": "liveGame",
+            "forceUpgradedExperiences": false
+        })
+    })
+        .then<Experiences>(res => res.json())
+        .then(parseGamemodes);
 
     static init() {
         Rewriter.exposeObjectBefore(true, "React", ".useDebugValue=", (react) => {
