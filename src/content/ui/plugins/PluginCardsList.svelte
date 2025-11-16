@@ -12,9 +12,11 @@
     import ViewControl from "../components/ViewControl.svelte";
     import { officialPluginsOpen } from "../stores";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
+    import toast from "svelte-5-french-toast";
     
     import PlusBoxOutline from 'svelte-material-icons/PlusBoxOutline.svelte';
     import Import from 'svelte-material-icons/Import.svelte';
+    import { parseScriptHeaders } from "$shared/parseHeader";
     
     let searchValue = $state("");
     let items = $state(PluginManager.plugins.map((plugin) => ({ id: plugin.headers.name })));
@@ -67,6 +69,21 @@
         PluginManager.plugins = sorted;
         Port.send("pluginsArrange", { order: sorted.map(p => p.headers.name) });
     }
+
+    // Stollen from OfficialPlugins.svelte because I do not know the proper place to put the function for sharing.
+    const install = async (url: string) => {
+        try {
+            const res = await fetch(url);
+            const code = await res.text();
+            await PluginManager.createPlugin(code);
+            toast.success(`Installed ${parseScriptHeaders(code).name}`);
+        } catch(e) {
+            console.error(e);
+            toast.error(`Failed to install plugin from URL`); // Just in case the issue is with the headers.
+        }
+    }
+
+    let pluginUrl = $state("");
 </script>
 
 <div class="flex flex-col max-h-full">
@@ -105,6 +122,12 @@
         </DropdownMenu.Root>
         <ViewControl />
         <Search bind:value={searchValue} />
+        <div class="ml-auto flex">
+            <input placeholder="Plugin URL" bind:value={pluginUrl} />
+            <button onclick={() => {install(pluginUrl); pluginUrl = ""}}>
+                <PlusBoxOutline size={32} />
+            </button>
+        </div>
     </div>
     {#if PluginManager.plugins.length === 0}
         <h2 class="text-xl w-full text-center">
