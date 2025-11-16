@@ -72,7 +72,7 @@ p-3 h-full bg-white preflight rounded-xl relative">
     </div>
     {#if expanded}
         <div class="ml-7">
-            <div class="overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-base leading-4">
+            <div class="overflow-ellipsis overflow-hidden whitespace-nowrap w-full text-base leading-5">
                 {@render author?.()}
             </div>
             <div class="grow text-sm pr-7 overflow-hidden overflow-ellipsis">
