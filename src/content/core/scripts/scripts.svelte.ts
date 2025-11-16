@@ -8,6 +8,7 @@ import type { PluginSettingsDescription } from "$types/settings";
 import Commands from "../commands.svelte";
 import PluginManager from "./pluginManager.svelte";
 import toast from "svelte-5-french-toast";
+import { showMenu } from "$content/ui/mount";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
 
@@ -19,6 +20,7 @@ abstract class BaseScript {
     headers: ScriptHeaders = $state();
     usedLibs: Lib[] = [];
     cleanupDeleteCommand: () => void;
+    cleanupConfigureCommand: () => void;
 
     constructor(script: string, headers?: ScriptHeaders) {
         this.script = script;
@@ -140,6 +142,7 @@ abstract class BaseScript {
 
     onDelete() {
         this.cleanupDeleteCommand?.();
+        this.cleanupConfigureCommand?.();
     }
 }
 
@@ -162,6 +165,15 @@ export class Plugin extends BaseScript {
             text: `Delete ${this.headers.name}`,
             keywords: ["remove", "uninstall"]
         }, () => this.confirmDelete());
+
+        this.cleanupConfigureCommand = Commands.addCommand(null, {
+            group: "Plugins",
+            text: `Configure ${this.headers.name}`,
+            keywords: ["setting", "settings", "configure", "config"]
+        }, () => {
+            if (this.openSettingsMenu.length === 0) return;
+            this.openSettingsMenu.forEach(c => c())
+        });
     }
 
     confirmDelete() {
