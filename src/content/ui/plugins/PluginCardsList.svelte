@@ -13,6 +13,7 @@
     import { officialPluginsOpen } from "../stores";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import toast from "svelte-5-french-toast";
+    import * as Dialog from "$shared/ui/dialog";
     
     import PlusBoxOutline from 'svelte-material-icons/PlusBoxOutline.svelte';
     import Import from 'svelte-material-icons/Import.svelte';
@@ -73,6 +74,7 @@
     // Stollen from OfficialPlugins.svelte because I do not know the proper place to put the function for sharing.
     const install = async (url: string) => {
         try {
+            if (!url.startsWith("https://") && !url.startsWith("http://")) throw new Error("Invalid URL");
             const res = await fetch(url);
             const code = await res.text();
             await PluginManager.createPlugin(code);
@@ -84,19 +86,32 @@
     }
 
     let pluginUrl = $state("");
+    let pluginUrlMenuOpen = $state(false);
 </script>
 
+<Dialog.Root open={pluginUrlMenuOpen}>
+    <Dialog.Content class="text-gray-600 max-w-110 min-h-35 flex items-center justify-center">
+        <input placeholder="Plugin URL" bind:value={pluginUrl} class="border-primary border-3 px-3 py-2 rounded-md" />
+        <Button onclick={() => {install(pluginUrl); pluginUrlMenuOpen = false}}>Install</Button>
+    </Dialog.Content>
+</Dialog.Root>
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px]">
         <Button class="h-7" onclick={() => officialPluginsOpen.set(true)}>
             Official Plugins
         </Button>
-        <button onclick={() => showEditor("plugin")}>
-            <PlusBoxOutline size={32} />
-        </button>
-        <button onclick={importPlugin}>
-            <Import size={32} />
-        </button>
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger class="mx-1.5!">
+                <Button class="h-7">
+                    Install Plugin
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+                <DropdownMenu.Item onclick={() => showEditor("plugin")}>Open Editor</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={importPlugin}>Upload</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => pluginUrlMenuOpen = true}>From URL</DropdownMenu.Item>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
         <DropdownMenu.Root>
             <DropdownMenu.Trigger>
                 <Button class="h-7">
@@ -122,12 +137,6 @@
         </DropdownMenu.Root>
         <ViewControl />
         <Search bind:value={searchValue} />
-        <div class="ml-auto flex">
-            <input placeholder="Plugin URL" bind:value={pluginUrl} />
-            <button onclick={() => {install(pluginUrl); pluginUrl = ""}}>
-                <PlusBoxOutline size={32} />
-            </button>
-        </div>
     </div>
     {#if PluginManager.plugins.length === 0}
         <h2 class="text-xl w-full text-center">
