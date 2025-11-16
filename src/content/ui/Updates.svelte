@@ -52,7 +52,7 @@
         {#each LibManager.libs as lib}
             <div class="flex items-center">
                 {#if lib.headers.downloadUrl}
-                    <button onclick={() => checkLibUpdate(lib)}>
+                    <button title="Check for updates" onclick={() => checkLibUpdate(lib)}>
                         <Update size={25} />
                     </button>
                 {/if}
