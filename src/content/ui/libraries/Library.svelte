@@ -57,24 +57,24 @@
         {library?.headers.description}
     {/snippet}
     {#snippet buttons()}
-        <button onclick={deleteLib}>
+        <button title="Delete" onclick={deleteLib}>
             <Delete size={28} />
         </button>
-        <button onclick={() => showEditor("library", library.headers.name)}>
+        <button title="Open library in editor" onclick={() => showEditor("library", library.headers.name)}>
             <Pencil size={28} />
         </button>
         {#if library?.headers.downloadUrl}
-            <button onclick={() => checkLibUpdate(library)}>
+            <button title="Check for updates" onclick={() => checkLibUpdate(library)}>
                 <Update size={28} />
             </button>
         {/if}
         {#if library?.headers.needsLib?.length || library?.headers.optionalLib?.length}
-            <button onclick={() => showScriptLibs(library)}>
+            <button title="See libraries used by this library" onclick={() => showScriptLibs(library)}>
                 <BookSettings size={24} />
             </button>
         {/if}
         {#if library?.headers.webpage}
-            <a href={library.headers.webpage} target="_blank">
+            <a title="Open webpage for library" href={library.headers.webpage} target="_blank">
                 <ScriptTextOutline size={28} />
             </a>
         {/if}

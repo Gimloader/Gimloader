@@ -1,1 +1,2 @@
 Fixed crash when used on Firefox together with some other extensions
+Added titles for script buttons

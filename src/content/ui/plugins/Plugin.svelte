@@ -79,14 +79,14 @@
         {plugin?.headers.description}
     {/snippet}
     {#snippet buttons()}
-        <button onclick={() => deletePlugin(plugin)}>
+        <button title="Delete" onclick={() => deletePlugin(plugin)}>
             <Delete size={28} />
         </button>
-        <button onclick={() => showEditor("plugin", plugin.headers.name)}>
+        <button title="Open plugin editor" onclick={() => showEditor("plugin", plugin.headers.name)}>
             <Pencil size={28} />
         </button>
         {#if plugin?.openSettingsMenu?.length !== 0}
-            <button onclick={() => plugin.openSettingsMenu.forEach(c => c())}>
+            <button title="Open settings" onclick={() => plugin.openSettingsMenu.forEach(c => c())}>
                 <Cog size={28} />
             </button>
         {:else if plugin?.headers.hasSettings !== "false"}
@@ -95,17 +95,17 @@
                 'Plugins need to be enabled to open settings'} />
         {/if}
         {#if plugin?.headers.downloadUrl}
-            <button onclick={() => checkPluginUpdate(plugin)}>
+            <button title="Check for updates" onclick={() => checkPluginUpdate(plugin)}>
                 <Update size={28} />
             </button>
         {/if}
         {#if plugin?.headers.needsLib?.length || plugin?.headers.optionalLib?.length}
-            <button onclick={() => showScriptLibs(plugin)}>
+            <button title="See libraries used by this plugin" onclick={() => showScriptLibs(plugin)}>
                 <BookSettings size={24} />
             </button>
         {/if}
         {#if plugin?.headers.webpage}
-            <a href={plugin.headers.webpage} target="_blank">
+            <a title="Open webpage for plugin" href={plugin.headers.webpage} target="_blank">
                 <ScriptTextOutline size={28} />
             </a>
         {/if}
