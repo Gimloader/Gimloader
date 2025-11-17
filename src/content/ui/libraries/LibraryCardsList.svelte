@@ -55,12 +55,15 @@
 
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px]">
-        <button onclick={() => showEditor("library")}>
-            <PlusBoxOutline size={32} />
-        </button>
-        <button onclick={importLib}>
-            <Import size={32} />
-        </button>
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger class="mr-1.5!">
+                <Button class="h-7">Install Library</Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+                <DropdownMenu.Item onclick={() => showEditor("library")}>Open Editor</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={importLib}>Upload</DropdownMenu.Item>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
         <DropdownMenu.Root>
             <DropdownMenu.Trigger class="mr-2!">
                 <Button class="h-7">
