@@ -153,7 +153,7 @@ export class Plugin extends BaseScript {
     enablePromise: Promise<void> | null = null;
     errored = $state(false);
     settingsDescription?: PluginSettingsDescription;
-    cleanupConfigureCommand?: () => void = undefined;
+    cleanupConfigureCommand?: () => void;
 
     constructor(script: string, enabled = true) {
         super(script);
