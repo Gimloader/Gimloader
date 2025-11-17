@@ -20,7 +20,7 @@ abstract class BaseScript {
     headers: ScriptHeaders = $state();
     usedLibs: Lib[] = [];
     cleanupDeleteCommand: () => void;
-    cleanupConfigureCommand: () => void;
+    cleanupConfigureCommand?: () => void = undefined;
 
     constructor(script: string, headers?: ScriptHeaders) {
         this.script = script;
@@ -142,7 +142,7 @@ abstract class BaseScript {
 
     onDelete() {
         this.cleanupDeleteCommand?.();
-        this.cleanupConfigureCommand?.();
+        if (this.cleanupConfigureCommand !== undefined) this.cleanupConfigureCommand?.();
     }
 }
 
@@ -165,15 +165,6 @@ export class Plugin extends BaseScript {
             text: `Delete ${this.headers.name}`,
             keywords: ["remove", "uninstall"]
         }, () => this.confirmDelete());
-
-        this.cleanupConfigureCommand = Commands.addCommand(null, {
-            group: "Plugins",
-            text: `Configure ${this.headers.name}`,
-            keywords: ["setting", "settings", "configure", "config"]
-        }, () => {
-            if (this.openSettingsMenu.length === 0) return;
-            this.openSettingsMenu.forEach(c => c())
-        });
     }
 
     confirmDelete() {
@@ -214,7 +205,16 @@ export class Plugin extends BaseScript {
                     if(returnVal.openSettingsMenu && typeof returnVal.openSettingsMenu === "function") {
                         this.openSettingsMenu.push(returnVal.openSettingsMenu);
                     }
-            
+
+                    if (this.openSettingsMenu.length > 0) this.cleanupConfigureCommand = Commands.addCommand(null, {
+                        group: "Plugins",
+                        text: `Configure ${this.headers.name}`,
+                        keywords: ["setting", "settings", "configure", "config"]
+                    }, () => {
+                        if (this.openSettingsMenu.length === 0) return;
+                        this.openSettingsMenu.forEach(c => c())
+                    });
+
                     log(`Loaded plugin: ${this.headers.name}`);
 
                     res();
