@@ -2,7 +2,6 @@
     import { Button } from "$shared/ui/button";
     import { Switch } from "$shared/ui/switch";
     import Storage from "$core/storage.svelte";
-    import { isFirefox } from "$shared/consts";
     import StateManager from "$core/state";
 
     function saveAutoUpdate() {
@@ -39,17 +38,12 @@
 </div>
 
 <h2 class="text-xl font-bold! mt-3! mb-0!">Developer Settings</h2>
-<div class="flex items-center gap-2 {isFirefox && "opacity-50 pointer-events-none"}">
+<div class="flex items-center gap-2">
     <Switch bind:checked={Storage.settings.pollerEnabled} onCheckedChange={() => {
         Storage.updateSetting("pollerEnabled", Storage.settings.pollerEnabled);
-    }} disabled={isFirefox} />
+    }} />
     Poll for plugins/libraries being served locally
 </div>
-{#if isFirefox}
-    <div>
-        Polling for local plugins/libraries is unavailable for Firefox.
-    </div>
-{/if}
 
 <h2 class="text-xl font-bold! mt-3! mb-0!">Export/Import Config</h2>
 <div>Your config consists of plugins, plugin values, libraries, hotkeys, and settings.</div>

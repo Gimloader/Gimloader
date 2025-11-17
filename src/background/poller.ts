@@ -2,7 +2,6 @@ import SettingsHandler from './messageHandlers/settings';
 import { saveDebounced, statePromise } from './state';
 import { parseScriptHeaders } from '$shared/parseHeader';
 import Server from './server';
-import { isFirefox } from '$shared/consts';
 
 export default class Poller {
     static enabled = false;
@@ -23,7 +22,6 @@ export default class Poller {
     }
 
     static async sendRequest() {
-        if(isFirefox) return;
         if(!this.enabled) return;
 
         const tryAgain = () => {

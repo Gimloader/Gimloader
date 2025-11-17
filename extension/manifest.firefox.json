@@ -53,6 +53,9 @@
         "unlimitedStorage",
         "declarativeNetRequest"
     ],
+    "host_permissions": [
+        "http://localhost:5822/*"
+    ],
     "browser_specific_settings": {
         "gecko": {
             "id": "gimloader@thelazysquid.github.io"
