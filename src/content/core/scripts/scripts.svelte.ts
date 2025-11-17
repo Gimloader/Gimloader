@@ -20,7 +20,6 @@ abstract class BaseScript {
     headers: ScriptHeaders = $state();
     usedLibs: Lib[] = [];
     cleanupDeleteCommand: () => void;
-    cleanupConfigureCommand?: () => void = undefined;
 
     constructor(script: string, headers?: ScriptHeaders) {
         this.script = script;
@@ -142,7 +141,6 @@ abstract class BaseScript {
 
     onDelete() {
         this.cleanupDeleteCommand?.();
-        if (this.cleanupConfigureCommand !== undefined) this.cleanupConfigureCommand?.();
     }
 }
 
@@ -155,6 +153,7 @@ export class Plugin extends BaseScript {
     enablePromise: Promise<void> | null = null;
     errored = $state(false);
     settingsDescription?: PluginSettingsDescription;
+    cleanupConfigureCommand?: () => void = undefined;
 
     constructor(script: string, enabled = true) {
         super(script);
@@ -209,10 +208,10 @@ export class Plugin extends BaseScript {
                     if (this.openSettingsMenu.length > 0) this.cleanupConfigureCommand = Commands.addCommand(null, {
                         group: "Plugins",
                         text: `Configure ${this.headers.name}`,
-                        keywords: ["setting", "settings", "configure", "config"]
+                        keywords: ["settings"]
                     }, () => {
                         if (this.openSettingsMenu.length === 0) return;
-                        this.openSettingsMenu.forEach(c => c())
+                        this.openSettingsMenu.forEach(c => c());
                     });
 
                     log(`Loaded plugin: ${this.headers.name}`);
@@ -249,6 +248,7 @@ export class Plugin extends BaseScript {
     onDelete() {
         this.cleanupDeleteCommand?.();
         this.cleanupToggleCommand?.();
+        this.cleanupConfigureCommand?.();
     }
 }
 
