@@ -39,7 +39,7 @@
 
 <svelte:window onkeydown={windowKeyDown} />
 
-<button class="ml-2" onclick={openSearch}>
+<button class="ml-2!" onclick={openSearch}>
     <Magnify />
 </button>
 <input type="text" class="ml-1 border-t-0 border-x-0 px-1 py-0 border-gray-500!"
