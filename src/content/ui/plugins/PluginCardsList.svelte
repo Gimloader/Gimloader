@@ -103,13 +103,13 @@
         <DropdownMenu.Root>
             <DropdownMenu.Trigger class="mx-1.5!">
                 <Button class="h-7">
-                    Install Plugin
+                    Create/Install Plugin
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => showEditor("plugin")}>Open Editor</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={importPlugin}>Upload</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={() => pluginUrlMenuOpen = true}>From URL</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => showEditor("plugin")}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={importPlugin}>Upload File</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => pluginUrlMenuOpen = true}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>

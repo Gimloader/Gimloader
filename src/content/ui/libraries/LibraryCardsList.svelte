@@ -61,7 +61,7 @@
             toast.success(`Installed ${parseScriptHeaders(code).name}`);
         } catch(e) {
             console.error(e);
-            toast.error(`Failed to install plugin from URL`); // Just in case the issue is with the headers.
+            toast.error(`Failed to install library from URL`); // Just in case the issue is with the headers.
         }
     }
 
@@ -74,7 +74,7 @@
 
 <Dialog.Root open={libUrlMenuOpen}>
     <Dialog.Content class="text-gray-600 max-w-110 min-h-35 flex items-center justify-center">
-        <input placeholder="Plugin URL" bind:value={libUrl} class="border-primary border-3 px-3 py-2 rounded-md" />
+        <input placeholder="Library URL" bind:value={libUrl} class="border-primary border-3 px-3 py-2 rounded-md" />
         <Button onclick={() => {install(libUrl); libUrlMenuOpen = false}}>Install</Button>
     </Dialog.Content>
 </Dialog.Root>
@@ -82,12 +82,12 @@
     <div class="flex items-center mb-[3px]">
         <DropdownMenu.Root>
             <DropdownMenu.Trigger class="mr-1.5!">
-                <Button class="h-7">Install Library</Button>
+                <Button class="h-7">Create/Install Library</Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => showEditor("library")}>Open Editor</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={importLib}>Upload</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={() => libUrlMenuOpen = true}>From URL</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => showEditor("library")}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={importLib}>Upload File</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => libUrlMenuOpen = true}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>
