@@ -61,6 +61,11 @@
         <Button class="h-7" onclick={() => officialPluginsOpen.set(false)}>
             &lt; Installed Plugins
         </Button>
+        {#if plugins.length > 0}
+            <Button class="h-7 ml-2!" onclick={() => plugins.forEach(plugin => install(plugin.title, plugin.downloadUrl))}>
+                Install All
+            </Button>
+        {/if}
         <Search bind:value={searchValue} />
     </div>
     <div class="overflow-y-auto grid gap-4 pb-1 grow view-grid">
