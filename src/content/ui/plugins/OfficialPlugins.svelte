@@ -62,7 +62,9 @@
             &lt; Installed Plugins
         </Button>
         {#if plugins.length > 0}
-            <Button class="h-7 ml-2!" onclick={() => plugins.forEach(plugin => install(plugin.title, plugin.downloadUrl))}>
+            <Button
+                class="h-7 ml-2!"
+                onclick={() => plugins.forEach(plugin => install(plugin.title, plugin.downloadUrl))}>
                 Install All
             </Button>
         {/if}
