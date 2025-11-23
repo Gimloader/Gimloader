@@ -53,17 +53,17 @@ export interface ColorSetting extends BaseSetting<string> {
     rgba?: boolean;
 }
 
-export interface CustomSetting extends BaseSetting<any> {
+export interface CustomSetting<T = any> extends BaseSetting<T> {
     type: "custom";
-    render: (container: HTMLElement, currentValue: any, update: (newValue: any) => void) => (() => void) | void;
+    render: (container: HTMLElement, currentValue: T, update: (newValue: T) => void) => (() => void) | void;
 }
 
-export interface CustomSection {
+export interface CustomSection<T = any> {
     type: "customsection";
     id: string;
-    default?: any;
-    onChange?: (value: any, remote: boolean) => void;
-    render: (container: HTMLElement, currentValue: any, onChange: (newValue: any) => void) => (() => void) | void;
+    default?: T;
+    onChange?: (value: T, remote: boolean) => void;
+    render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
 }
 
 export type PluginSetting = DropdownSetting | MultiselectSetting | NumberSetting | ToggleSetting | TextSetting | SliderSetting | RadioSetting | ColorSetting | CustomSetting | CustomSection;
