@@ -44,7 +44,10 @@ export interface DeviceOption {
     seasonTicketRequired?: boolean;
     subsequentMemoryCost?: number;
     supportedMapStyles?: string[];
-    wireConfig: { in: { connections: WireConnection[] }, out: { connections: WireConnection[] }};
+    wireConfig: {
+        in: { connections: WireConnection[] };
+        out: { connections: WireConnection[] };
+    };
 }
 
 interface DeviceData {

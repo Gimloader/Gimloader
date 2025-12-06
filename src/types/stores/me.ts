@@ -71,7 +71,7 @@ interface MeCustomAssets {
 }
 
 interface DeviceUIProps {
-    actions: { action: string, text: string }[];
+    actions: { action: string; text: string }[];
     character: string;
     darkenBackground: boolean;
     font: string;

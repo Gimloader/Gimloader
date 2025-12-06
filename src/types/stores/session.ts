@@ -21,7 +21,7 @@ interface Widget {
 }
 
 interface GameSession {
-    callToAction: { categories: CallToActionCategory[], items: CallToActionItem[] };
+    callToAction: { categories: CallToActionCategory[]; items: CallToActionItem[] };
     countdownEnd: number;
     phase: string;
     resultsEnd: number;
