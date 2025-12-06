@@ -7,6 +7,7 @@ import type MemorySystem from "./memorySystem";
 import type WorldOptions from "./worldOptions";
 import type Character from "./phaser/character";
 import type Scene from "./phaser/scene";
+import type { Vector } from '@dimforge/rapier2d-compat';
 
 // Single-interface stores properties are in this file, everything else is in its own file
 
@@ -24,7 +25,7 @@ interface Assignment {
 }
 
 interface EditingStore {
-    accessPoints: Map<any, any>;
+    accessPoints: Map<string, { name: string, position: Vector }>;
     gridSnap: number;
     showMemoryBarAtAllTimes: boolean;
 }

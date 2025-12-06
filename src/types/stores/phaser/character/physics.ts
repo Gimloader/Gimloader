@@ -3,7 +3,8 @@ import type Character from "../character";
 import type { Collider, ColliderDesc, RigidBody, RigidBodyDesc, Vector } from "@dimforge/rapier2d-compat";
 
 interface Jump {
-    actuallyJumped: boolean;
+    /** Optional in top-down, required in platformer */
+    actuallyJumped?: boolean;
     isJumping: boolean;
     jumpCounter: number;
     jumpTicks: number;

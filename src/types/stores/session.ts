@@ -1,9 +1,31 @@
+interface CallToActionCategory {
+    id: string;
+    name: string;
+    plural: string;
+}
+
+interface CallToActionItem {
+    id: string;
+    category: string;
+    name: string;
+    url: string;
+}
+
+interface Widget {
+    type: string;
+    id: string;
+    y: number;
+    placement: string;
+    statName: string;
+    statValue: number;
+}
+
 interface GameSession {
-    callToAction: any;
+    callToAction: { categories: CallToActionCategory[], items: CallToActionItem[] };
     countdownEnd: number;
     phase: string;
     resultsEnd: number;
-    widgets: { widgets: any[] };
+    widgets: { widgets: Widget[] };
 }
 
 export default interface Session {

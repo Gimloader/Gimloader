@@ -25,12 +25,26 @@ export interface CodeGridSchema {
     triggers: any[];
 }
 
+interface WireConnection {
+    id: string;
+    name: string;
+}
+
 export interface DeviceOption {
     codeGridSchema: CodeGridSchema;
-    defaultState: any;
+    defaultState: Record<string, any>;
+    description?: string;
     id: string;
+    initialMemoryCost?: number;
+    maxOnMap?: number;
+    maximumRoleLevel?: number;
+    minimumRoleLevel?: number;
+    name?: string;
     optionSchema: { options: any[] };
-    wireConfig: any;
+    seasonTicketRequired?: boolean;
+    subsequentMemoryCost?: number;
+    supportedMapStyles?: string[];
+    wireConfig: { in: { connections: WireConnection[] }, out: { connections: WireConnection[] }};
 }
 
 interface DeviceData {

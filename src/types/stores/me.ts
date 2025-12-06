@@ -70,8 +70,18 @@ interface MeCustomAssets {
     showDeleteConfirm: boolean;
 }
 
+interface DeviceUIProps {
+    actions: { action: string, text: string }[];
+    character: string;
+    darkenBackground: boolean;
+    font: string;
+    message: string;
+    send(key?: string, data?: unknown): void;
+    typewriter: boolean;
+}
+
 interface MeDeviceUI {
-    current: { deviceId: string; props: any };
+    current: { deviceId: string; props: DeviceUIProps };
     desiredOpenDeviceId?: string;
     serverVersionOpenDeviceId: string;
 }
@@ -81,14 +91,31 @@ interface CurrentlyEditedDevice {
     id: string;
 }
 
+interface SortingState {
+    depth: number;
+    deviceId: string;
+    deviceName: string;
+    globalDepth: number;
+    layer: string;
+    y: number;
+}
+
+interface VisualEditing {
+    active: boolean;
+    cursor: string;
+    id: string;
+    instruction: string;
+    keyboardHelpers: { trigger: string; action: string }[];
+}
+
 interface EditingDevice {
     currentlyEditedDevice: CurrentlyEditedDevice;
     currentlyEditedGridId: string;
     currentlySortedDeviceId: string;
     screen: string;
-    sortingState: any[];
+    sortingState: SortingState[];
     usingMultiselect: boolean;
-    visualEditing: any;
+    visualEditing: VisualEditing;
 }
 
 interface EditingPreferences {
@@ -244,7 +271,7 @@ export default interface Me {
     nonDismissMessage: NonDismissMessage;
     phase: boolean;
     preferences: { startGameWithMode: string };
-    properties: Map<string, any>;
+    properties: Map<string, number | boolean | string>;
     removing: Removing;
     roleLevel: number;
     spawnPosition: Vector;

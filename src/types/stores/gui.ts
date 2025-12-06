@@ -12,7 +12,7 @@ interface BottomInGamePrimaryContent {
 
 interface DamageIndicator {
     show: boolean;
-    /** `h` for red, `s` for blue, and any other string for yellow. */
+    /** An enumerated and likely bundled character that represents the type. */
     type: string;
 }
 
@@ -20,7 +20,7 @@ interface GuiSlot {
     id: string;
     position: string;
     text: string;
-    trackedItemId: any;
+    trackedItemId: string;
     showTrackedItemMaximumAmount: boolean;
     type: string;
     priority: number;
