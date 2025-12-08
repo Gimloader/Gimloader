@@ -36,7 +36,7 @@ interface KeyboardState {
 }
 
 interface Keyboard {
-    heldKeys: Set<string>;
+    heldKeys: Set<number>;
     scene: Scene;
     state: KeyboardState;
     createListeners(): void;
