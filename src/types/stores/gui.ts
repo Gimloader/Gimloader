@@ -20,7 +20,7 @@ interface GuiSlot {
     id: string;
     position: string;
     text: string;
-    trackedItemId: string;
+    trackedItemId: string | null;
     showTrackedItemMaximumAmount: boolean;
     type: string;
     priority: number;

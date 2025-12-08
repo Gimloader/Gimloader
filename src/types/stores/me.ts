@@ -70,18 +70,8 @@ interface MeCustomAssets {
     showDeleteConfirm: boolean;
 }
 
-interface DeviceUIProps {
-    actions: { action: string; text: string }[];
-    character: string;
-    darkenBackground: boolean;
-    font: string;
-    message: string;
-    send(key?: string, data?: unknown): void;
-    typewriter: boolean;
-}
-
 interface MeDeviceUI {
-    current: { deviceId: string; props: DeviceUIProps };
+    current: { deviceId: string; props: Record<string, any> };
     desiredOpenDeviceId?: string;
     serverVersionOpenDeviceId: string;
 }
@@ -271,7 +261,7 @@ export default interface Me {
     nonDismissMessage: NonDismissMessage;
     phase: boolean;
     preferences: { startGameWithMode: string };
-    properties: Map<string, number | boolean | string>;
+    properties: Map<string, any>;
     removing: Removing;
     roleLevel: number;
     spawnPosition: Vector;
