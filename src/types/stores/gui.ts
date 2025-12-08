@@ -12,7 +12,7 @@ interface BottomInGamePrimaryContent {
 
 interface DamageIndicator {
     show: boolean;
-    /** An enumerated and likely bundled character that represents the type. */
+    /** `h` for red, `s` for blue, and any other string for yellow. */
     type: string;
 }
 
