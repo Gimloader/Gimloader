@@ -16,6 +16,7 @@
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
+    import InformationOutline from "svelte-material-icons/InformationOutline.svelte";
     import Modals from "$content/core/modals.svelte";
 
     interface Props {
@@ -61,6 +62,14 @@
             title: `Dependencies for ${plugin.headers.name}`
         });
     }
+
+    function showChangelog() {
+        Modals.open("singleChangelog", {
+            name: plugin.headers.name,
+            changes: plugin.headers.changelog,
+            version: plugin.headers.version
+        });
+    }
 </script>
 
 <SvelteComponent
@@ -74,7 +83,14 @@
         <h2 class="overflow-ellipsis overflow-hidden whitespace-nowrap grow text-xl font-bold! mb-0!">
             {plugin?.headers.name}
             {#if plugin?.headers.version}
-                <span class="text-sm">v{plugin?.headers.version}</span>
+                <span class="text-sm">
+                    v{plugin?.headers.version}
+                    {#if plugin?.headers.changelog.length > 0}
+                        <button title="View changlog" onclick={showChangelog}>
+                            <InformationOutline size={10} color="blue" />
+                        </button>
+                    {/if}
+                </span>
             {/if}
         </h2>
     {/snippet}

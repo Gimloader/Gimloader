@@ -3,10 +3,13 @@
     import LibManager from "$core/scripts/libManager.svelte";
     import { checkUpdate } from "$core/net/checkUpdates";
     import Update from "svelte-material-icons/Update.svelte";
+    import InformationOutline from "svelte-material-icons/InformationOutline.svelte";
     import { version } from "../../../package.json";
     import { toast } from "svelte-sonner";
     import Port from "$shared/net/port.svelte";
     import { englishList } from "$shared/utils";
+    import Modals from "$content/core/modals.svelte";
+    import { changelog } from '$content/utils';
 
     async function checkAll() {
         if(!confirm("Do you want to try to update all plugins and all libraries?")) return;
@@ -17,6 +20,15 @@
     }
 </script>
 
+{#snippet update(name: string, changes: string[], version?: string)}
+    {name}{version && ` v${version}`}
+    {#if changes.length > 0}
+        <button title="View changelog" onclick={() => Modals.open("singleChangelog", { name, version, changes })}>
+            <InformationOutline size={20} color="blue" />
+        </button>
+    {/if}
+{/snippet}
+
 <div class="h-full overflow-y-auto">
     <div class="flex items-center">
         <button onclick={checkAll}>
@@ -26,7 +38,7 @@
     </div>
     <div class="font-bold text-xl mt-2">Gimloader</div>
     <div class="flex items-center">
-        Gimloader v{version}
+        {@render update("Gimloader", changelog, version)}
     </div>
     <div class="font-bold text-xl mt-2">Plugins</div>
     {#if PluginManager.scripts.length === 0}
@@ -39,7 +51,7 @@
                         <Update size={25} />
                     </button>
                 {/if}
-                {plugin.headers.name} {plugin.headers.version ? `v${plugin.headers.version}` : ""}
+                {@render update(plugin.headers.name, plugin.headers.changelog, plugin.headers.version)}
             </div>
         {/each}
     {/if}
@@ -54,7 +66,7 @@
                         <Update size={25} />
                     </button>
                 {/if}
-                {lib.headers.name} {lib.headers.version ? `v${lib.headers.version}` : ""}
+                {@render update(lib.headers.name, lib.headers.changelog, lib.headers.version)}
             </div>
         {/each}
     {/if}

@@ -2,6 +2,7 @@ import Port from "$shared/net/port.svelte";
 import { nop } from "$shared/utils";
 import type { ScriptType } from "$types/messages";
 import * as z from "zod";
+import rawChangelog from "../../../release-notes.txt";
 
 export function validate(fnName: string, args: IArguments, ...schema: [string, string | z.ZodType][]) {
     for(let i = 0; i < schema.length; i++) {
@@ -103,3 +104,5 @@ export const domLoaded = new Promise<void>((res) => {
 
     document.addEventListener("readystatechange", () => res(), { once: true });
 });
+
+export const changelog = rawChangelog.split("\n").filter(line => line);

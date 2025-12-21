@@ -19,6 +19,11 @@ interface ModalProps {
         type: string;
         title: string;
     };
+    singleChangelog: {
+        name: string;
+        version: string;
+        changes: string[];
+    }
 }
 
 export default new class Modals {

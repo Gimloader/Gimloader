@@ -5,12 +5,11 @@ import PluginManager from "$core/scripts/pluginManager.svelte";
 import Hotkeys from "$core/hotkeys/hotkeys.svelte";
 import UpdateNotifier from "$core/updateNotifier.svelte";
 import Port from "$shared/net/port.svelte";
-import { readUserFile } from "$content/utils";
+import { changelog, readUserFile } from "$content/utils";
 import { toast } from "svelte-sonner";
 import Rewriter from "./rewriter";
 import { version } from "../../../package.json";
 import Modals from "./modals.svelte";
-import changelog from "../../../release-notes.txt";
 import Commands from "./commands.svelte";
 
 export default class StateManager {
@@ -29,8 +28,7 @@ export default class StateManager {
         const updated = lastVersion && versionChanged;
 
         if(updated) {
-            const changes = changelog.split("\n").filter(line => line);
-            Modals.addUpdated("Gimloader", version, changes);
+            Modals.addUpdated("Gimloader", version, changelog);
         }
 
         Storage.init(state.pluginStorage, state.settings, state.pluginSettings);
