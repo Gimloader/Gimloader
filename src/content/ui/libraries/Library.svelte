@@ -44,14 +44,6 @@
             title: `Dependencies for ${library.headers.name}`
         });
     }
-
-    function showChangelog() {
-        Modals.open("singleChangelog", {
-            name: library.headers.name,
-            changes: library.headers.changelog,
-            version: library.headers.version
-        });
-    }
 </script>
 
 <SvelteComponent {dragDisabled} {startDrag} {dragAllowed} deprecated={library?.headers.deprecated !== null}>
@@ -61,11 +53,6 @@
             {#if library?.headers.version}
                 <span class="text-sm">
                     v{library?.headers.version}
-                    {#if library?.headers.changelog.length > 0}
-                        <button title="View changlog" onclick={showChangelog}>
-                            <InformationOutline size={10} color="blue" />
-                        </button>
-                    {/if}
                 </span>
             {/if}
         </h2>

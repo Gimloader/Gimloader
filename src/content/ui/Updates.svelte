@@ -21,12 +21,14 @@
 </script>
 
 {#snippet update(name: string, changes: string[], version?: string)}
-    {name}{version && ` v${version}`}
-    {#if changes.length > 0}
-        <button title="View changelog" onclick={() => Modals.open("singleChangelog", { name, version, changes })}>
-            <InformationOutline size={20} color="blue" />
-        </button>
-    {/if}
+    <div class="flex gap-1">
+        {name}{version && ` v${version}`}
+        {#if changes.length > 0}
+            <button title="View changelog" onclick={() => Modals.open("singleChangelog", { name, version, changes })}>
+                <InformationOutline size={20} color="var(--primary-500)" />
+            </button>
+        {/if}
+    </div>
 {/snippet}
 
 <div class="h-full overflow-y-auto">
