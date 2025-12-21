@@ -23,7 +23,7 @@ interface ModalProps {
         name: string;
         version: string;
         changes: string[];
-    }
+    };
 }
 
 export default new class Modals {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Dialog from '$shared/ui/dialog';
+    import * as Dialog from "$shared/ui/dialog";
 
     interface Props {
         name: string;
