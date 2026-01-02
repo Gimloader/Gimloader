@@ -1,6 +1,6 @@
 import type { Vector } from "@dimforge/rapier2d-compat";
 import type Scene from "../scene";
-import type { TickInput } from "../character/physics";
+import type { AngleInput, TickInput } from "../character/physics";
 import type { GameObjects, Input } from "phaser";
 
 interface AimCursor {
@@ -71,6 +71,7 @@ interface Mouse {
 
 export default interface InputManager {
     aimCursor: AimCursor;
+    angleSinceLastPhysicsFetch: AngleInput;
     currentInput: TickInput;
     cursor: Cursor;
     isListeningForInput: boolean;

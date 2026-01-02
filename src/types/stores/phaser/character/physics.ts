@@ -29,13 +29,10 @@ interface PhysicsState {
     velocity: Vector;
 }
 
-interface PhysicsInput {
-    _jumpKeyPressed: boolean;
+interface PhysicsInput extends TickInput {
     activeClassDeviceId: string;
-    angle: number;
     ignoredStaticBodies: Set<any>;
     ignoredTileBodies: Set<any>;
-    jump: boolean;
     projectileHitForcesQueue: Set<any>;
 }
 
@@ -55,8 +52,10 @@ interface ServerPosition {
     teleport: boolean;
 }
 
+export type AngleInput = number | null;
+
 export interface TickInput {
-    angle: number | null;
+    angle: AngleInput;
     jump: boolean;
     _jumpKeyPressed: boolean;
 }
