@@ -5,6 +5,8 @@ import type { Stores } from "$types/stores/stores";
 export default class GimkitInternals {
     static stores: Stores;
     static notification: any;
+    static message: any;
+    static modal: any;
     static platformerPhysics: any;
     static events = new EventEmitter2();
 
@@ -22,6 +24,20 @@ export default class GimkitInternals {
             this.notification = notifs;
 
             this.events.emit("notification", notifs);
+        });
+
+        // ant-design message
+        Rewriter.exposeObject("index", "message", "useMessage:", (msgs) => {
+            this.message = msgs;
+
+            this.events.emit("message", msgs);
+        });
+
+        // ant-design modal
+        Rewriter.exposeObjectBefore(true, "modal", ".useModal=", (modal) => {
+            this.modal = modal;
+
+            this.events.emit("modal", modal);
         });
 
         // window.platformerPhysics
