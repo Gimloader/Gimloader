@@ -1,12 +1,13 @@
 import EventEmitter2 from "eventemitter2";
 import Rewriter from "./rewriter";
 import type { Stores } from "$types/stores/stores";
+import type { message, Modal, notification } from "antd";
 
 export default class GimkitInternals {
     static stores: Stores;
-    static notification: any;
-    static message: any;
-    static modal: any;
+    static notification: typeof notification;
+    static message: typeof message;
+    static modal: typeof Modal;
     static platformerPhysics: any;
     static events = new EventEmitter2();
 
@@ -20,21 +21,21 @@ export default class GimkitInternals {
         });
 
         // ant-design notifications
-        Rewriter.exposeObject("index", "notification", "useNotification:", (notifs) => {
+        Rewriter.exposeObject("index", "notification", "useNotification:", (notifs: typeof notification) => {
             this.notification = notifs;
 
             this.events.emit("notification", notifs);
         });
 
         // ant-design message
-        Rewriter.exposeObject("index", "message", "useMessage:", (msgs) => {
+        Rewriter.exposeObject("index", "message", "useMessage:", (msgs: typeof message) => {
             this.message = msgs;
 
             this.events.emit("message", msgs);
         });
 
         // ant-design modal
-        Rewriter.exposeObjectBefore(true, "modal", ".useModal=", (modal) => {
+        Rewriter.exposeObjectBefore(true, "modal", ".useModal=", (modal: typeof Modal) => {
             this.modal = modal;
 
             this.events.emit("modal", modal);

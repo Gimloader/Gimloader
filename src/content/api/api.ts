@@ -82,30 +82,11 @@ class Api {
     }
 
     /**
-     * Gimkit's notification object, only available when joining or playing a game
-     *
-     * {@link https://ant.design/components/notification#api}
+     * @deprecated Use GL.UI.notification
+     * @hidden
      */
     static get notification() {
         return GimkitInternals.notification;
-    }
-
-    /**
-     * Gimkit's message object
-     *
-     * {@link https://ant.design/components/message#api}
-     */
-    static get message() {
-        return GimkitInternals.message;
-    }
-
-    /**
-     * Gimkit's modal object
-     *
-     * {@link https://ant.design/components/modal#modalmethod}
-     */
-    static get modal() {
-        return GimkitInternals.modal;
     }
 
     /**
@@ -261,30 +242,11 @@ class Api {
     }
 
     /**
-     * Gimkit's notification object, only available when joining or playing a game
-     *
-     * {@link https://ant.design/components/notification#api}
+     * @deprecated Use api.UI.notification
+     * @hidden
      */
     get notification() {
         return GimkitInternals.notification;
-    }
-
-    /**
-     * Gimkit's message object
-     *
-     * {@link https://ant.design/components/message#api}
-     */
-    get message() {
-        return GimkitInternals.message;
-    }
-
-    /**
-     * Gimkit's modal object
-     *
-     * {@link https://ant.design/components/modal#modalmethod}
-     */
-    get modal() {
-        return GimkitInternals.modal;
     }
 
     /** Run a callback when the script is disabled */
