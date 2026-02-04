@@ -2,7 +2,7 @@
     import type { RadioSetting } from "$types/settings";
     import * as RadioGroup from "$shared/ui/radio-group";
 
-    let { value = $bindable(), setting }: { value: string; setting: RadioSetting } = $props();
+    let { value = $bindable(), setting }: { value: string; setting: RadioSetting<string> } = $props();
 </script>
 
 <RadioGroup.Root bind:value class="gap-1">

@@ -3,7 +3,7 @@
     import * as Select from "$shared/ui/select";
     import Eraser from "svelte-material-icons/Eraser.svelte";
 
-    let { value = $bindable(), setting }: { value: string; setting: DropdownSetting } = $props();
+    let { value = $bindable(), setting }: { value: string; setting: DropdownSetting<string> } = $props();
 </script>
 
 <div class="flex items-center gap-2">

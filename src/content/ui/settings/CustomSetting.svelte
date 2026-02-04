@@ -2,7 +2,10 @@
     import type { CustomSection, CustomSetting } from "$types/settings";
     import { onMount } from "svelte";
 
-    let { value = $bindable(), setting }: { value: string[]; setting: CustomSetting | CustomSection } = $props();
+    let { value = $bindable(), setting }: {
+        value: string[];
+        setting: CustomSetting<string> | CustomSection<string>;
+    } = $props();
 
     let node: HTMLElement;
     onMount(() => {

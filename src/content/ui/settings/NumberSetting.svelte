@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { NumberSetting } from "$types/settings";
 
-    let { value = $bindable(), setting }: { value: number; setting: NumberSetting } = $props();
+    let { value = $bindable(), setting }: { value: number; setting: NumberSetting<string> } = $props();
     let inputValue = $state(value);
 
     function onchange() {

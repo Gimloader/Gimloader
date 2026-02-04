@@ -88,30 +88,26 @@ export type PluginSettingsDescription = (PluginSetting<any> | SettingGroup)[];
 export type SettingsChangeCallback = (value: any, remote: boolean) => void;
 
 // There's probably some black magic that can be done to get rid of this
-export type DescriptionToReturnType<T extends PluginSetting<any>> =
-    T extends DropdownSetting<any> ? string :
-    T extends MultiselectSetting<any> ? string[] :
-    T extends NumberSetting<any> ? number :
-    T extends ToggleSetting<any> ? boolean :
-    T extends TextSetting<any> ? string :
-    T extends SliderSetting<any> ? number :
-    T extends RadioSetting<any> ? string :
-    T extends ColorSetting<any> ? string :
-    T extends CustomSetting<any, infer V> ? V :
-    T extends CustomSection<any, infer V> ? V :
-    never;
+export type DescriptionToReturnType<T extends PluginSetting<any>> = T extends DropdownSetting<any> ? string
+    : T extends MultiselectSetting<any> ? string[]
+    : T extends NumberSetting<any> ? number
+    : T extends ToggleSetting<any> ? boolean
+    : T extends TextSetting<any> ? string
+    : T extends SliderSetting<any> ? number
+    : T extends RadioSetting<any> ? string
+    : T extends ColorSetting<any> ? string
+    : T extends CustomSetting<any, infer V> ? V
+    : T extends CustomSection<any, infer V> ? V
+    : never;
 
-type ExtractSettingObject<T> = 
-    T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> } :
-    T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> :
-    never;
+type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
+    : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
+    : never;
 
-type UnionToIntersection<U> = 
-    (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 
 export interface SettingsMethods {
-    create<const T extends PluginSettingsDescription>(description: T): 
-        UnionToIntersection<ExtractSettingObject<T[number]>>
+    create<const T extends PluginSettingsDescription>(description: T): UnionToIntersection<ExtractSettingObject<T[number]>>;
     listen(key: string, callback: SettingsChangeCallback, immediate?: boolean): () => void;
 }
 

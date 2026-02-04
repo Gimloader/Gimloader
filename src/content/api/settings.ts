@@ -170,14 +170,6 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
         }
     };
 
-    const the = methods.create([
-        {
-            id: "test",
-            type: "toggle",
-            title: "guh"
-        }
-    ])
-
     const settings = new Proxy(methods, {
         get(target, prop, receiver) {
             if(typeof prop !== "string") return null;
