@@ -1,5 +1,5 @@
 import type { Plugin } from "$core/scripts/plugin.svelte";
-import type { PluginSetting, PluginSettings, SettingGroup, SettingsMethods } from "$types/settings";
+import type { PluginSettings, PluginSettingsDescription, SettingsMethods } from "$types/settings";
 import { validate } from "$content/utils";
 import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
@@ -111,7 +111,7 @@ const DescriptionSchema = z.array(z.discriminatedUnion("type", [
     GroupSchema
 ]));
 
-function applyDefaults(id: string, settings: (PluginSetting | SettingGroup)[]) {
+function applyDefaults(id: string, settings: PluginSettingsDescription) {
     for(const setting of settings) {
         if(setting.type === "group") {
             applyDefaults(id, setting.settings);
@@ -134,7 +134,7 @@ function applyDefaults(id: string, settings: (PluginSetting | SettingGroup)[]) {
     }
 }
 
-function registerListeners(id: string, settings: (PluginSetting | SettingGroup)[]) {
+function registerListeners(id: string, settings: PluginSettingsDescription) {
     for(const setting of settings) {
         if(setting.type === "group") {
             registerListeners(id, setting.settings);
@@ -159,6 +159,8 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             Storage.pluginSettings[id] ??= {};
             applyDefaults(id, description);
             registerListeners(id, description);
+
+            return this;
         },
         listen(key, callback, immediate = false) {
             validate("settings.listen", arguments, ["key", "string"], ["callback", "function"], ["immediate?", "boolean"]);
@@ -167,6 +169,14 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             return Storage.onPluginSettingUpdate(id, key, callback);
         }
     };
+
+    const the = methods.create([
+        {
+            id: "test",
+            type: "toggle",
+            title: "guh"
+        }
+    ])
 
     const settings = new Proxy(methods, {
         get(target, prop, receiver) {
