@@ -1,6 +1,6 @@
 import EventEmitter2 from "eventemitter2";
 import Rewriter from "./rewriter";
-import type { Message, Modal, Notification } from '$types/antd';
+import type { Message, Modal, Notification } from "$types/antd";
 
 export default class GimkitInternals {
     static stores: Stores.Stores;
