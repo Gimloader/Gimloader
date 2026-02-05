@@ -112,7 +112,7 @@ interface Terrain {
     tiles: Map<string, Tile>;
 }
 
-export default interface World {
+export default interface GimkitWorld {
     customAssets: WorldCustomAssets;
     devices: WorldDevices;
     height: number;

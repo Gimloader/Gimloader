@@ -108,7 +108,7 @@ interface BodyStatic {
     cells: Set<string>;
 }
 
-interface Body {
+interface GimkitBody {
     collider?: Collider;
     colliderDesc: ColliderDesc;
     rigidBody?: RigidBody;
@@ -120,17 +120,17 @@ interface Body {
 
 interface BodyManager {
     activeBodies: ActiveBodies;
-    bodies: Map<string, Body>;
+    bodies: Map<string, GimkitBody>;
     cells: Map<string, Set<string>>;
     dynamicBodies: Set<string>;
     gridSize: number;
     staticBodies: Set<string>;
     staticSensorBodies: Set<string>;
     _idCount: number;
-    find(id: string): Body | undefined;
+    find(id: string): GimkitBody | undefined;
     findPotentialStaticBodiesWithinArea(area: Rect): Set<string>;
     generateId(): void;
-    insert(body: Body): string;
+    insert(body: GimkitBody): string;
     remove(id: string): void;
 }
 

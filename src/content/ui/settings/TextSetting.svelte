@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { TextSetting } from "$types/settings";
 
-    let { value = $bindable(), setting }: { value: string; setting: TextSetting } = $props();
+    let { value = $bindable(), setting }: { value: string; setting: TextSetting<string> } = $props();
 </script>
 
 <input

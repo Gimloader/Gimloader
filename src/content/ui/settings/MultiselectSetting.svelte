@@ -2,7 +2,7 @@
     import type { MultiselectSetting } from "$types/settings";
     import * as Select from "$shared/ui/select";
 
-    let { value = $bindable(), setting }: { value: string[]; setting: MultiselectSetting } = $props();
+    let { value = $bindable(), setting }: { value: string[]; setting: MultiselectSetting<string> } = $props();
 </script>
 
 <Select.Root type="multiple" bind:value>

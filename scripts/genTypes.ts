@@ -1,106 +1,67 @@
-import { $ } from 'bun';
+import { execSync } from 'child_process';
 import fs from 'fs';
 
-let eventEmitterTypes = fs.readFileSync("node_modules/eventemitter2/eventemitter2.d.ts").toString();
+const isDT = process.argv.includes("--dt");
 
-// get types for Gimloader
-await $`bun run buildTypes`;
-let types = fs.readFileSync("types.d.ts").toString();
-fs.rmSync("types.d.ts");
+let flags = "--project declaration.tsconfig.json --no-check --no-banner";
+if(!isDT) flags += " --external-inlines=eventemitter2 @dimforge/rapier2d-compat --";
 
-types = types.replaceAll(`import("$types/stores/stores").`, "")
-    .replaceAll(`import("types/stores/stores").`, "")
-    .replaceAll(`import("types/scripts").`, "")
-    .replaceAll("Input.Pointer", "import(\"phaser\").Input.Pointer")
-    .replaceAll("Types.Tweens", "import(\"phaser\").Types.Tweens")
-    .replaceAll(" Tweens.Tween", " import(\"phaser\").Tweens.Tween")
-    .replaceAll("GameObjects", "import(\"phaser\").GameObjects");
+// There's a warning when bundling eventemitter2, not much that can be done
+execSync(`bunx dts-bundle-generator -o tmp/api.d.ts ${flags} src/types/entry/api.ts`);
+execSync(`bunx dts-bundle-generator -o tmp/stores.d.ts ${flags} src/types/entry/stores.ts`);
 
-// Gather all the variable/type declarations
-const declarations = new Map<string, string>();
-const interfaceDeclaration = /    (?:export )?(?:default )?(interface ([A-Z]\S+) .*{[\S\s]+?\n    })/g;
-const classDeclaration = /    (?:export )?(?:default )?(class ([A-Z]\S+) .*{[\S\s]+?\n    })/g;
-const typeDeclaration = /    (?:export )?(?:default )?(type ([A-Z]\S+) [\S\s]+?;\n)(?=}|    \w)/g;
-
-let match: RegExpExecArray | null;
-const addDeclaration = () => {
-    if(!match) return;
-
-    const name = match[2]
-        .replace("<T>", "")
-        .replace("<T", "");
+const importRegex = /(?:^|\n)(import .+)\n/g;
+function readTypes(path: string) {
+    let types = fs.readFileSync(path, "utf-8");
     
-    if(declarations.has(name)) console.log("Duplicate declaration for", name);
-    declarations.set(name, match[1]);
+    // Remove export/declare keywords
+    types = types.replace(/(export )?declare /g, "");
+    types = types.replaceAll("export {};", "");
+
+    // Extract import statements
+    const matches = types.matchAll(importRegex);
+    const importText = Array.from(matches).map(m => m[1]).join("\n");
+
+    types = types.replace(importRegex, "").trim();
+
+    return { types, importText };
 }
 
-while(match = interfaceDeclaration.exec(types)) addDeclaration();
-while(match = classDeclaration.exec(types)) addDeclaration();
-while(match = typeDeclaration.exec(types)) addDeclaration();
+const apiTypes = readTypes("tmp/api.d.ts");
+const storeTypes = readTypes("tmp/stores.d.ts");
 
-const useRegexes = new Map<string, RegExp>();
+let output = "export {};\n\n"
 
-for(let name of declarations.keys()) {
-    const regex = new RegExp(`[ <]${name}[^a-zA-Z0-9_:]`, "g");
-    useRegexes.set(name, regex);
-}
+// Add imports
+output += apiTypes.importText + "\n" + storeTypes.importText + "\n\n";
 
-// Figure out which ones need to be used
-const added: string[] = [];
-const storesAdded: string[] = [];
+// Add the declaration
+output += "declare global {\nnamespace Gimloader {\n";
 
-const process = (name: string, inStores: boolean) => {
-    if(inStores) storesAdded.unshift(name);
-    else added.unshift(name);
-    
-    const code = declarations.get(name);
-    if(!code) return;
+// Add the stores type
+output += "namespace Stores {\n" + storeTypes.types + "\n}\n\n";
 
-    for(let [otherName, regex] of useRegexes) {
-        if(code.match(regex)) {
-            useRegexes.delete(otherName);
-            if(otherName === "Stores") process(otherName, true);
-            else process(otherName, inStores);
-        }
-    }
-}
+// Add the API types
+output += apiTypes.types + "\n";
 
-useRegexes.delete("Api");
-process("Api", false);
-
-// Create the final output
-let gimloaderTypes =
-`namespace Stores {
-interface Vector { x: number; y: number; }
-type BaseScene = import("phaser").Scene;\n\n`
-
-gimloaderTypes += storesAdded.map(name => declarations.get(name)).join("\n\n")
-    .replaceAll("\n    ", "\n")
-    .replaceAll("ReactElement", "import('react').ReactElement");
-
-gimloaderTypes += "\n}\n\n";
-
-gimloaderTypes += added.map(name => declarations.get(name)).join("\n\n")
-    .replaceAll("\n    ", "\n")
-    .replaceAll("ReactElement", "import('react').ReactElement");
-
-gimloaderTypes = gimloaderTypes.replaceAll(": Stores", ": Stores.Stores");
-gimloaderTypes += `
+// Add Plugins/Libraries interfaces
+output += `
 interface Plugins {
     [name: string]: any;
 }
 
 interface Libraries {
     [name: string]: any;
-}`;
+}
+}\n`;
 
-let declaration =
-`declare const api: Gimloader.Api;
-declare const GL: typeof Gimloader.Api;
+// Add the global declarations
+output += `const api: Gimloader.Api;
+const GL: typeof Gimloader.Api;
 /** @deprecated Use GL.stores */
-declare const stores: Gimloader.Stores.Stores;
+const stores: Gimloader.Stores.Stores;
 /** @deprecated No longer supported */
-declare const platformerPhysics: any;
+const platformerPhysics: any;
 
 interface Window {
     api: Gimloader.Api;
@@ -109,11 +70,9 @@ interface Window {
     stores: Gimloader.Stores.Stores;
     /** @deprecated No longer supported */
     platformerPhysics: any;
-}`;
+}
+}\n`;
 
-let ee2Types = eventEmitterTypes.replace("export declare class", "class")
-    .replace("\n\nexport default EventEmitter2;\n", "");
-
-let output = "declare namespace Gimloader {\n" + ee2Types + "\n\n" + gimloaderTypes + "\n}\n\n" + declaration;
-
-fs.writeFileSync("src/editor/gimloaderTypes.txt", output);
+// Write the output
+const path = isDT ? "tmp/gimloader.d.ts" : "src/editor/gimloaderTypes.txt";
+fs.writeFileSync(path, output);

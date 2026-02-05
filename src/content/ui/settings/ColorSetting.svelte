@@ -2,7 +2,7 @@
     import type { ColorSetting } from "$types/settings";
     import ColorPicker, { type RgbaColor } from "svelte-awesome-color-picker";
 
-    let { value = $bindable(), setting }: { value: string; setting: ColorSetting } = $props();
+    let { value = $bindable(), setting }: { value: string; setting: ColorSetting<string> } = $props();
 
     const initialValue = rgbaStringToObject(value);
     function rgbaStringToObject(rgba: string): RgbaColor {

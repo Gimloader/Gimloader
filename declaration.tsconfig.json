@@ -1,11 +1,9 @@
 {
     "compilerOptions": {
         "target": "ES2022",
-        "outFile": "types.d.ts",
         "declaration": true,
-        "module": "ES2022",
-        "moduleResolution": "Bundler",
-        "emitDeclarationOnly": true,
+        "module": "es2022",
+        "moduleResolution": "bundler",
         "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {

@@ -4,7 +4,7 @@ interface NonMainCharacterState {
     grounded: boolean;
 }
 
-export default interface Animation {
+export default interface CharacterAnimation {
     availableAnimations: string[];
     blinkTimer: number;
     bodyAnimationLocked: boolean;
