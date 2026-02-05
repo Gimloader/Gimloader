@@ -1,7 +1,7 @@
 import type Me from "./me";
 import type Session from "./session";
 import type GUI from "./gui";
-import type World from "./world";
+import type GimkitWorld from "./world";
 import type Characters from "./characters";
 import type MemorySystem from "./memorySystem";
 import type WorldOptions from "./worldOptions";
@@ -67,7 +67,7 @@ interface NetworkStore {
     syncingAfterReconnection: boolean;
 }
 
-interface Phaser {
+interface PhaserStore {
     mainCharacter: Character;
     mainCharacterTeleported: boolean;
     scene: Scene;
@@ -104,10 +104,10 @@ export interface Stores {
     me: Me;
     memorySystem: MemorySystem;
     network: NetworkStore;
-    phaser: Phaser;
+    phaser: PhaserStore;
     scene: SceneStore;
     session: Session;
     teams: Teams;
-    world: World;
+    world: GimkitWorld;
     worldOptions: WorldOptions;
 }
