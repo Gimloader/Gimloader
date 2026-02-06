@@ -1,6 +1,6 @@
 export {};
 
-import { ReactElement } from 'react';
+import * as React$1 from 'react';
 import { GameObjects, Input, Scene as BaseScene, Tweens, Types } from 'phaser';
 
 declare global {
@@ -6603,6 +6603,8 @@ export interface Stores {
 }
 }
 
+import { ReactElement } from 'react';
+
 export interface BaseSetting<K extends string, T> {
 	id: K;
 	default?: T;
@@ -7065,9 +7067,342 @@ export interface ModalOptions {
 	buttons?: ModalButton[];
 	onClosed?: () => void;
 }
+export type NoticeType = "info" | "success" | "error" | "warning" | "loading";
+export type MessageSemanticClassNames = {
+	root?: string;
+	icon?: string;
+	content?: string;
+};
+export type MessageSemanticStyles = {
+	root?: React$1.CSSProperties;
+	icon?: React$1.CSSProperties;
+	content?: React$1.CSSProperties;
+};
+export type ArgsClassNamesType = MessageSemanticClassNames;
+export type ArgsStylesType = MessageSemanticStyles;
+export interface MessageConfigOptions {
+	top?: string | number;
+	duration?: number;
+	prefixCls?: string;
+	getContainer?: () => HTMLElement;
+	transitionName?: string;
+	maxCount?: number;
+	rtl?: boolean;
+	pauseOnHover?: boolean;
+	classNames?: ArgsClassNamesType;
+	styles?: ArgsStylesType;
+}
+export interface MessageArgsProps {
+	content: React$1.ReactNode;
+	duration?: number;
+	type?: NoticeType;
+	onClose?: () => void;
+	icon?: React$1.ReactNode;
+	key?: string | number;
+	style?: React$1.CSSProperties;
+	className?: string;
+	classNames?: ArgsClassNamesType;
+	styles?: ArgsStylesType;
+	onClick?: (e: React$1.MouseEvent<HTMLDivElement>) => void;
+	pauseOnHover?: boolean;
+}
+export type MessageJointContent = React$1.ReactNode | MessageArgsProps;
+export interface MessageType extends PromiseLike<boolean> {
+	(): void;
+}
+export type MessageTypeOpen = (content: MessageJointContent, duration?: number | VoidFunction, onClose?: VoidFunction) => MessageType;
+export interface MessageInstance {
+	info: MessageTypeOpen;
+	success: MessageTypeOpen;
+	error: MessageTypeOpen;
+	warning: MessageTypeOpen;
+	loading: MessageTypeOpen;
+	open: (args: MessageArgsProps) => MessageType;
+	destroy: (key?: React$1.Key) => void;
+}
+export interface MessageBaseMethods {
+	open: (config: MessageArgsProps) => MessageType;
+	destroy: (key?: React$1.Key) => void;
+	config: (config: MessageConfigOptions) => void;
+	useMessage: () => MessageInstance;
+	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
+}
+export interface MessageMethods {
+	info: MessageTypeOpen;
+	success: MessageTypeOpen;
+	error: MessageTypeOpen;
+	warning: MessageTypeOpen;
+	loading: MessageTypeOpen;
+}
+const NotificationPlacements: readonly [
+	"top",
+	"topLeft",
+	"topRight",
+	"bottom",
+	"bottomLeft",
+	"bottomRight"
+];
+export type NotificationPlacement = (typeof NotificationPlacements)[number];
+export type NotificationIconType = "success" | "info" | "error" | "warning";
+export type NotificationSemanticClassNames = {
+	root?: string;
+	title?: string;
+	description?: string;
+	actions?: string;
+	icon?: string;
+};
+export type NotificationSemanticStyles = {
+	root?: React$1.CSSProperties;
+	title?: React$1.CSSProperties;
+	description?: React$1.CSSProperties;
+	actions?: React$1.CSSProperties;
+	icon?: React$1.CSSProperties;
+};
+export type NotificationClassNamesType = NotificationSemanticClassNames;
+export type NotificationStylesType = NotificationSemanticStyles;
+export interface NotificationDivProps extends React$1.HTMLProps<HTMLDivElement> {
+	"data-testid"?: string;
+}
+export interface NotificationArgsProps {
+	message?: React$1.ReactNode;
+	title?: React$1.ReactNode;
+	description?: React$1.ReactNode;
+	btn?: React$1.ReactNode;
+	actions?: React$1.ReactNode;
+	key?: React$1.Key;
+	onClose?: () => void;
+	duration?: number | false;
+	showProgress?: boolean;
+	pauseOnHover?: boolean;
+	icon?: React$1.ReactNode;
+	placement?: NotificationPlacement;
+	style?: React$1.CSSProperties;
+	className?: string;
+	classNames?: NotificationClassNamesType;
+	styles?: NotificationStylesType;
+	readonly type?: NotificationIconType;
+	onClick?: () => void;
+	closeIcon?: React$1.ReactNode;
+	closable?: boolean | {
+		onClose?: () => void;
+	};
+	props?: NotificationDivProps;
+	role?: "alert" | "status";
+}
+export type NotificationStaticFn = (args: NotificationArgsProps) => void;
+export interface NotificationInstance {
+	success: NotificationStaticFn;
+	error: NotificationStaticFn;
+	info: NotificationStaticFn;
+	warning: NotificationStaticFn;
+	open: NotificationStaticFn;
+	destroy: (key?: React$1.Key) => void;
+}
+export interface NotificationGlobalConfigProps {
+	top?: number;
+	bottom?: number;
+	duration?: number | false;
+	showProgress?: boolean;
+	pauseOnHover?: boolean;
+	prefixCls?: string;
+	getContainer?: () => HTMLElement | ShadowRoot;
+	placement?: NotificationPlacement;
+	closeIcon?: React$1.ReactNode;
+	closable?: boolean | {
+		onClose?: () => void;
+	};
+	rtl?: boolean;
+	maxCount?: number;
+	props?: NotificationDivProps;
+}
+export interface NotificationBaseMethods {
+	open: (config: NotificationArgsProps) => void;
+	destroy: (key?: React$1.Key) => void;
+	config: (config: NotificationGlobalConfigProps) => void;
+	useNotification: () => NotificationInstance;
+	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
+}
+export interface NotificationNoticeMethods {
+	success: NotificationStaticFn;
+	info: NotificationStaticFn;
+	warning: NotificationStaticFn;
+	error: NotificationStaticFn;
+}
+export type ModalSemanticClassNames = {
+	root?: string;
+	header?: string;
+	body?: string;
+	footer?: string;
+	container?: string;
+	title?: string;
+	wrapper?: string;
+	mask?: string;
+};
+export type ModalSemanticStyles = {
+	root?: React$1.CSSProperties;
+	header?: React$1.CSSProperties;
+	body?: React$1.CSSProperties;
+	footer?: React$1.CSSProperties;
+	container?: React$1.CSSProperties;
+	title?: React$1.CSSProperties;
+	wrapper?: React$1.CSSProperties;
+	mask?: React$1.CSSProperties;
+};
+export type ModalClassNamesType = ModalSemanticClassNames;
+export type ModalStylesType = ModalSemanticStyles;
+export type ModalMousePosition = {
+	x: number;
+	y: number;
+} | null;
+export type ModalGetContainerFunc = () => HTMLElement;
+export type ModalLegacyButtonType = "primary" | "dashed" | "default" | "text" | "link";
+export interface ModalCommonProps {
+	footer?: React$1.ReactNode | ((originNode: React$1.ReactNode, extra: {
+		OkBtn: React$1.FC;
+		CancelBtn: React$1.FC;
+	}) => React$1.ReactNode);
+	closable?: boolean | {
+		onClose?: () => void;
+		afterClose?: () => void;
+	};
+	classNames?: ModalClassNamesType;
+	styles?: ModalStylesType;
+}
+export interface ModalProps extends ModalCommonProps {
+	open?: boolean;
+	confirmLoading?: boolean;
+	title?: React$1.ReactNode;
+	onOk?: (e: React$1.MouseEvent<HTMLButtonElement>) => void;
+	onCancel?: (e: React$1.MouseEvent<HTMLButtonElement>) => void;
+	afterClose?: () => void;
+	afterOpenChange?: (open: boolean) => void;
+	centered?: boolean;
+	width?: string | number;
+	okText?: React$1.ReactNode;
+	okType?: ModalLegacyButtonType;
+	cancelText?: React$1.ReactNode;
+	maskClosable?: boolean;
+	forceRender?: boolean;
+	okButtonProps?: Record<string, any>;
+	cancelButtonProps?: Record<string, any>;
+	destroyOnClose?: boolean;
+	destroyOnHidden?: boolean;
+	style?: React$1.CSSProperties;
+	wrapClassName?: string;
+	maskTransitionName?: string;
+	transitionName?: string;
+	className?: string;
+	rootClassName?: string;
+	rootStyle?: React$1.CSSProperties;
+	getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
+	zIndex?: number;
+	bodyStyle?: React$1.CSSProperties;
+	maskStyle?: React$1.CSSProperties;
+	mask?: boolean | "static";
+	keyboard?: boolean;
+	wrapProps?: any;
+	prefixCls?: string;
+	closeIcon?: React$1.ReactNode;
+	modalRender?: (node: React$1.ReactNode) => React$1.ReactNode;
+	children?: React$1.ReactNode;
+	mousePosition?: ModalMousePosition;
+	loading?: boolean;
+	focusTriggerAfterClose?: boolean;
+	focusable?: {
+		focusTriggerAfterClose?: boolean;
+	};
+}
+export interface ModalFuncProps extends ModalCommonProps {
+	prefixCls?: string;
+	className?: string;
+	rootClassName?: string;
+	open?: boolean;
+	title?: React$1.ReactNode;
+	content?: React$1.ReactNode;
+	onOk?: (...args: any[]) => any;
+	onCancel?: (...args: any[]) => any;
+	afterClose?: () => void;
+	okButtonProps?: Record<string, any>;
+	cancelButtonProps?: Record<string, any>;
+	centered?: boolean;
+	width?: string | number;
+	okText?: React$1.ReactNode;
+	okType?: ModalLegacyButtonType;
+	cancelText?: React$1.ReactNode;
+	icon?: React$1.ReactNode;
+	mask?: boolean | "static";
+	maskClosable?: boolean;
+	zIndex?: number;
+	okCancel?: boolean;
+	style?: React$1.CSSProperties;
+	wrapClassName?: string;
+	maskStyle?: React$1.CSSProperties;
+	type?: "info" | "success" | "error" | "warn" | "warning" | "confirm";
+	keyboard?: boolean;
+	getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
+	transitionName?: string;
+	maskTransitionName?: string;
+	direction?: "ltr" | "rtl";
+	bodyStyle?: React$1.CSSProperties;
+	closeIcon?: React$1.ReactNode;
+	footer?: ModalProps["footer"];
+	modalRender?: (node: React$1.ReactNode) => React$1.ReactNode;
+	focusTriggerAfterClose?: boolean;
+	autoFocusButton?: null | "ok" | "cancel";
+	focusable?: {
+		focusTriggerAfterClose?: boolean;
+		autoFocusButton?: null | "ok" | "cancel";
+	};
+}
+export type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
+export interface ModalFuncReturn {
+	destroy: () => void;
+	update: (configUpdate: ModalConfigUpdate) => void;
+}
+export type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
+export interface ModalStaticFunctions {
+	info: ModalFunc;
+	success: ModalFunc;
+	error: ModalFunc;
+	warning: ModalFunc;
+	confirm: ModalFunc;
+	warn: ModalFunc;
+}
+export interface ModalBaseMethods {
+	useModal: () => [
+		api: any,
+		contextHolder: React$1.ReactNode
+	];
+	destroyAll: () => void;
+	config: (config: {
+		rootPrefixCls: string;
+	}) => void;
+	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
+}
+export type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
+export type AntdMessage = MessageMethods & MessageBaseMethods;
+export type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
 class BaseUIApi {
 	/** Shows a customizable modal to the user */
-	showModal(element: HTMLElement | ReactElement, options?: ModalOptions): void;
+	showModal(element: HTMLElement | React$1.ReactElement, options?: ModalOptions): void;
+	/**
+	 * Gimkit's notification object, only available when joining or playing a game
+	 *
+	 * {@link https://ant.design/components/notification#api}
+	 */
+	get notification(): AntdNotification;
+	/**
+	 * Gimkit's message object
+	 *
+	 * {@link https://ant.design/components/message#api}
+	 */
+	get message(): AntdMessage;
+	/**
+	 * Gimkit's modal object
+	 *
+	 * {@link https://ant.design/components/modal#modalmethod}
+	 */
+	get modal(): AntdModal;
 }
 class UIApi extends BaseUIApi {
 	/**
@@ -7366,11 +7701,10 @@ class Api {
 	/** A variety of Gimkit internal objects available in 2d gamemodes */
 	static get stores(): Stores.Stores;
 	/**
-	 * Gimkit's notification object, only available when joining or playing a game
-	 *
-	 * {@link https://ant.design/components/notification}
+	 * @deprecated Use GL.UI.notification
+	 * @hidden
 	 */
-	static get notification(): any;
+	static get notification(): AntdNotification;
 	/**
 	 * @deprecated No longer supported
 	 * @hidden
@@ -7439,11 +7773,10 @@ class Api {
 	/** A variety of gimkit internal objects available in 2d gamemodes */
 	get stores(): Stores.Stores;
 	/**
-	 * Gimkit's notification object, only available when joining or playing a game
-	 *
-	 * {@link https://ant.design/components/notification}
+	 * @deprecated Use api.UI.notification
+	 * @hidden
 	 */
-	get notification(): any;
+	get notification(): AntdNotification;
 	/** Run a callback when the script is disabled */
 	onStop: (callback: () => void) => void;
 	/**

@@ -348,8 +348,8 @@ interface ModalBaseMethods {
     _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
 }
 
-export type Notification = NotificationNoticeMethods & NotificationBaseMethods;
+export type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
 
-export type Message = MessageMethods & MessageBaseMethods;
+export type AntdMessage = MessageMethods & MessageBaseMethods;
 
-export type Modal = React.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
+export type AntdModal = React.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
