@@ -130,13 +130,15 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     onImport?(exports: any): void;
 
-    checkReloadNeeded() {
-        if(
-            this.headers.reloadRequired === "true"
+    get reloadNeeded() {
+        return this.headers.reloadRequired === "true"
             || this.headers.reloadRequired === ""
             || (this.headers.reloadRequired === "ingame" && gameState.inGame)
-            || (this.headers.reloadRequired === "notingame" && !gameState.inGame)
-        ) {
+            || (this.headers.reloadRequired === "notingame" && !gameState.inGame);
+    }
+
+    checkReloadNeeded() {
+        if(this.reloadNeeded) {
             Modals.addReloadNeeded(this.headers.name);
         }
     }

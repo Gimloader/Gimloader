@@ -13,6 +13,7 @@
     import BookSettings from "svelte-material-icons/BookSettings.svelte";
     import Update from "svelte-material-icons/Update.svelte";
     import Cog from "svelte-material-icons/Cog.svelte";
+    import Reload from "svelte-material-icons/Reload.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
@@ -81,7 +82,13 @@
         </h2>
     {/snippet}
     {#snippet toggle()}
-        <Switch bind:checked={() => enabled, (enabled) => setEnabled(enabled)} />
+        <Switch bind:checked={() => enabled, (enabled) => setEnabled(enabled)}>
+            {#if plugin?.reloadNeeded}
+                <div class="relative -mr-0.5 flex h-full items-center justify-center">
+                    <Reload size={15} />
+                </div>
+            {/if}
+        </Switch>
     {/snippet}
     {#snippet author()}
         By {plugin?.headers.author}
