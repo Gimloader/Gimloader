@@ -84,8 +84,8 @@
     {#snippet toggle()}
         <Switch bind:checked={() => enabled, (enabled) => setEnabled(enabled)}>
             {#if plugin?.reloadNeeded}
-                <div class="flex h-full items-center justify-center">
-                    <Reload title="This plugin requires a reload" size={20} />
+                <div class="relative -mr-0.5 flex h-full items-center justify-center">
+                    <Reload size={15} />
                 </div>
             {/if}
         </Switch>
