@@ -1,15 +1,18 @@
 import EventEmitter2 from "eventemitter2";
 import Rewriter from "./rewriter";
+import type { AntdMessage, AntdModal, AntdNotification } from "$types/antd";
 
 export default class GimkitInternals {
     static stores: Stores.Stores;
-    static notification: any;
+    static notification: AntdNotification;
+    static message: AntdMessage;
+    static modal: AntdModal;
     static platformerPhysics: any;
     static events = new EventEmitter2();
 
     static init() {
         // window.stores
-        Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores) => {
+        Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores: Stores.Stores) => {
             this.stores = stores;
             window.stores = stores;
 
@@ -17,10 +20,24 @@ export default class GimkitInternals {
         });
 
         // ant-design notifications
-        Rewriter.exposeObject("index", "notification", "useNotification:", (notifs) => {
+        Rewriter.exposeObject("index", "notification", "useNotification:", (notifs: AntdNotification) => {
             this.notification = notifs;
 
             this.events.emit("notification", notifs);
+        });
+
+        // ant-design message
+        Rewriter.exposeObject("index", "message", "useMessage:", (msgs: AntdMessage) => {
+            this.message = msgs;
+
+            this.events.emit("message", msgs);
+        });
+
+        // ant-design modal
+        Rewriter.exposeObjectBefore(true, "modal", ".useModal=", (modal: AntdModal) => {
+            this.modal = modal;
+
+            this.events.emit("modal", modal);
         });
 
         // window.platformerPhysics

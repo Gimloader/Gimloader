@@ -82,9 +82,8 @@ class Api {
     }
 
     /**
-     * Gimkit's notification object, only available when joining or playing a game
-     *
-     * {@link https://ant.design/components/notification}
+     * @deprecated Use GL.UI.notification
+     * @hidden
      */
     static get notification() {
         return GimkitInternals.notification;
@@ -243,9 +242,8 @@ class Api {
     }
 
     /**
-     * Gimkit's notification object, only available when joining or playing a game
-     *
-     * {@link https://ant.design/components/notification}
+     * @deprecated Use api.UI.notification
+     * @hidden
      */
     get notification() {
         return GimkitInternals.notification;

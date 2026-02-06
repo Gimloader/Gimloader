@@ -4,6 +4,7 @@ import UI from "$core/ui/ui";
 import { validate } from "$content/utils";
 import type { ReactElement } from "react";
 import * as z from "zod";
+import GimkitInternals from "$content/core/internals";
 
 const ButtonSchema = z.object({
     text: z.string(),
@@ -27,6 +28,33 @@ class BaseUIApi {
         validate("UI.showModal", arguments, ["element", "any"], ["options?", ModalOptionsSchema]);
 
         showModal(element, options);
+    }
+
+    /**
+     * Gimkit's notification object, only available when joining or playing a game
+     *
+     * {@link https://ant.design/components/notification#api}
+     */
+    get notification() {
+        return GimkitInternals.notification;
+    }
+
+    /**
+     * Gimkit's message object
+     *
+     * {@link https://ant.design/components/message#api}
+     */
+    get message() {
+        return GimkitInternals.message;
+    }
+
+    /**
+     * Gimkit's modal object
+     *
+     * {@link https://ant.design/components/modal#modalmethod}
+     */
+    get modal() {
+        return GimkitInternals.modal;
     }
 }
 
