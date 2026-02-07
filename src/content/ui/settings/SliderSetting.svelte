@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { SliderSetting } from "$types/settings";
 
-    let { value = $bindable(), setting }: { value: number; setting: SliderSetting } = $props();
+    let { value = $bindable(), setting }: { value: number; setting: SliderSetting<string> } = $props();
     const ticks = $derived(setting.ticks ?? [setting.min, setting.max]);
     let thumbLeft = $derived((value - setting.min) / (setting.max - setting.min) * 100);
 

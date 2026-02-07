@@ -1,11 +1,11 @@
-interface Permissions {
+interface CharacterPermissions {
     adding: boolean;
     editing: boolean;
     manageCodeGrids: boolean;
     removing: boolean;
 }
 
-interface CharacterData {
+interface CharacterInfo {
     allowWeaponFire: boolean;
     existsBeforeReconnect: boolean;
     fragility: number;
@@ -14,12 +14,12 @@ interface CharacterData {
     isActive: boolean;
     lastPlayersTeamId: string;
     name: string;
-    permissions: Permissions;
+    permissions: CharacterPermissions;
     score: number;
     teamId: string;
     type: string;
 }
 
 export default interface Characters {
-    characters: Map<string, CharacterData>;
+    characters: Map<string, CharacterInfo>;
 }

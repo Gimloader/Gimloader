@@ -1,6 +1,6 @@
 import type Scene from "./scene";
 import type AimingAndLookingAround from "./character/aimingAndLookingAround";
-import type Animation from "./character/animation";
+import type CharacterAnimation from "./character/animation";
 import type Movement from "./character/movement";
 import type Physics from "./character/physics";
 import type { Vector } from "@dimforge/rapier2d-compat";
@@ -224,7 +224,7 @@ interface Network {
     updateAimAngle(angle: number): void;
 }
 
-interface Position {
+interface CharacterPosition {
     character: Character;
     update(dt: number): void;
 }
@@ -322,7 +322,7 @@ interface VFX {
 export default interface Character {
     aimingAndLookingAround: AimingAndLookingAround;
     alpha: Alpha;
-    animation: Animation;
+    animation: CharacterAnimation;
     body: Vector;
     characterTrail: CharacterTrail;
     culling: Culling;
@@ -342,7 +342,7 @@ export default interface Character {
     nametag: Nametag;
     network: Network;
     physics: Physics;
-    position: Position;
+    position: CharacterPosition;
     prevBody: Vector;
     scale: Scale;
     scene: Scene;
