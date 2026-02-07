@@ -2,7 +2,7 @@ import type { ModalOptions } from "$core/ui/modal";
 import showModal from "$core/ui/modal";
 import UI from "$core/ui/ui";
 import { validate } from "$content/utils";
-import type { ReactElement } from "react";
+import type * as React from "react";
 import * as z from "zod";
 import GimkitInternals from "$content/core/internals";
 
@@ -24,7 +24,7 @@ const ModalOptionsSchema = z.object({
 
 class BaseUIApi {
     /** Shows a customizable modal to the user */
-    showModal(element: HTMLElement | ReactElement, options: ModalOptions = {}) {
+    showModal(element: HTMLElement | React.ReactElement, options: ModalOptions = {}) {
         validate("UI.showModal", arguments, ["element", "any"], ["options?", ModalOptionsSchema]);
 
         showModal(element, options);

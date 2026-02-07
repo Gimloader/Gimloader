@@ -6611,8 +6611,6 @@ export interface Stores {
 }
 }
 
-import { ReactElement } from 'react';
-
 export interface BaseSetting<K extends string, T> {
 	id: K;
 	default?: T;
@@ -6678,21 +6676,24 @@ export interface CustomSection<K extends string, T = any> extends BaseSetting<K,
 	type: "customsection";
 	render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
 }
-export type PluginSetting<K extends string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
+export type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
 export interface SettingGroup {
 	type: "group";
 	title: string;
 	settings: PluginSetting<any>[];
 }
 export type PluginSettingsDescription = (PluginSetting<any> | SettingGroup)[];
-export type SettingsChangeCallback = (value: any, remote: boolean) => void;
+export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
 export type DescriptionToReturnType<T extends PluginSetting<any>> = T extends DropdownSetting<any> ? string : T extends MultiselectSetting<any> ? string[] : T extends NumberSetting<any> ? number : T extends ToggleSetting<any> ? boolean : T extends TextSetting<any> ? string : T extends SliderSetting<any> ? number : T extends RadioSetting<any> ? string : T extends ColorSetting<any> ? string : T extends CustomSetting<any, infer V> ? V : T extends CustomSection<any, infer V> ? V : never;
 export type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? {
 	[K in Id]: DescriptionToReturnType<T>;
 } : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> : never;
 export type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+export type SettingsObject<T> = T & {
+	listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;
+};
 export interface SettingsMethods {
-	create<const T extends PluginSettingsDescription>(description: T): UnionToIntersection<ExtractSettingObject<T[number]>>;
+	create<const T extends PluginSettingsDescription>(description: T): SettingsObject<UnionToIntersection<ExtractSettingObject<T[number]>>>;
 	listen(key: string, callback: SettingsChangeCallback, immediate?: boolean): () => void;
 }
 export type PluginSettings = SettingsMethods & Record<string, any>;

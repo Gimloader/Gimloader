@@ -10,7 +10,7 @@ if(!isDT) flags += " --external-inlines=eventemitter2 @dimforge/rapier2d-compat 
 execSync(`bunx dts-bundle-generator -o tmp/api.d.ts ${flags} src/types/entry/api.ts`);
 execSync(`bunx dts-bundle-generator -o tmp/stores.d.ts ${flags} src/types/entry/stores.ts`);
 
-const importRegex = /(?:^|\n)(import .+)\n/g;
+const importRegex = /(?:^|\n)(import .+)(?=\n)/g;
 function readTypes(path: string) {
     let types = fs.readFileSync(path, "utf-8");
     

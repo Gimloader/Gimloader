@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type * as React from "react";
 import { focusTrapEnabled } from "$content/stores";
 import GenericModal from "$content/ui/modals/Generic.svelte";
 import { mount, unmount } from "svelte";
@@ -22,7 +22,7 @@ export interface ModalOptions {
 
 const openModals = new Map<string, () => void>();
 
-export default function showModal(content: HTMLElement | ReactElement, options: ModalOptions = {}) {
+export default function showModal(content: HTMLElement | React.ReactElement, options: ModalOptions = {}) {
     focusTrapEnabled.set(false);
 
     if(options.id) {

@@ -66,7 +66,7 @@ export interface CustomSection<K extends string, T = any> extends BaseSetting<K,
     render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
 }
 
-export type PluginSetting<K extends string> =
+export type PluginSetting<K extends string = string> =
     | DropdownSetting<K>
     | MultiselectSetting<K>
     | NumberSetting<K>
@@ -85,7 +85,7 @@ export interface SettingGroup {
 }
 
 export type PluginSettingsDescription = (PluginSetting<any> | SettingGroup)[];
-export type SettingsChangeCallback = (value: any, remote: boolean) => void;
+export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
 
 // There's probably some black magic that can be done to get rid of this
 export type DescriptionToReturnType<T extends PluginSetting<any>> = T extends DropdownSetting<any> ? string
@@ -106,8 +106,12 @@ type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? { [K in Id]: 
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 
+type SettingsObject<T> = T & {
+    listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;
+};
+
 export interface SettingsMethods {
-    create<const T extends PluginSettingsDescription>(description: T): UnionToIntersection<ExtractSettingObject<T[number]>>;
+    create<const T extends PluginSettingsDescription>(description: T): SettingsObject<UnionToIntersection<ExtractSettingObject<T[number]>>>;
     listen(key: string, callback: SettingsChangeCallback, immediate?: boolean): () => void;
 }
 
