@@ -5591,8 +5591,16 @@ export interface PhysicsInput extends TickInput {
 	ignoredTileBodies: Set<any>;
 	projectileHitForcesQueue: Set<any>;
 }
+export interface CharacterBody {
+	id: string;
+	ignoredStaticBodies: Set<any>;
+	ignoredTileBodies: Set<any>;
+	controller: KinematicCharacterController;
+	aroundSensor: Collider;
+	feetSensor: Collider;
+}
 export interface Bodies {
-	character: Character;
+	character: CharacterBody;
 	collider: Collider;
 	colliderDesc: ColliderDesc;
 	rigidBody: RigidBody;

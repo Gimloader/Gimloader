@@ -1,6 +1,6 @@
 import type Scene from "../scene";
 import type Character from "../character";
-import type { Collider, ColliderDesc, RigidBody, RigidBodyDesc, Vector } from "@dimforge/rapier2d-compat";
+import type { Collider, ColliderDesc, KinematicCharacterController, RigidBody, RigidBodyDesc, Vector } from "@dimforge/rapier2d-compat";
 
 interface Jump {
     /** Optional in top-down, required in platformer */
@@ -36,8 +36,17 @@ interface PhysicsInput extends TickInput {
     projectileHitForcesQueue: Set<any>;
 }
 
+interface CharacterBody {
+    id: string;
+    ignoredStaticBodies: Set<any>;
+    ignoredTileBodies: Set<any>;
+    controller: KinematicCharacterController;
+    aroundSensor: Collider;
+    feetSensor: Collider;
+}
+
 interface Bodies {
-    character: Character;
+    character: CharacterBody;
     collider: Collider;
     colliderDesc: ColliderDesc;
     rigidBody: RigidBody;
