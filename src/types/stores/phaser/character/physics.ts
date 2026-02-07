@@ -42,6 +42,7 @@ interface CharacterBody {
     ignoredTileBodies: Set<any>;
     controller: KinematicCharacterController;
     aroundSensor: Collider;
+    feetSensor: Collider;
 }
 
 interface Bodies {
