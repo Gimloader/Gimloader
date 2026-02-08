@@ -1,8 +1,1 @@
-Added api.requestReload method for scripts
-Fixed id property being accessible on api namespaces
-Fixed poller not showing toasts
-Fixed hotkeys tab overflowing rather than scrolling
-Added gimloader button to signed out screen, and in Draw That
-Added indicator to show that a plugin requires a reload
-Improved stores types
-Settings.create now returns a typed object of the settings
+Fixed poller setting not updating when loading a config

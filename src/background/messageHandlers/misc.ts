@@ -5,6 +5,7 @@ import type { OnceMessages, OnceResponses, ScriptType } from "$types/messages";
 import type { State } from "$types/state";
 import Scripts from "$bg/scripts";
 import { parseScriptHeaders } from "$shared/parseHeader";
+import Poller from "$bg/net/poller";
 
 export default class MiscHandler {
     static init() {
@@ -29,6 +30,7 @@ export default class MiscHandler {
         state.cacheInvalid = true;
 
         Server.send("setState", state);
+        Poller.setEnabled(state.settings.pollerEnabled);
 
         saveDebounced("plugins");
         saveDebounced("pluginStorage");
