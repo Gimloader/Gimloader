@@ -1110,7 +1110,7 @@ class RawVector {
 	 */
 	y: number;
 }
-export interface Vector {
+interface Vector {
 	x: number;
 	y: number;
 }
@@ -1208,7 +1208,7 @@ enum SolverFlags {
 	EMPTY = 0,
 	COMPUTE_IMPULSE = 1
 }
-export interface PhysicsHooks {
+interface PhysicsHooks {
 	/**
 	 * Function that determines if contacts computation should happen between two colliders, and how the
 	 * constraints solver should behave for these contacts.
@@ -4634,13 +4634,13 @@ class CCDSolver {
 	free(): void;
 	constructor(raw?: RawCCDSolver);
 }
-export interface Shapes {
+interface Shapes {
 	circles: number[][];
 	lines: number[][];
 	paths: number[][];
 	rects: number[][];
 }
-export interface CustomAsset {
+interface CustomAsset {
 	data: {
 		shapes: Shapes;
 	};
@@ -4649,21 +4649,21 @@ export interface CustomAsset {
 	name: string;
 	optionId: string;
 }
-export interface WorldCustomAssets {
+interface WorldCustomAssets {
 	customAssets: Map<string, CustomAsset>;
 	isUIOpen: boolean;
 	updateCounter: number;
 }
-export interface CodeGridSchema {
+interface CodeGridSchema {
 	allowChannelGrids: boolean;
 	customBlocks: any[];
 	triggers: any[];
 }
-export interface WireConnection {
+interface WireConnection {
 	id: string;
 	name: string;
 }
-export interface DeviceOption {
+interface DeviceOption {
 	codeGridSchema: CodeGridSchema;
 	defaultState: Record<string, any>;
 	description?: string;
@@ -4688,7 +4688,7 @@ export interface DeviceOption {
 		};
 	};
 }
-export interface DeviceData {
+interface DeviceData {
 	depth: number;
 	deviceOption: DeviceOption;
 	existsBeforeReconnect: boolean;
@@ -4702,7 +4702,7 @@ export interface DeviceData {
 	x: number;
 	y: number;
 }
-export interface CodeGridItem {
+interface CodeGridItem {
 	createdAt: number;
 	existsBeforeReconnect: boolean;
 	json: string;
@@ -4711,38 +4711,38 @@ export interface CodeGridItem {
 	triggerValue?: string;
 	visitors: string[];
 }
-export interface CodeGrid {
+interface CodeGrid {
 	existsBeforeReconnect: boolean;
 	items: Map<string, CodeGridItem>;
 }
-export interface DeviceState {
+interface DeviceState {
 	deviceId: string;
 	properties: Map<string, any>;
 }
-export interface WorldDevices {
+interface WorldDevices {
 	codeGrids: Map<string, CodeGrid>;
 	devices: Map<string, DeviceData>;
 	states: Map<string, DeviceState>;
 }
-export interface Tile {
+interface Tile {
 	collides: boolean;
 	depth: number;
 	terrain: string;
 	x: number;
 	y: number;
 }
-export interface QueuedTile {
+interface QueuedTile {
 	timestamp: number;
 	removedBodyIds: string[];
 }
-export interface Terrain {
+interface Terrain {
 	currentTerrainUpdateId: number;
 	modifiedHealth: Map<string, number>;
 	queuedTiles: Map<number, QueuedTile>;
 	teamColorTiles: Map<string, string>;
 	tiles: Map<string, Tile>;
 }
-export interface GimkitWorld {
+interface GimkitWorld {
 	customAssets: WorldCustomAssets;
 	devices: WorldDevices;
 	height: number;
@@ -4753,36 +4753,36 @@ export interface GimkitWorld {
 		wires: Map<any, any>;
 	};
 }
-export interface ExistingDevice {
+interface ExistingDevice {
 	action: string;
 	id: string;
 	shiftX: number;
 	shiftY: number;
 	use: boolean;
 }
-export interface AddingDevices {
+interface AddingDevices {
 	currentlySelectedProp: string;
 	existingDevice: ExistingDevice;
 	selectedDeviceType: string;
 }
-export interface AddingTerrain {
+interface AddingTerrain {
 	brushSize: number;
 	buildTerrainAsWall: boolean;
 	currentlySelectedTerrain: string;
 	currentlySelectedTerrainDepth: number;
 }
-export interface AddingWires {
+interface AddingWires {
 	hoveringOverSupportedDevice: boolean;
 	pointUnderMouseDeviceId?: string;
 	startDeviceSelected: boolean;
 }
-export interface Adding {
+interface Adding {
 	devices: AddingDevices;
 	terrain: AddingTerrain;
 	wires: AddingWires;
 	mode: string;
 }
-export interface CinematicMode {
+interface CinematicMode {
 	charactersVisible: boolean;
 	enabled: boolean;
 	followingMainCharacter: boolean;
@@ -4790,19 +4790,19 @@ export interface CinematicMode {
 	mainCharacterVisible: boolean;
 	nameTagsVisible: boolean;
 }
-export interface ClassDesigner {
+interface ClassDesigner {
 	activeClassDeviceId: string;
 	lastActivatedClassDeviceId: string;
 	lastClassDeviceActivationId: number;
 }
-export interface Context {
+interface Context {
 	cursorIsOverCharacterId: string;
 	__devicesUnderCursor: string[];
 	__wiresUnderCursor: Set<string>;
 	cursorIsOverDevice: boolean;
 	cursorIsOverWire: boolean;
 }
-export interface MeCustomAssets {
+interface MeCustomAssets {
 	currentData?: {
 		shapes: Shapes;
 	};
@@ -4815,7 +4815,7 @@ export interface MeCustomAssets {
 	pendingDeleteId: string | null;
 	showDeleteConfirm: boolean;
 }
-export interface MeDeviceUI {
+interface MeDeviceUI {
 	current: {
 		deviceId: string;
 		props: Record<string, any>;
@@ -4823,11 +4823,11 @@ export interface MeDeviceUI {
 	desiredOpenDeviceId?: string;
 	serverVersionOpenDeviceId: string;
 }
-export interface CurrentlyEditedDevice {
+interface CurrentlyEditedDevice {
 	deviceOptionId: string;
 	id: string;
 }
-export interface SortingState {
+interface SortingState {
 	depth: number;
 	deviceId: string;
 	deviceName: string;
@@ -4835,7 +4835,7 @@ export interface SortingState {
 	layer: string;
 	y: number;
 }
-export interface VisualEditing {
+interface VisualEditing {
 	active: boolean;
 	cursor: string;
 	id: string;
@@ -4845,7 +4845,7 @@ export interface VisualEditing {
 		action: string;
 	}[];
 }
-export interface EditingDevice {
+interface EditingDevice {
 	currentlyEditedDevice: CurrentlyEditedDevice;
 	currentlyEditedGridId: string;
 	currentlySortedDeviceId: string;
@@ -4854,21 +4854,21 @@ export interface EditingDevice {
 	usingMultiselect: boolean;
 	visualEditing: VisualEditing;
 }
-export interface EditingPreferences {
+interface EditingPreferences {
 	cameraZoom: number;
 	movementSpeed: number | null;
 	phase: boolean | null;
 	showGrid: boolean | null;
 	topDownControlsActive: boolean;
 }
-export interface Editing {
+interface Editing {
 	device: EditingDevice;
 	preferences: EditingPreferences;
 	wire: {
 		currentlyEditedWireId: string;
 	};
 }
-export interface Health {
+interface Health {
 	fragility: number;
 	health: number;
 	lives: number;
@@ -4876,18 +4876,18 @@ export interface Health {
 	maxShield: number;
 	shield: number;
 }
-export interface InteractiveInfo {
+interface InteractiveInfo {
 	action: string;
 	allowedToInteract: boolean;
 	message: string;
 	topHeader?: string;
 	topHeaderColor: string;
 }
-export interface Interactives {
+interface Interactives {
 	deviceId: string;
 	info: InteractiveInfo;
 }
-export interface InteractiveSlot {
+interface InteractiveSlot {
 	clipSize: number;
 	count: number;
 	currentClip: number;
@@ -4897,15 +4897,15 @@ export interface InteractiveSlot {
 	waitingEndTime: number;
 	waitingStartTime: number;
 }
-export interface AlertFeed {
+interface AlertFeed {
 	amount: number;
 	itemId: string;
 }
-export interface InventorySlot {
+interface InventorySlot {
 	amount: number;
 	existsBeforeReconnect: boolean;
 }
-export interface Inventory {
+interface Inventory {
 	activeInteractiveSlot: number;
 	alertFeed?: AlertFeed;
 	alertsFeed: AlertFeed[];
@@ -4920,27 +4920,27 @@ export interface Inventory {
 	maxSlots: number;
 	slots: Map<string, InventorySlot>;
 }
-export interface MobileControls {
+interface MobileControls {
 	left: boolean;
 	right: boolean;
 	up: boolean;
 }
-export interface Mood {
+interface Mood {
 	activeDeviceId: string;
 	vignetteActive: boolean;
 	vignetteStrength: number;
 }
-export interface NonDismissMessage {
+interface NonDismissMessage {
 	description: string;
 	title: string;
 }
-export interface TileToRemove {
+interface TileToRemove {
 	depth: number;
 	id: string;
 	x: number;
 	y: number;
 }
-export interface Removing {
+interface Removing {
 	deviceIdToRemove?: string;
 	removingMode: string;
 	removingTilesEraserSize: number;
@@ -4949,27 +4949,27 @@ export interface Removing {
 	tilesToRemove: TileToRemove[];
 	wireIdToRemove?: string;
 }
-export interface MeSpectating {
+interface MeSpectating {
 	id: string;
 	name: string;
 	shuffle: boolean;
 }
-export interface XPAddition {
+interface XPAddition {
 	amount: number;
 	reason: string;
 	xp: number;
 }
-export interface XP {
+interface XP {
 	additionTimeouts: Map<string, ReturnType<typeof setTimeout>>;
 	additions: XPAddition[];
 	showingLevelUp: boolean;
 }
-export interface ZoneDropOverrides {
+interface ZoneDropOverrides {
 	allowItemDrop: boolean;
 	allowResourceDrop: boolean;
 	allowWeaponDrop: boolean;
 }
-export interface Me {
+interface Me {
 	adding: Adding;
 	cinematicMode: CinematicMode;
 	classDesigner: ClassDesigner;
@@ -5003,18 +5003,18 @@ export interface Me {
 	xp: XP;
 	zoneDropOverrides: ZoneDropOverrides;
 }
-export interface CallToActionCategory {
+interface CallToActionCategory {
 	id: string;
 	name: string;
 	plural: string;
 }
-export interface CallToActionItem {
+interface CallToActionItem {
 	id: string;
 	category: string;
 	name: string;
 	url: string;
 }
-export interface Widget {
+interface Widget {
 	type: string;
 	id: string;
 	y: number;
@@ -5022,7 +5022,7 @@ export interface Widget {
 	statName: string;
 	statValue: number;
 }
-export interface GameSession {
+interface GameSession {
 	callToAction: {
 		categories: CallToActionCategory[];
 		items: CallToActionItem[];
@@ -5034,7 +5034,7 @@ export interface GameSession {
 		widgets: Widget[];
 	};
 }
-export interface Session {
+interface Session {
 	allowGoogleTranslate: boolean;
 	amIGameOwner: boolean;
 	canAddGameTime: boolean;
@@ -5058,22 +5058,22 @@ export interface Session {
 	phaseChangedAt: number;
 	version: string;
 }
-export interface Achievement {
+interface Achievement {
 	id: string;
 	key: string;
 	reset: () => void;
 	update: () => void;
 }
-export interface BottomInGamePrimaryContent {
+interface BottomInGamePrimaryContent {
 	interactionWantsToBeVisible: boolean;
 	prioritizeInteraction: boolean;
 }
-export interface DamageIndicator {
+interface DamageIndicator {
 	show: boolean;
 	/** `h` for red, `s` for blue, and any other string for yellow. */
 	type: string;
 }
-export interface GuiSlot {
+interface GuiSlot {
 	id: string;
 	position: string;
 	text: string;
@@ -5083,16 +5083,16 @@ export interface GuiSlot {
 	priority: number;
 	color: string;
 }
-export interface KnockoutAlert {
+interface KnockoutAlert {
 	id: string;
 	name: string;
 }
-export interface Modals {
+interface Modals {
 	closeAllModals: () => void;
 	cosmosModalOpen: boolean;
 	switchToRegisterScreenWhenCosmosModalOpens: boolean;
 }
-export interface NoneGui {
+interface NoneGui {
 	addMenu: {
 		screen: string;
 	};
@@ -5102,11 +5102,11 @@ export interface NoneGui {
 	};
 	screen: string;
 }
-export interface Scorebar {
+interface Scorebar {
 	teamColors: string[];
 	teams: string[];
 }
-export interface GUI {
+interface GUI {
 	achievement: Achievement;
 	bottomInGamePrimaryContent: BottomInGamePrimaryContent;
 	damageIndicator: DamageIndicator;
@@ -5122,13 +5122,13 @@ export interface GUI {
 	selectedPlayerId: string;
 	showingGrid: boolean;
 }
-export interface CharacterPermissions {
+interface CharacterPermissions {
 	adding: boolean;
 	editing: boolean;
 	manageCodeGrids: boolean;
 	removing: boolean;
 }
-export interface CharacterInfo {
+interface CharacterInfo {
 	allowWeaponFire: boolean;
 	existsBeforeReconnect: boolean;
 	fragility: number;
@@ -5142,10 +5142,10 @@ export interface CharacterInfo {
 	teamId: string;
 	type: string;
 }
-export interface Characters {
+interface Characters {
 	characters: Map<string, CharacterInfo>;
 }
-export interface Costs {
+interface Costs {
 	codeGrid: number;
 	collidingTile: number;
 	customAssetDefault: number;
@@ -5154,7 +5154,7 @@ export interface Costs {
 	nonCollidingTile: number;
 	wire: number;
 }
-export interface Counters {
+interface Counters {
 	codeGrids: number;
 	collidingTiles: number;
 	customAssets: Map<string, number>;
@@ -5162,7 +5162,7 @@ export interface Counters {
 	nonCollidingTiles: number;
 	wires: number;
 }
-export interface Limits {
+interface Limits {
 	blocksPerCodeGrid: number;
 	codeGrids: number;
 	codeGridsPerDevice: number;
@@ -5172,63 +5172,63 @@ export interface Limits {
 	nonCollidingTiles: number;
 	wires: number;
 }
-export interface MemorySystem {
+interface MemorySystem {
 	costs: Costs;
 	counters: Counters;
 	limits: Limits;
 	maxUsedMemory: number;
 	usedMemoryCost: number;
 }
-export interface Rect {
+interface Rect {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 }
-export interface RotatedRect extends Rect {
+interface RotatedRect extends Rect {
 	angle: number;
 }
-export interface Circle {
+interface Circle {
 	x: number;
 	y: number;
 	radius: number;
 }
-export interface RotatedCircle extends Circle {
+interface RotatedCircle extends Circle {
 	angle: number;
 }
-export interface Ellipse {
+interface Ellipse {
 	x: number;
 	y: number;
 	r1: number;
 	r2: number;
 }
-export interface RotatedEllipse extends Ellipse {
+interface RotatedEllipse extends Ellipse {
 	angle: number;
 }
-export interface RectShort {
+interface RectShort {
 	x: number;
 	y: number;
 	w: number;
 	h: number;
 }
-export interface RotatedRectShort extends RectShort {
+interface RotatedRectShort extends RectShort {
 	angle: number;
 }
-export interface CircleShort {
+interface CircleShort {
 	x: number;
 	y: number;
 	r: number;
 }
-export interface CodeGrids {
+interface CodeGrids {
 	blockCategories: string;
 	customBlocks: string;
 	customBlocksParsed: any[];
 }
-export interface OptionSchema {
+interface OptionSchema {
 	options: any[];
 	categories?: any[];
 }
-export interface DeviceInfo {
+interface DeviceInfo {
 	id: string;
 	name: string;
 	description?: string;
@@ -5244,7 +5244,7 @@ export interface DeviceInfo {
 	seasonTicketRequired?: boolean;
 	maximumRoleLevel?: number;
 }
-export interface ItemOption {
+interface ItemOption {
 	type: string;
 	id: string;
 	name: string;
@@ -5259,7 +5259,7 @@ export interface ItemOption {
 	terrainId?: string;
 	maxStackSize?: number;
 }
-export interface Weapon {
+interface Weapon {
 	type: string;
 	appearance: string;
 	shared: WeaponShared;
@@ -5267,12 +5267,12 @@ export interface Weapon {
 		ammoItemId: string;
 	};
 }
-export interface WeaponShared {
+interface WeaponShared {
 	cooldownBetweenShots: number;
 	allowAutoFire: boolean;
 	startingProjectileDistanceFromCharacter: number;
 }
-export interface PropOption {
+interface PropOption {
 	id: string;
 	name: string;
 	scaleMultip: number;
@@ -5287,12 +5287,12 @@ export interface PropOption {
 	minimumRoleLevel?: number;
 	defaultLayer?: string;
 }
-export interface SkinOption {
+interface SkinOption {
 	id: string;
 	name: string;
 	minimumRoleLevel?: number;
 }
-export interface TerrainOption {
+interface TerrainOption {
 	id: string;
 	name: string;
 	maskTilesUrl: string;
@@ -5304,14 +5304,14 @@ export interface TerrainOption {
 	health?: number;
 	minimumRoleLevel?: number;
 }
-export interface CustomAssetOption {
+interface CustomAssetOption {
 	id: string;
 	maxOnMap: number;
 	memoryCost: number;
 	minimumRoleLevel?: number;
 	validate: any;
 }
-export interface WorldOptions {
+interface WorldOptions {
 	codeGrids: CodeGrids;
 	customAssetsOptions: CustomAssetOption[];
 	deviceOptions: DeviceInfo[];
@@ -5321,13 +5321,13 @@ export interface WorldOptions {
 	skinOptions: SkinOption[];
 	terrainOptions: TerrainOption[];
 }
-export interface AppearanceVariation {
+interface AppearanceVariation {
 	device: Device;
 	resetAppearance(): void;
 	setPreviewAppearance(): void;
 	setRemovalAppearance(): void;
 }
-export interface BoundingBox {
+interface BoundingBox {
 	cachedBoundingBox: Rect;
 	device: Device;
 	hardcodedBoundingBox?: Rect;
@@ -5338,21 +5338,21 @@ export interface BoundingBox {
 	isInsideBoundingBox(x: number, y: number): boolean;
 	setHardcoded(rect: Rect): void;
 }
-export type DeviceCollider = RectShort | CircleShort | Ellipse;
-export type ColliderOptions = {
+type DeviceCollider = RectShort | CircleShort | Ellipse;
+type ColliderOptions = {
 	device: Device;
 	scene: Scene;
 	angle: number;
 	x: number;
 	y: number;
 } & Partial<RectShort & CircleShort & Ellipse>;
-export interface ColliderEntry {
+interface ColliderEntry {
 	bodyId: string;
 	options: ColliderOptions;
 	device: Device;
 	scene: Scene;
 }
-export interface Colliders {
+interface Colliders {
 	add: {
 		box(collider: RectShort): void;
 		circle(collider: CircleShort): void;
@@ -5366,12 +5366,12 @@ export interface Colliders {
 	hideDebug(): void;
 	showDebug(): void;
 }
-export interface UpdateCullOptions {
+interface UpdateCullOptions {
 	mainCharacter: Character;
 	isPhase: boolean;
 	insideView: boolean;
 }
-export interface Cull {
+interface Cull {
 	device: Device;
 	ignoresCull: boolean;
 	isInsideView: boolean;
@@ -5386,13 +5386,13 @@ export interface Cull {
 	onLeaveViewCallback?(): void;
 	updateCull(options: UpdateCullOptions): void;
 }
-export interface DeviceUI {
+interface DeviceUI {
 	device: Device;
 	close(): void;
 	open(options: Record<string, any>): void;
 	update(options: Record<string, any>): void;
 }
-export interface DeviceInput {
+interface DeviceInput {
 	device: Device;
 	enabled: boolean;
 	hasKeyListeners: boolean;
@@ -5408,7 +5408,7 @@ export interface DeviceInput {
 	partIsUnderMouse(): void;
 	removeDeviceFromCursorUnderList(): void;
 }
-export interface InteractiveZones {
+interface InteractiveZones {
 	add: {
 		circle(zone: CircleShort): void;
 		rect(zone: Rect): void;
@@ -5431,7 +5431,7 @@ export interface InteractiveZones {
 	remove(zone: CircleShort | Rect): void;
 	onInteraction?(): void;
 }
-export interface VisualEditingBox {
+interface VisualEditingBox {
 	width: number;
 	height: number;
 	angle: number;
@@ -5443,7 +5443,7 @@ export interface VisualEditingBox {
 	rotable: boolean;
 	onChange(value: RotatedRect): void;
 }
-export interface VisualEditingCircle {
+interface VisualEditingCircle {
 	angle: number;
 	rotable: boolean;
 	radius: number;
@@ -5451,7 +5451,7 @@ export interface VisualEditingCircle {
 	maxRadius: number;
 	onChange(value: RotatedCircle): void;
 }
-export interface DeviceVisualEditing {
+interface DeviceVisualEditing {
 	add: {
 		box(options: VisualEditingBox): void;
 		circle(options: VisualEditingCircle): void;
@@ -5461,7 +5461,7 @@ export interface DeviceVisualEditing {
 	shapes: (VisualEditingBox | VisualEditingCircle)[];
 	clear(): void;
 }
-export interface ShadowOptions {
+interface ShadowOptions {
 	x: number;
 	y: number;
 	r1: number;
@@ -5469,7 +5469,7 @@ export interface ShadowOptions {
 	alphaMultip: number;
 	depth: number;
 }
-export interface Shadows {
+interface Shadows {
 	device: Device;
 	list: ShadowOptions[];
 	add(options: ShadowOptions): void;
@@ -5478,26 +5478,26 @@ export interface Shadows {
 	hide(): void;
 	show(): void;
 }
-export interface Layers {
+interface Layers {
 	depth: number;
 	device: Device;
 	layer: string;
 	options: any;
 }
-export interface WirePoints {
+interface WirePoints {
 	device: Device;
 	end: Vector;
 	start: Vector;
 	onPointChange(): void;
 	setBoth(x: number, y: number): void;
 }
-export interface DeviceTweens {
+interface DeviceTweens {
 	list: Tweens.Tween[];
 	device: Device;
 	add(config: Types.Tweens.TweenBuilderConfig): Tweens.Tween;
 	destroy(): void;
 }
-export interface DeviceProjectiles {
+interface DeviceProjectiles {
 	device: Device;
 	addToDynamicDevices(): void;
 	collidesWithProjectile(object: Circle): boolean;
@@ -5505,7 +5505,7 @@ export interface DeviceProjectiles {
 	removeFromDynamicDevices(): void;
 	setDynamic(dynamic: boolean): void;
 }
-export interface BaseDevice {
+interface BaseDevice {
 	isPreview: boolean;
 	placedByClient: boolean;
 	isDestroyed: boolean;
@@ -5558,10 +5558,10 @@ export interface BaseDevice {
 		isBeingReplaced: boolean;
 	}): void;
 }
-export type Device = BaseDevice & {
+type Device = BaseDevice & {
 	[key: string]: any;
 };
-export interface Jump {
+interface Jump {
 	/** Optional in top-down, required in platformer */
 	actuallyJumped?: boolean;
 	isJumping: boolean;
@@ -5570,12 +5570,12 @@ export interface Jump {
 	jumpsLeft: number;
 	xVelocityAtJumpStart: number;
 }
-export interface MovementState {
+interface MovementState {
 	accelerationTicks: number;
 	direction: string;
 	xVelocity: number;
 }
-export interface PhysicsState {
+interface PhysicsState {
 	forces: any[];
 	gravity: number;
 	grounded: boolean;
@@ -5585,13 +5585,13 @@ export interface PhysicsState {
 	movement: MovementState;
 	velocity: Vector;
 }
-export interface PhysicsInput extends TickInput {
+interface PhysicsInput extends TickInput {
 	activeClassDeviceId: string;
 	ignoredStaticBodies: Set<any>;
 	ignoredTileBodies: Set<any>;
 	projectileHitForcesQueue: Set<any>;
 }
-export interface CharacterBody {
+interface CharacterBody {
 	id: string;
 	ignoredStaticBodies: Set<any>;
 	ignoredTileBodies: Set<any>;
@@ -5599,27 +5599,27 @@ export interface CharacterBody {
 	aroundSensor: Collider;
 	feetSensor: Collider;
 }
-export interface Bodies {
+interface Bodies {
 	character: CharacterBody;
 	collider: Collider;
 	colliderDesc: ColliderDesc;
 	rigidBody: RigidBody;
 	rigidBodyDesc: RigidBodyDesc;
 }
-export interface ServerPosition {
+interface ServerPosition {
 	packet: number;
 	x: number;
 	y: number;
 	jsonState: string;
 	teleport: boolean;
 }
-export type AngleInput = number | null;
-export interface TickInput {
+type AngleInput = number | null;
+interface TickInput {
 	angle: AngleInput;
 	jump: boolean;
 	_jumpKeyPressed: boolean;
 }
-export interface Physics {
+interface Physics {
 	character: Character;
 	currentPacketId: number;
 	frameInputsHistory: Map<number, PhysicsInput>;
@@ -5647,7 +5647,7 @@ export interface Physics {
 	setupBody(x: number, y: number): void;
 	updateDebugGraphics(): void;
 }
-export interface AimCursor {
+interface AimCursor {
 	aimCursor: GameObjects.Sprite;
 	aimCursorWorldPos: Vector;
 	centerShiftX: number;
@@ -5657,39 +5657,39 @@ export interface AimCursor {
 	y: number;
 	update(): void;
 }
-export interface Cursor {
+interface Cursor {
 	scene: Scene;
 	createStateListeners(): void;
 	updateCursor(): void;
 }
-export interface PressedKeys {
+interface PressedKeys {
 	up: boolean;
 	down: boolean;
 	left: boolean;
 	right: boolean;
 }
-export interface KeyboardState {
+interface KeyboardState {
 	isHoldingDown: boolean;
 	isHoldingLeft: boolean;
 	isHoldingRight: boolean;
 	isHoldingUp: boolean;
 	isHoldingSpace: boolean;
 }
-export interface Keyboard {
+interface Keyboard {
 	heldKeys: Set<number>;
 	scene: Scene;
 	state: KeyboardState;
 	createListeners(): void;
 	isKeyDown(key: number): boolean;
 }
-export interface MovementPointer {
+interface MovementPointer {
 	id: string;
 	x: number;
 	y: number;
 	downX: number;
 	downY: number;
 }
-export interface Mouse {
+interface Mouse {
 	clickListeners: Map<string, (pointer: Input.Pointer) => void>;
 	downX: number;
 	downY: number;
@@ -5708,7 +5708,7 @@ export interface Mouse {
 	removeClickListener(id: string): void;
 	shouldBecomeMovementPointer(pointer: Input.Pointer): boolean;
 }
-export interface InputManager {
+interface InputManager {
 	aimCursor: AimCursor;
 	angleSinceLastPhysicsFetch: AngleInput;
 	currentInput: TickInput;
@@ -5727,7 +5727,7 @@ export interface InputManager {
 	refreshInput(): void;
 	update(): void;
 }
-export interface Cameras {
+interface Cameras {
 	allCameras: Device[];
 	allCamerasNeedsUpdate: boolean;
 	camerasPlayerIsInside: any[];
@@ -5738,20 +5738,20 @@ export interface Cameras {
 	switchToDefaultCameraSize(reset: boolean): void;
 	update(devices: Device[]): void;
 }
-export interface DevicesAction {
+interface DevicesAction {
 	inputManager: InputManager;
 	scene: Scene;
 	onClick(arg: any): void;
 	update(): void;
 }
-export interface DevicesPreview {
+interface DevicesPreview {
 	devicePreviewOverlay: Overlay;
 	previousDevices: Device[];
 	scene: Scene;
 	removePreviousDevices(isBeingReplaced: boolean): void;
 	update(): void;
 }
-export interface WorldInteractives {
+interface WorldInteractives {
 	scene: Scene;
 	currentDevice?: Device;
 	clearCurrentDevice(): void;
@@ -5760,7 +5760,7 @@ export interface WorldInteractives {
 	canBeReachedByPlayer(device: Device): boolean;
 	findClosestInteractiveDevice(devices: Device[], x: number, y: number): Device | undefined;
 }
-export interface Devices {
+interface Devices {
 	allDevices: Device[];
 	cameras: Cameras;
 	devicesAction: DevicesAction;
@@ -5781,13 +5781,13 @@ export interface Devices {
 	}): void;
 	update(dt: number): void;
 }
-export interface CreateTileOptions {
+interface CreateTileOptions {
 	x: number;
 	y: number;
 	tileIndex: number;
 	terrainOption: TerrainOption;
 }
-export interface InGameTerrainBuilder {
+interface InGameTerrainBuilder {
 	afterFailureWithTouch: boolean;
 	overlay: Overlay;
 	previewingTile?: Vector;
@@ -5798,7 +5798,7 @@ export interface InGameTerrainBuilder {
 	createPreviewTile(options: CreateTileOptions): void;
 	update(): void;
 }
-export interface ActiveBodies {
+interface ActiveBodies {
 	activeBodies: Set<string>;
 	bodyManager: BodyManager;
 	currentCoordinateKeys: Set<string>;
@@ -5816,17 +5816,17 @@ export interface ActiveBodies {
 	enableBody(id: string): void;
 	setDirty(): void;
 }
-export interface BodyBounds {
+interface BodyBounds {
 	minX: number;
 	minY: number;
 	maxX: number;
 	maxY: number;
 }
-export interface BodyStatic {
+interface BodyStatic {
 	bounds: BodyBounds;
 	cells: Set<string>;
 }
-export interface GimkitBody {
+interface GimkitBody {
 	collider?: Collider;
 	colliderDesc: ColliderDesc;
 	rigidBody?: RigidBody;
@@ -5839,7 +5839,7 @@ export interface GimkitBody {
 		key: string;
 	};
 }
-export interface BodyManager {
+interface BodyManager {
 	activeBodies: ActiveBodies;
 	bodies: Map<string, GimkitBody>;
 	cells: Map<string, Set<string>>;
@@ -5854,11 +5854,11 @@ export interface BodyManager {
 	insert(body: GimkitBody): string;
 	remove(id: string): void;
 }
-export interface WorldBoundsCollider {
+interface WorldBoundsCollider {
 	body: RigidBody;
 	collider: Collider;
 }
-export interface PhysicsManager {
+interface PhysicsManager {
 	bodies: BodyManager;
 	cumulTime: number;
 	lastTime: number;
@@ -5867,7 +5867,7 @@ export interface PhysicsManager {
 	world: World;
 	worldBoundsColliders: Set<WorldBoundsCollider>;
 }
-export interface Projectile {
+interface Projectile {
 	id: string;
 	startTime: number;
 	endTime: number;
@@ -5881,7 +5881,7 @@ export interface Projectile {
 	hitPos?: Vector;
 	hitTime?: number;
 }
-export interface Projectiles {
+interface Projectiles {
 	damageMarkers: any;
 	dynamicDevices: Set<Device>;
 	fireSlashes: any;
@@ -5892,7 +5892,7 @@ export interface Projectiles {
 	fire(pointer: Input.Pointer, snap: boolean): void;
 	update(): void;
 }
-export interface WorldManager {
+interface WorldManager {
 	devices: Devices;
 	inGameTerrainBuilder: InGameTerrainBuilder;
 	physics: PhysicsManager;
@@ -5902,7 +5902,7 @@ export interface WorldManager {
 	wires: any;
 	update(dt: number): void;
 }
-export interface BackgroundLayersManager {
+interface BackgroundLayersManager {
 	layerManager: LayerManager;
 	scene: Scene;
 	createLayer(options: {
@@ -5916,7 +5916,7 @@ export interface BackgroundLayersManager {
 		layerId: string;
 	}): void;
 }
-export interface LayerManager {
+interface LayerManager {
 	backgroundLayersManager: BackgroundLayersManager;
 	colliders: Map<string, Map<string, string>>;
 	layers: Map<string, any>;
@@ -5928,12 +5928,12 @@ export interface LayerManager {
 	moveLayersAboveCharacters(): void;
 	onWorldSizeChange(): void;
 }
-export interface TileKey {
+interface TileKey {
 	depth: number;
 	x: number;
 	y: number;
 }
-export interface TileManager {
+interface TileManager {
 	cumulTime: number;
 	scene: Scene;
 	layerManager: LayerManager;
@@ -5944,14 +5944,14 @@ export interface TileManager {
 	update(dt: number): void;
 	updateTeamColorTileAtXY(x: number, y: number, depth: number, team?: string, playerId?: string): void;
 }
-export interface ShowOverlayOptions {
+interface ShowOverlayOptions {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 	depth: number;
 }
-export interface Overlay {
+interface Overlay {
 	scene: Scene;
 	showing: boolean;
 	showingDimensions: {
@@ -5965,19 +5965,19 @@ export interface Overlay {
 	hide(): void;
 	show(options: ShowOverlayOptions): void;
 }
-export interface DepthSort {
+interface DepthSort {
 	overlay: Overlay;
 	scene: Scene;
 	update(): void;
 }
-export interface SelectedDevicesOverlay {
+interface SelectedDevicesOverlay {
 	graphics: GameObjects.Graphics;
 	scene: Scene;
 	showing: boolean;
 	hide(): void;
 	show(rects: Rect[]): void;
 }
-export interface MultiSelect {
+interface MultiSelect {
 	boundingBoxAroundEverything: Rect | null;
 	currentlySelectedDevices: Device[];
 	currentlySelectedDevicesIds: string[];
@@ -6008,10 +6008,10 @@ export interface MultiSelect {
 	updateSelectedDevicesOverlay(): void;
 	updateSelectionRect(): void;
 }
-export interface PlatformerEditing {
+interface PlatformerEditing {
 	setTopDownControlsActive(active: boolean): void;
 }
-export interface Removal {
+interface Removal {
 	overlay: Overlay;
 	prevMouseWasDown: boolean;
 	scene: Scene;
@@ -6020,27 +6020,27 @@ export interface Removal {
 	removeSelectedItems(): void;
 	update(): void;
 }
-export interface ActionManager {
+interface ActionManager {
 	depthSort: DepthSort;
 	multiSelect: MultiSelect;
 	platformerEditing: PlatformerEditing;
 	removal: Removal;
 	update(): void;
 }
-export interface Spectating {
+interface Spectating {
 	findNewCharacter(): void;
 	onBeginSpectating(): void;
 	onEndSpectating(): void;
 	setShuffle(shuffle: boolean, save?: boolean): void;
 }
-export interface CharacterOptions {
+interface CharacterOptions {
 	id: string;
 	x: number;
 	y: number;
 	scale: number;
 	type: string;
 }
-export interface CharacterManager {
+interface CharacterManager {
 	characterContainer: GameObjects.Container;
 	characters: Map<string, Character>;
 	scene: Scene;
@@ -6050,7 +6050,7 @@ export interface CharacterManager {
 	removeCharacter(id: string): void;
 	update(dt: number): void;
 }
-export interface Scene extends BaseScene {
+interface Scene extends BaseScene {
 	actionManager: ActionManager;
 	cameraHelper: any;
 	characterManager: CharacterManager;
@@ -6064,22 +6064,22 @@ export interface Scene extends BaseScene {
 	worldManager: WorldManager;
 	create(): void;
 }
-export interface SoundEffect {
+interface SoundEffect {
 	path: string;
 	volume: number;
 }
-export interface BaseAsset {
+interface BaseAsset {
 	frameHeight: number;
 	frameRate: number;
 	frameWidth: number;
 	imageUrl: string;
 	scale: number;
 }
-export interface ImpactAsset extends BaseAsset {
+interface ImpactAsset extends BaseAsset {
 	frames: number[];
 	hideIfNoHit?: boolean;
 }
-export interface WeaponAsset extends BaseAsset {
+interface WeaponAsset extends BaseAsset {
 	fireFrames: number[];
 	fromCharacterCenterRadius: number;
 	hideFireSlash: boolean;
@@ -6087,12 +6087,12 @@ export interface WeaponAsset extends BaseAsset {
 	originX: number;
 	originY: number;
 }
-export interface ProjectileAppearance {
+interface ProjectileAppearance {
 	imageUrl: string;
 	rotateToTarget: boolean;
 	scale: number;
 }
-export interface CurrentAppearance {
+interface CurrentAppearance {
 	id: string;
 	explosionSfx: SoundEffect[];
 	fireSfx: SoundEffect[];
@@ -6101,7 +6101,7 @@ export interface CurrentAppearance {
 	reloadSfx: SoundEffect;
 	weapon: WeaponAsset;
 }
-export interface AimingAndLookingAround {
+interface AimingAndLookingAround {
 	angleTween?: Tweens.Tween;
 	character: Character;
 	currentAngle?: number;
@@ -6124,10 +6124,10 @@ export interface AimingAndLookingAround {
 	updateMainCharacterMouse(): void;
 	updateMainCharacterTouch(): void;
 }
-export interface NonMainCharacterState {
+interface NonMainCharacterState {
 	grounded: boolean;
 }
-export interface CharacterAnimation {
+interface CharacterAnimation {
 	availableAnimations: string[];
 	blinkTimer: number;
 	bodyAnimationLocked: boolean;
@@ -6153,7 +6153,7 @@ export interface CharacterAnimation {
 	stopBlinkAnimation(): void;
 	update(dt: number): void;
 }
-export interface Point {
+interface Point {
 	endTime: number;
 	endX: number;
 	endY: number;
@@ -6163,13 +6163,13 @@ export interface Point {
 	teleported: boolean;
 	usedTeleported: boolean;
 }
-export interface EndInfo {
+interface EndInfo {
 	end: number;
 	start: number;
 	x: number;
 	y: number;
 }
-export interface Movement {
+interface Movement {
 	character: Character;
 	currentPoint: Point;
 	currentTime: number;
@@ -6191,7 +6191,7 @@ export interface Movement {
 	setTeleportCount(teleportCount: number): void;
 	update(dt: number): void;
 }
-export interface Updates {
+interface Updates {
 	update(update: {
 		delta: number;
 	}): void;
@@ -6200,17 +6200,17 @@ export interface Updates {
 	updatePosition(dt: number): void;
 	updateScale(): void;
 }
-export interface TeamState {
+interface TeamState {
 	status: string;
 	teamId: string;
 }
-export interface TweenAlphaOptions {
+interface TweenAlphaOptions {
 	alpha: number;
 	type: string;
 	duration: number;
 	ease?: string;
 }
-export interface Alpha {
+interface Alpha {
 	character: Character;
 	cinematicModeAlpha: number;
 	currentAlpha: number;
@@ -6223,7 +6223,7 @@ export interface Alpha {
 	tweenAlpha(options: TweenAlphaOptions): void;
 	update(): void;
 }
-export interface TrailEmitter {
+interface TrailEmitter {
 	frequency: number;
 	quantity: number;
 	blendMode: number;
@@ -6244,18 +6244,18 @@ export interface TrailEmitter {
 	yOriginChange: number;
 	emitterZone: Partial<Vector>;
 }
-export interface TrailParticles {
+interface TrailParticles {
 	frameHeight: number;
 	frameWidth: number;
 	imageUrl: string;
 	numberOfFrames: number;
 }
-export interface TrailAppearance {
+interface TrailAppearance {
 	id: string;
 	emitter: TrailEmitter;
 	particles: TrailParticles;
 }
-export interface CharacterTrail {
+interface CharacterTrail {
 	character: Character;
 	currentAppearance: TrailAppearance;
 	currentAppearanceId: string;
@@ -6267,7 +6267,7 @@ export interface CharacterTrail {
 	update(): void;
 	updateAppearance(id: string): void;
 }
-export interface Culling {
+interface Culling {
 	character: Character;
 	isInCamera: boolean;
 	needsCullUpdate: boolean;
@@ -6280,14 +6280,14 @@ export interface Culling {
 	showObject(object: any): void;
 	updateNeedsUpdate(): void;
 }
-export interface Depth {
+interface Depth {
 	character: Character;
 	currentDepth: number;
 	lastY: number;
 	update(): void;
 	updateDepth(): void;
 }
-export interface Dimensions {
+interface Dimensions {
 	character: Character;
 	currentDimensionsId: string;
 	bottomY: number;
@@ -6296,7 +6296,7 @@ export interface Dimensions {
 	x: number;
 	onPotentialDimensionsChange(): void;
 }
-export interface Flip {
+interface Flip {
 	character: Character;
 	flipXLastX: number;
 	isFlipped: boolean;
@@ -6306,7 +6306,7 @@ export interface Flip {
 	updateFlipForMainCharacter(): void;
 	updateFlipForOthers(): void;
 }
-export interface Healthbar extends Updates {
+interface Healthbar extends Updates {
 	character: Character;
 	depth: number;
 	isVisible: boolean;
@@ -6315,7 +6315,7 @@ export interface Healthbar extends Updates {
 	makeIndicator(): void;
 	updateValue(): void;
 }
-export interface Immunity {
+interface Immunity {
 	character: Character;
 	classImmunityActive: boolean;
 	spawnImmunityActive: boolean;
@@ -6327,7 +6327,7 @@ export interface Immunity {
 	deactivateSpawnImmunity(): void;
 	isActive(): boolean;
 }
-export interface ImpactAnimation {
+interface ImpactAnimation {
 	animations: Map<string, GameObjects.Sprite>;
 	character: Character;
 	loadedAnimations: Set<string>;
@@ -6337,7 +6337,7 @@ export interface ImpactAnimation {
 	load(animation: string): void;
 	play(animation: string): void;
 }
-export interface Indicator extends Updates {
+interface Indicator extends Updates {
 	character: Character;
 	characterHeight: number;
 	depth: number;
@@ -6350,13 +6350,13 @@ export interface Indicator extends Updates {
 	destroy(): void;
 	makeIndicator(): void;
 }
-export interface CharacterInput {
+interface CharacterInput {
 	character: Character;
 	isListeningForInput: boolean;
 	scene: Scene;
 	setupInput(): void;
 }
-export interface Nametag {
+interface Nametag {
 	alpha: number;
 	character: Character;
 	creatingTag: boolean;
@@ -6389,21 +6389,21 @@ export interface Nametag {
 	updateTagPosition(force?: boolean): void;
 	updateTagScale(force?: boolean): void;
 }
-export interface Network {
+interface Network {
 	lastAngle?: number;
 	lastAngleUpdate: number;
 	updateAimAngle(angle: number): void;
 }
-export interface CharacterPosition {
+interface CharacterPosition {
 	character: Character;
 	update(dt: number): void;
 }
-export interface TweenScaleOptions {
+interface TweenScaleOptions {
 	type: string;
 	scale: number;
 	duration: number;
 }
-export interface Scale {
+interface Scale {
 	activeScale: number;
 	baseScale: number;
 	character: Character;
@@ -6420,22 +6420,22 @@ export interface Scale {
 	tweenScale(options: TweenScaleOptions): void;
 	update(): void;
 }
-export interface Shadow {
+interface Shadow {
 	character: Character;
 	image?: GameObjects.Image;
 	createShadow(): void;
 	destroy(): void;
 	update(): void;
 }
-export interface SkinOptions {
+interface SkinOptions {
 	id: string;
 	editStyles?: Record<string, string>;
 }
-export interface SkinSetupOptions extends SkinOptions {
+interface SkinSetupOptions extends SkinOptions {
 	x?: number;
 	y?: number;
 }
-export interface Skin {
+interface Skin {
 	character: Character;
 	editStyles?: Record<string, string>;
 	latestSkinId: string;
@@ -6445,7 +6445,7 @@ export interface Skin {
 	setupSkin(position: SkinSetupOptions): void;
 	updateSkin(options: SkinOptions): void;
 }
-export interface TintParams {
+interface TintParams {
 	type: string;
 	fromColor: string;
 	toColor: string;
@@ -6453,7 +6453,7 @@ export interface TintParams {
 	tween?: Tweens.Tween;
 	ease(t: number): number;
 }
-export interface Tint {
+interface Tint {
 	character: Character;
 	scene: Scene;
 	phase?: TintParams;
@@ -6466,7 +6466,7 @@ export interface Tint {
 	stopAnimateTint(type: string): void;
 	update(): void;
 }
-export interface VFX {
+interface VFX {
 	character: Character;
 	damageBoostActive: boolean;
 	phaseActive: boolean;
@@ -6479,7 +6479,7 @@ export interface VFX {
 	stopDamageBoostAnim(): void;
 	stopPhaseAnim(): void;
 }
-export interface Character {
+interface Character {
 	aimingAndLookingAround: AimingAndLookingAround;
 	alpha: Alpha;
 	animation: CharacterAnimation;
@@ -6517,18 +6517,18 @@ export interface Character {
 	setIsMain(isMain: boolean): void;
 	update(dt: number): void;
 }
-export interface ActivityFeed {
+interface ActivityFeed {
 	feedItems: {
 		id: string;
 		message: string;
 	}[];
 }
-export interface Assignment {
+interface Assignment {
 	hasSavedProgress: boolean;
 	objective: string;
 	percentageComplete: number;
 }
-export interface EditingStore {
+interface EditingStore {
 	accessPoints: Map<string, {
 		name: string;
 		position: Vector;
@@ -6536,19 +6536,19 @@ export interface EditingStore {
 	gridSnap: number;
 	showMemoryBarAtAllTimes: boolean;
 }
-export interface Hooks {
+interface Hooks {
 	hookJSON: string;
 }
-export interface Loading {
+interface Loading {
 	completedInitialLoad: boolean;
 	loadedInitialDevices: boolean;
 	loadedInitialTerrain: boolean;
 	percentageAssetsLoaded: number;
 }
-export interface Matchmaker {
+interface Matchmaker {
 	gameCode: string;
 }
-export interface NetworkStore {
+interface NetworkStore {
 	attemptingToConnect: boolean;
 	attemptingToReconnect: boolean;
 	authId: string;
@@ -6569,28 +6569,28 @@ export interface NetworkStore {
 	roomIntentErrorMessage: string;
 	syncingAfterReconnection: boolean;
 }
-export interface PhaserStore {
+interface PhaserStore {
 	mainCharacter: Character;
 	mainCharacterTeleported: boolean;
 	scene: Scene;
 }
-export interface SceneStore {
+interface SceneStore {
 	currentScene: string;
 	gpuTier: number;
 	isCursorOverCanvas: boolean;
 }
-export interface Team {
+interface Team {
 	characters: Map<number, string>;
 	id: string;
 	name: string;
 	score: number;
 }
-export interface Teams {
+interface Teams {
 	teams: Map<string, Team>;
 	updateCounter: number;
 }
 /** The stores type is incomplete and is not guaranteed to be accurate */
-export interface Stores {
+interface Stores {
 	activityFeed: ActivityFeed;
 	assignment: Assignment;
 	characters: Characters;
@@ -6611,94 +6611,94 @@ export interface Stores {
 }
 }
 
-export interface BaseSetting<K extends string, T> {
+interface BaseSetting<K extends string, T> {
 	id: K;
 	default?: T;
 	onChange?: (value: T, remote: boolean) => void;
 }
-export interface NamedSetting<K extends string, T> extends BaseSetting<K, T> {
+interface NamedSetting<K extends string, T> extends BaseSetting<K, T> {
 	title: string;
 	description?: string;
 }
-export interface DropdownSetting<K extends string> extends NamedSetting<K, string> {
+interface DropdownSetting<K extends string> extends NamedSetting<K, string> {
 	type: "dropdown";
-	options: {
+	options: ReadonlyArray<{
 		label: string;
 		value: string;
-	}[];
+	}>;
 	allowNone?: boolean;
 }
-export interface MultiselectSetting<K extends string> extends NamedSetting<K, string[]> {
+interface MultiselectSetting<K extends string> extends NamedSetting<K, ReadonlyArray<string>> {
 	type: "multiselect";
-	options: {
+	options: ReadonlyArray<{
 		label: string;
 		value: string;
-	}[];
+	}>;
 }
-export interface NumberSetting<K extends string> extends NamedSetting<K, number> {
+interface NumberSetting<K extends string> extends NamedSetting<K, number> {
 	type: "number";
 	min?: number;
 	max?: number;
 	step?: number;
 }
-export interface ToggleSetting<K extends string> extends NamedSetting<K, boolean> {
+interface ToggleSetting<K extends string> extends NamedSetting<K, boolean> {
 	type: "toggle";
 }
-export interface TextSetting<K extends string> extends NamedSetting<K, string> {
+interface TextSetting<K extends string> extends NamedSetting<K, string> {
 	type: "text";
 	placeholder?: string;
 	maxLength?: number;
 }
-export interface SliderSetting<K extends string> extends NamedSetting<K, number> {
+interface SliderSetting<K extends string> extends NamedSetting<K, number> {
 	type: "slider";
 	min: number;
 	max: number;
 	step?: number;
-	ticks?: number[];
+	ticks?: ReadonlyArray<number>;
 	formatter?: (value: number) => string;
 }
-export interface RadioSetting<K extends string> extends NamedSetting<K, string> {
+interface RadioSetting<K extends string> extends NamedSetting<K, string> {
 	type: "radio";
-	options: {
+	options: ReadonlyArray<{
 		label: string;
 		value: string;
-	}[];
+	}>;
 }
-export interface ColorSetting<K extends string> extends NamedSetting<K, string> {
+interface ColorSetting<K extends string> extends NamedSetting<K, string> {
 	type: "color";
 	rgba?: boolean;
 }
-export interface CustomSetting<K extends string, T = any> extends NamedSetting<K, T> {
+interface CustomSetting<K extends string, T = any> extends NamedSetting<K, T> {
 	type: "custom";
 	render: (container: HTMLElement, currentValue: T, update: (newValue: T) => void) => (() => void) | void;
 }
-export interface CustomSection<K extends string, T = any> extends BaseSetting<K, T> {
+interface CustomSection<K extends string, T = any> extends BaseSetting<K, T> {
 	type: "customsection";
 	render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
 }
-export type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
-export interface SettingGroup {
+type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
+interface SettingGroup {
 	type: "group";
 	title: string;
-	settings: PluginSetting<any>[];
+	settings: ReadonlyArray<PluginSetting>;
 }
-export type PluginSettingsDescription = (PluginSetting<any> | SettingGroup)[];
-export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
-export type DescriptionToReturnType<T extends PluginSetting<any>> = T extends DropdownSetting<any> ? string : T extends MultiselectSetting<any> ? string[] : T extends NumberSetting<any> ? number : T extends ToggleSetting<any> ? boolean : T extends TextSetting<any> ? string : T extends SliderSetting<any> ? number : T extends RadioSetting<any> ? string : T extends ColorSetting<any> ? string : T extends CustomSetting<any, infer V> ? V : T extends CustomSection<any, infer V> ? V : never;
-export type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? {
+type PluginSettingsDescription = ReadonlyArray<PluginSetting | SettingGroup>;
+type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
+type DescriptionToReturnType<T extends PluginSetting> = T extends DropdownSetting<any> ? string : T extends MultiselectSetting<any> ? ReadonlyArray<string> : T extends NumberSetting<any> ? number : T extends ToggleSetting<any> ? boolean : T extends TextSetting<any> ? string : T extends SliderSetting<any> ? number : T extends RadioSetting<any> ? string : T extends ColorSetting<any> ? string : T extends CustomSetting<any, infer V> ? V : T extends CustomSection<any, infer V> ? V : never;
+type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? {
 	[K in Id]: DescriptionToReturnType<T>;
 } : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> : never;
-export type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
-export type SettingsObject<T> = T & {
+type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+type SettingsObject<T> = T & {
 	listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;
 };
-export interface SettingsMethods {
+interface SettingsMethods {
 	create<const T extends PluginSettingsDescription>(description: T): SettingsObject<UnionToIntersection<ExtractSettingObject<T[number]>>>;
 	listen(key: string, callback: SettingsChangeCallback, immediate?: boolean): () => void;
 }
-export type PluginSettings = SettingsMethods & Record<string, any>;
-/** @inline */
-export interface HotkeyTrigger {
+type PluginSettings = SettingsMethods & Record<string, any>;
+
+interface HotkeyTrigger {
 	/** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
 	key?: string;
 	/** Should be keyboardevent [codes](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
@@ -6707,26 +6707,26 @@ export interface HotkeyTrigger {
 	shift?: boolean;
 	alt?: boolean;
 }
-/** @inline */
-export interface HotkeyOptions extends HotkeyTrigger {
+
+interface HotkeyOptions extends HotkeyTrigger {
 	preventDefault?: boolean;
 }
-/** @inline */
-export interface ConfigurableHotkeyOptions {
+
+interface ConfigurableHotkeyOptions {
 	category: string;
 	/** There should be no duplicate titles within a category */
 	title: string;
 	preventDefault?: boolean;
 	default?: HotkeyTrigger;
 }
-export interface OldConfigurableOptions {
+interface OldConfigurableOptions {
 	category: string;
 	title: string;
 	preventDefault?: boolean;
 	defaultKeys?: Set<string>;
 }
-/** @inline */
-export type KeyboardCallback = (e: KeyboardEvent) => void;
+
+type KeyboardCallback = (e: KeyboardEvent) => void;
 class BaseHotkeysApi {
 	/**
 	 * Releases all keys, needed if a hotkey opens something that will
@@ -6779,7 +6779,7 @@ class HotkeysApi extends BaseHotkeysApi {
 	removeConfigurable(pluginName: string, hotkeyId: string): void;
 }
 class ScopedHotkeysApi extends BaseHotkeysApi {
-	#private;
+	
 	constructor(id: string);
 	/**
 	 * Adds a hotkey which will fire when certain keys are pressed
@@ -6835,8 +6835,8 @@ class ScopedParcelApi extends BaseParcelApi {
 	getLazy(): () => void;
 }
 type event$1 = (symbol | string);
-export type eventNS = string | event$1[];
-export interface ConstructorOptions {
+type eventNS = string | event$1[];
+interface ConstructorOptions {
 	/**
 	 * @default false
 	 * @description set this to `true` to use wildcards.
@@ -6873,16 +6873,16 @@ export interface ConstructorOptions {
 	 */
 	ignoreErrors?: boolean;
 }
-export interface ListenerFn {
+interface ListenerFn {
 	(...values: any[]): void;
 }
-export interface EventAndListener {
+interface EventAndListener {
 	(event: string | string[], ...values: any[]): void;
 }
-export interface WaitForFilter {
+interface WaitForFilter {
 	(...values: any[]): boolean;
 }
-export interface WaitForOptions {
+interface WaitForOptions {
 	/**
 	 * @default 0
 	 */
@@ -6904,10 +6904,10 @@ export interface WaitForOptions {
 	 */
 	overload: boolean;
 }
-export interface CancelablePromise<T> extends Promise<T> {
+interface CancelablePromise<T> extends Promise<T> {
 	cancel(reason: string): undefined;
 }
-export interface OnceOptions {
+interface OnceOptions {
 	/**
 	 * @default 0
 	 */
@@ -6921,7 +6921,7 @@ export interface OnceOptions {
 	 */
 	overload: boolean;
 }
-export interface ListenToOptions {
+interface ListenToOptions {
 	on?: {
 		(event: event$1 | eventNS, handler: ListenerFn): void;
 	};
@@ -6930,7 +6930,7 @@ export interface ListenToOptions {
 	};
 	reducers: Function | Object;
 }
-export interface GeneralEventEmitter {
+interface GeneralEventEmitter {
 	addEventListener(event: event$1, handler: ListenerFn): this;
 	removeEventListener(event: event$1, handler: ListenerFn): this;
 	addListener?(event: event$1, handler: ListenerFn): this;
@@ -6938,13 +6938,13 @@ export interface GeneralEventEmitter {
 	on?(event: event$1, handler: ListenerFn): this;
 	off?(event: event$1, handler: ListenerFn): this;
 }
-export interface OnOptions {
+interface OnOptions {
 	async?: boolean;
 	promisify?: boolean;
 	nextTick?: boolean;
 	objectify?: boolean;
 }
-export interface Listener {
+interface Listener {
 	emitter: EventEmitter2;
 	event: event$1 | eventNS;
 	listener: ListenerFn;
@@ -6984,8 +6984,8 @@ class EventEmitter2 {
 	static once(emitter: EventEmitter2, event: event$1 | eventNS, options?: OnceOptions): CancelablePromise<any[]>;
 	static defaultMaxListeners: number;
 }
-export type ConnectionType = "None" | "Colyseus" | "Blueboat";
-export interface RequesterOptions {
+type ConnectionType = "None" | "Colyseus" | "Blueboat";
+interface RequesterOptions {
 	url: string;
 	method?: string;
 	data?: any;
@@ -7048,7 +7048,7 @@ class NetApi extends BaseNetApi {
 	removeEventListener(channel: string, callback: (...args: any[]) => void): void;
 }
 class ScopedNetApi extends BaseNetApi {
-	#private;
+	
 	constructor(id: string, defaultGamemode: string[]);
 	/**
 	 * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded.
@@ -7061,13 +7061,13 @@ class ScopedNetApi extends BaseNetApi {
 	/** Runs a callback when a response is recieved for a request under a certain path (can have wildcards) */
 	modifyFetchResponse(path: string, callback: (response: any) => any): () => void;
 }
-export interface ModalButton {
+interface ModalButton {
 	text: string;
 	style?: "primary" | "danger" | "close";
 	onClick?: (event: MouseEvent) => boolean | void;
 }
-/** @inline */
-export interface ModalOptions {
+
+interface ModalOptions {
 	id?: string;
 	title?: string;
 	style?: string;
@@ -7076,20 +7076,20 @@ export interface ModalOptions {
 	buttons?: ModalButton[];
 	onClosed?: () => void;
 }
-export type NoticeType = "info" | "success" | "error" | "warning" | "loading";
-export type MessageSemanticClassNames = {
+type NoticeType = "info" | "success" | "error" | "warning" | "loading";
+interface MessageSemanticClassNames {
 	root?: string;
 	icon?: string;
 	content?: string;
-};
-export type MessageSemanticStyles = {
+}
+interface MessageSemanticStyles {
 	root?: React$1.CSSProperties;
 	icon?: React$1.CSSProperties;
 	content?: React$1.CSSProperties;
-};
-export type ArgsClassNamesType = MessageSemanticClassNames;
-export type ArgsStylesType = MessageSemanticStyles;
-export interface MessageConfigOptions {
+}
+type ArgsClassNamesType = MessageSemanticClassNames;
+type ArgsStylesType = MessageSemanticStyles;
+interface MessageConfigOptions {
 	top?: string | number;
 	duration?: number;
 	prefixCls?: string;
@@ -7101,7 +7101,7 @@ export interface MessageConfigOptions {
 	classNames?: ArgsClassNamesType;
 	styles?: ArgsStylesType;
 }
-export interface MessageArgsProps {
+interface MessageArgsProps {
 	content: React$1.ReactNode;
 	duration?: number;
 	type?: NoticeType;
@@ -7115,12 +7115,12 @@ export interface MessageArgsProps {
 	onClick?: (e: React$1.MouseEvent<HTMLDivElement>) => void;
 	pauseOnHover?: boolean;
 }
-export type MessageJointContent = React$1.ReactNode | MessageArgsProps;
-export interface MessageType extends PromiseLike<boolean> {
+type MessageJointContent = React$1.ReactNode | MessageArgsProps;
+interface MessageType extends PromiseLike<boolean> {
 	(): void;
 }
-export type MessageTypeOpen = (content: MessageJointContent, duration?: number | VoidFunction, onClose?: VoidFunction) => MessageType;
-export interface MessageInstance {
+type MessageTypeOpen = (content: MessageJointContent, duration?: number | VoidFunction, onClose?: VoidFunction) => MessageType;
+interface MessageInstance {
 	info: MessageTypeOpen;
 	success: MessageTypeOpen;
 	error: MessageTypeOpen;
@@ -7129,14 +7129,14 @@ export interface MessageInstance {
 	open: (args: MessageArgsProps) => MessageType;
 	destroy: (key?: React$1.Key) => void;
 }
-export interface MessageBaseMethods {
+interface MessageBaseMethods {
 	open: (config: MessageArgsProps) => MessageType;
 	destroy: (key?: React$1.Key) => void;
 	config: (config: MessageConfigOptions) => void;
 	useMessage: () => MessageInstance;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
-export interface MessageMethods {
+interface MessageMethods {
 	info: MessageTypeOpen;
 	success: MessageTypeOpen;
 	error: MessageTypeOpen;
@@ -7151,28 +7151,28 @@ const NotificationPlacements: readonly [
 	"bottomLeft",
 	"bottomRight"
 ];
-export type NotificationPlacement = (typeof NotificationPlacements)[number];
-export type NotificationIconType = "success" | "info" | "error" | "warning";
-export type NotificationSemanticClassNames = {
+type NotificationPlacement = (typeof NotificationPlacements)[number];
+type NotificationIconType = "success" | "info" | "error" | "warning";
+interface NotificationSemanticClassNames {
 	root?: string;
 	title?: string;
 	description?: string;
 	actions?: string;
 	icon?: string;
-};
-export type NotificationSemanticStyles = {
+}
+interface NotificationSemanticStyles {
 	root?: React$1.CSSProperties;
 	title?: React$1.CSSProperties;
 	description?: React$1.CSSProperties;
 	actions?: React$1.CSSProperties;
 	icon?: React$1.CSSProperties;
-};
-export type NotificationClassNamesType = NotificationSemanticClassNames;
-export type NotificationStylesType = NotificationSemanticStyles;
-export interface NotificationDivProps extends React$1.HTMLProps<HTMLDivElement> {
+}
+type NotificationClassNamesType = NotificationSemanticClassNames;
+type NotificationStylesType = NotificationSemanticStyles;
+interface NotificationDivProps extends React$1.HTMLProps<HTMLDivElement> {
 	"data-testid"?: string;
 }
-export interface NotificationArgsProps {
+interface NotificationArgsProps {
 	message?: React$1.ReactNode;
 	title?: React$1.ReactNode;
 	description?: React$1.ReactNode;
@@ -7198,8 +7198,8 @@ export interface NotificationArgsProps {
 	props?: NotificationDivProps;
 	role?: "alert" | "status";
 }
-export type NotificationStaticFn = (args: NotificationArgsProps) => void;
-export interface NotificationInstance {
+type NotificationStaticFn = (args: NotificationArgsProps) => void;
+interface NotificationInstance {
 	success: NotificationStaticFn;
 	error: NotificationStaticFn;
 	info: NotificationStaticFn;
@@ -7207,7 +7207,7 @@ export interface NotificationInstance {
 	open: NotificationStaticFn;
 	destroy: (key?: React$1.Key) => void;
 }
-export interface NotificationGlobalConfigProps {
+interface NotificationGlobalConfigProps {
 	top?: number;
 	bottom?: number;
 	duration?: number | false;
@@ -7224,20 +7224,20 @@ export interface NotificationGlobalConfigProps {
 	maxCount?: number;
 	props?: NotificationDivProps;
 }
-export interface NotificationBaseMethods {
+interface NotificationBaseMethods {
 	open: (config: NotificationArgsProps) => void;
 	destroy: (key?: React$1.Key) => void;
 	config: (config: NotificationGlobalConfigProps) => void;
 	useNotification: () => NotificationInstance;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
-export interface NotificationNoticeMethods {
+interface NotificationNoticeMethods {
 	success: NotificationStaticFn;
 	info: NotificationStaticFn;
 	warning: NotificationStaticFn;
 	error: NotificationStaticFn;
 }
-export type ModalSemanticClassNames = {
+interface ModalSemanticClassNames {
 	root?: string;
 	header?: string;
 	body?: string;
@@ -7246,8 +7246,8 @@ export type ModalSemanticClassNames = {
 	title?: string;
 	wrapper?: string;
 	mask?: string;
-};
-export type ModalSemanticStyles = {
+}
+interface ModalSemanticStyles {
 	root?: React$1.CSSProperties;
 	header?: React$1.CSSProperties;
 	body?: React$1.CSSProperties;
@@ -7256,16 +7256,16 @@ export type ModalSemanticStyles = {
 	title?: React$1.CSSProperties;
 	wrapper?: React$1.CSSProperties;
 	mask?: React$1.CSSProperties;
-};
-export type ModalClassNamesType = ModalSemanticClassNames;
-export type ModalStylesType = ModalSemanticStyles;
-export type ModalMousePosition = {
+}
+type ModalClassNamesType = ModalSemanticClassNames;
+type ModalStylesType = ModalSemanticStyles;
+type ModalMousePosition = {
 	x: number;
 	y: number;
 } | null;
-export type ModalGetContainerFunc = () => HTMLElement;
-export type ModalLegacyButtonType = "primary" | "dashed" | "default" | "text" | "link";
-export interface ModalCommonProps {
+type ModalGetContainerFunc = () => HTMLElement;
+type ModalLegacyButtonType = "primary" | "dashed" | "default" | "text" | "link";
+interface ModalCommonProps {
 	footer?: React$1.ReactNode | ((originNode: React$1.ReactNode, extra: {
 		OkBtn: React$1.FC;
 		CancelBtn: React$1.FC;
@@ -7277,7 +7277,7 @@ export interface ModalCommonProps {
 	classNames?: ModalClassNamesType;
 	styles?: ModalStylesType;
 }
-export interface ModalProps extends ModalCommonProps {
+interface ModalProps extends ModalCommonProps {
 	open?: boolean;
 	confirmLoading?: boolean;
 	title?: React$1.ReactNode;
@@ -7321,7 +7321,7 @@ export interface ModalProps extends ModalCommonProps {
 		focusTriggerAfterClose?: boolean;
 	};
 }
-export interface ModalFuncProps extends ModalCommonProps {
+interface ModalFuncProps extends ModalCommonProps {
 	prefixCls?: string;
 	className?: string;
 	rootClassName?: string;
@@ -7363,13 +7363,13 @@ export interface ModalFuncProps extends ModalCommonProps {
 		autoFocusButton?: null | "ok" | "cancel";
 	};
 }
-export type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
-export interface ModalFuncReturn {
+type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
+interface ModalFuncReturn {
 	destroy: () => void;
 	update: (configUpdate: ModalConfigUpdate) => void;
 }
-export type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
-export interface ModalStaticFunctions {
+type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
+interface ModalStaticFunctions {
 	info: ModalFunc;
 	success: ModalFunc;
 	error: ModalFunc;
@@ -7377,7 +7377,7 @@ export interface ModalStaticFunctions {
 	confirm: ModalFunc;
 	warn: ModalFunc;
 }
-export interface ModalBaseMethods {
+interface ModalBaseMethods {
 	useModal: () => [
 		api: any,
 		contextHolder: React$1.ReactNode
@@ -7388,9 +7388,9 @@ export interface ModalBaseMethods {
 	}) => void;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
-export type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
-export type AntdMessage = MessageMethods & MessageBaseMethods;
-export type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
+type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
+type AntdMessage = MessageMethods & MessageBaseMethods;
+type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
 class BaseUIApi {
 	/** Shows a customizable modal to the user */
 	showModal(element: HTMLElement | React$1.ReactElement, options?: ModalOptions): void;
@@ -7423,7 +7423,7 @@ class UIApi extends BaseUIApi {
 	removeStyles(id: string): void;
 }
 class ScopedUIApi extends BaseUIApi {
-	#private;
+	
 	constructor(id: string);
 	/**
 	 * Adds a style to the DOM
@@ -7431,8 +7431,8 @@ class ScopedUIApi extends BaseUIApi {
 	 */
 	addStyles(style: string): () => void;
 }
-/** @inline */
-export type ValueChangeCallback = (value: any, remote: boolean) => void;
+
+type ValueChangeCallback = (value: any, remote: boolean) => void;
 class StorageApi {
 	/** Gets a value that has previously been saved */
 	getValue(pluginName: string, key: string, defaultValue?: any): any;
@@ -7453,7 +7453,7 @@ class StorageApi {
 	offAllChanges(pluginName: string): void;
 }
 class ScopedStorageApi {
-	#private;
+	
 	constructor(id: string);
 	/** Gets a value that has previously been saved */
 	getValue(key: string, defaultValue?: any): any;
@@ -7464,12 +7464,12 @@ class ScopedStorageApi {
 	/** Adds a listener for when a stored value with a certain key changes  */
 	onChange(key: string, callback: ValueChangeCallback): () => void;
 }
-/** @inline */
-export type PatcherAfterCallback = (thisVal: any, args: IArguments, returnVal: any) => any;
-/** @inline */
-export type PatcherBeforeCallback = (thisVal: any, args: IArguments) => boolean | void;
-/** @inline */
-export type PatcherInsteadCallback = (thisVal: any, args: IArguments) => void;
+
+type PatcherAfterCallback = (thisVal: any, args: IArguments, returnVal: any) => any;
+
+type PatcherBeforeCallback = (thisVal: any, args: IArguments) => boolean | void;
+
+type PatcherInsteadCallback = (thisVal: any, args: IArguments) => void;
 class PatcherApi {
 	/**
 	 * Runs a callback after a function on an object has been run
@@ -7491,7 +7491,7 @@ class PatcherApi {
 	unpatchAll(id: string): void;
 }
 class ScopedPatcherApi {
-	#private;
+	
 	constructor(id: string);
 	/**
 	 * Runs a callback after a function on an object has been run
@@ -7510,10 +7510,10 @@ class ScopedPatcherApi {
 	 */
 	instead(object: any, method: string, callback: PatcherInsteadCallback): () => void;
 }
-/** @inline */
-export type RunInScopeCallback = (code: string, run: (evalCode: string) => void) => true | void;
-/** @inline */
-export interface Exposer {
+
+type RunInScopeCallback = (code: string, run: (evalCode: string) => void) => true | void;
+
+interface Exposer {
 	check?: string;
 	find: RegExp;
 	callback: (val: any) => void;
@@ -7555,7 +7555,7 @@ class RewriterApi {
 	exposeVar(pluginName: string, prefix: string | boolean, exposer: Exposer): () => void;
 }
 class ScopedRewriterApi {
-	#private;
+	
 	constructor(id: string);
 	/**
 	 * Creates a hook that will modify the code of a script before it is run.
@@ -7583,37 +7583,37 @@ class ScopedRewriterApi {
 	/** A utility function that exposes a variable based on regex to get its name. */
 	exposeVar(prefix: string | boolean, exposer: Exposer): () => void;
 }
-/** @inline */
-export interface CommandOptions {
+
+interface CommandOptions {
 	text: string | (() => string);
 	keywords?: string[];
 	hidden?: () => boolean;
 }
-export interface BaseCommandOptions {
+interface BaseCommandOptions {
 	title: string;
 }
-export interface CommandSelectOptions extends BaseCommandOptions {
+interface CommandSelectOptions extends BaseCommandOptions {
 	options: {
 		label: string;
 		value: string;
 	}[];
 }
-export interface CommandNumberOptions extends BaseCommandOptions {
+interface CommandNumberOptions extends BaseCommandOptions {
 	min?: number;
 	max?: number;
 	decimal?: boolean;
 }
-export interface CommandStringOptions extends BaseCommandOptions {
+interface CommandStringOptions extends BaseCommandOptions {
 	maxLength?: number;
 }
-/** @inline */
-export interface CommandContext {
+
+interface CommandContext {
 	select(options: CommandSelectOptions): Promise<string>;
 	number(options: CommandNumberOptions): Promise<number>;
 	string(options: CommandStringOptions): Promise<string>;
 }
-/** @inline */
-export type CommandCallback = (context: CommandContext) => void | Promise<void>;
+
+type CommandCallback = (context: CommandContext) => void | Promise<void>;
 class CommandsApi {
 	/** Adds a command to the user's command palette. Can request additional input within the callback. */
 	addCommand(id: string, options: CommandOptions, callback: CommandCallback): () => void;
@@ -7621,12 +7621,12 @@ class CommandsApi {
 	removeCommands(id: string): void;
 }
 class ScopedCommandsApi {
-	#private;
+	
 	constructor(id: string);
 	/** Adds a command to the user's command palette. Can request additional input within the callback. */
 	addCommand(options: CommandOptions, callback: CommandCallback): () => void;
 }
-export interface ScriptHeaders {
+interface ScriptHeaders {
 	name: string;
 	description: string;
 	author: string;
@@ -7672,7 +7672,7 @@ class PluginsApi {
 	};
 }
 class Api {
-	#private;
+	
 	/**
 	 * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
 	 * @hidden

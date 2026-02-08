@@ -2,17 +2,17 @@ import type * as React from "react";
 
 type NoticeType = "info" | "success" | "error" | "warning" | "loading";
 
-type MessageSemanticClassNames = {
+interface MessageSemanticClassNames {
     root?: string;
     icon?: string;
     content?: string;
-};
+}
 
-type MessageSemanticStyles = {
+interface MessageSemanticStyles {
     root?: React.CSSProperties;
     icon?: React.CSSProperties;
     content?: React.CSSProperties;
-};
+}
 
 type ArgsClassNamesType = MessageSemanticClassNames;
 
@@ -90,21 +90,21 @@ type NotificationPlacement = (typeof NotificationPlacements)[number];
 
 type NotificationIconType = "success" | "info" | "error" | "warning";
 
-type NotificationSemanticClassNames = {
+interface NotificationSemanticClassNames {
     root?: string;
     title?: string;
     description?: string;
     actions?: string;
     icon?: string;
-};
+}
 
-type NotificationSemanticStyles = {
+interface NotificationSemanticStyles {
     root?: React.CSSProperties;
     title?: React.CSSProperties;
     description?: React.CSSProperties;
     actions?: React.CSSProperties;
     icon?: React.CSSProperties;
-};
+}
 
 type NotificationClassNamesType = NotificationSemanticClassNames;
 
@@ -185,7 +185,7 @@ interface NotificationNoticeMethods {
     error: NotificationStaticFn;
 }
 
-type ModalSemanticClassNames = {
+interface ModalSemanticClassNames {
     root?: string;
     header?: string;
     body?: string;
@@ -194,9 +194,9 @@ type ModalSemanticClassNames = {
     title?: string;
     wrapper?: string;
     mask?: string;
-};
+}
 
-type ModalSemanticStyles = {
+interface ModalSemanticStyles {
     root?: React.CSSProperties;
     header?: React.CSSProperties;
     body?: React.CSSProperties;
@@ -205,7 +205,7 @@ type ModalSemanticStyles = {
     title?: React.CSSProperties;
     wrapper?: React.CSSProperties;
     mask?: React.CSSProperties;
-};
+}
 
 type ModalClassNamesType = ModalSemanticClassNames;
 

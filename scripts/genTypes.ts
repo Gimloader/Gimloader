@@ -15,8 +15,18 @@ function readTypes(path: string) {
     let types = fs.readFileSync(path, "utf-8");
     
     // Remove export/declare keywords
-    types = types.replace(/(export )?declare /g, "");
     types = types.replaceAll("export {};", "");
+    types = types.replaceAll("export ", "");
+    types = types.replaceAll("declare ", "");
+
+    // Remove #private annotations
+    types = types.replaceAll("#private;", "");
+
+    // Remove @inline jsdoc tags
+    types = types.replaceAll("/** @inline */", "");
+
+    // Allow void in unions
+    if(isDT) types = types.replace(/^(.*\| void.*)$/gm, "// eslint-disable-next-line @typescript-eslint/no-invalid-void-type\n$1");
 
     // Extract import statements
     const matches = types.matchAll(importRegex);

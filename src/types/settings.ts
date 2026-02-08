@@ -11,13 +11,13 @@ export interface NamedSetting<K extends string, T> extends BaseSetting<K, T> {
 
 export interface DropdownSetting<K extends string> extends NamedSetting<K, string> {
     type: "dropdown";
-    options: { label: string; value: string }[];
+    options: ReadonlyArray<{ label: string; value: string }>;
     allowNone?: boolean;
 }
 
-export interface MultiselectSetting<K extends string> extends NamedSetting<K, string[]> {
+export interface MultiselectSetting<K extends string> extends NamedSetting<K, ReadonlyArray<string>> {
     type: "multiselect";
-    options: { label: string; value: string }[];
+    options: ReadonlyArray<{ label: string; value: string }>;
 }
 
 export interface NumberSetting<K extends string> extends NamedSetting<K, number> {
@@ -42,13 +42,13 @@ export interface SliderSetting<K extends string> extends NamedSetting<K, number>
     min: number;
     max: number;
     step?: number;
-    ticks?: number[];
+    ticks?: ReadonlyArray<number>;
     formatter?: (value: number) => string;
 }
 
 export interface RadioSetting<K extends string> extends NamedSetting<K, string> {
     type: "radio";
-    options: { label: string; value: string }[];
+    options: ReadonlyArray<{ label: string; value: string }>;
 }
 
 export interface ColorSetting<K extends string> extends NamedSetting<K, string> {
@@ -81,15 +81,15 @@ export type PluginSetting<K extends string = string> =
 export interface SettingGroup {
     type: "group";
     title: string;
-    settings: PluginSetting<any>[];
+    settings: ReadonlyArray<PluginSetting>;
 }
 
-export type PluginSettingsDescription = (PluginSetting<any> | SettingGroup)[];
+export type PluginSettingsDescription = ReadonlyArray<PluginSetting | SettingGroup>;
 export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
 
 // There's probably some black magic that can be done to get rid of this
-export type DescriptionToReturnType<T extends PluginSetting<any>> = T extends DropdownSetting<any> ? string
-    : T extends MultiselectSetting<any> ? string[]
+export type DescriptionToReturnType<T extends PluginSetting> = T extends DropdownSetting<any> ? string
+    : T extends MultiselectSetting<any> ? ReadonlyArray<string>
     : T extends NumberSetting<any> ? number
     : T extends ToggleSetting<any> ? boolean
     : T extends TextSetting<any> ? string
