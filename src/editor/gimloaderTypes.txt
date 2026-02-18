@@ -7464,29 +7464,33 @@ class ScopedStorageApi {
 	/** Adds a listener for when a stored value with a certain key changes  */
 	onChange(key: string, callback: ValueChangeCallback): () => void;
 }
+type BaseFunction = (...args: any[]) => any;
+type FunctionKeys<T> = keyof {
+	[K in keyof T as T[K] extends BaseFunction ? K : never]: T[K];
+};
 
-type PatcherAfterCallback = (thisVal: any, args: IArguments, returnVal: any) => any;
+type PatcherAfterCallback<T> = (thisVal: any, args: T extends BaseFunction ? Parameters<T> : any[], returnVal: T extends BaseFunction ? ReturnType<T> : any) => any;
 
-type PatcherBeforeCallback = (thisVal: any, args: IArguments) => boolean | void;
+type PatcherBeforeCallback<T> = (thisVal: any, args: T extends BaseFunction ? Parameters<T> : any[]) => boolean | void;
 
-type PatcherInsteadCallback = (thisVal: any, args: IArguments) => void;
+type PatcherInsteadCallback<T> = (thisVal: any, args: T extends BaseFunction ? Parameters<T> : any[]) => any;
 class PatcherApi {
 	/**
 	 * Runs a callback after a function on an object has been run
 	 * @returns A function to remove the patch
 	 */
-	after(id: string, object: any, method: string, callback: PatcherAfterCallback): () => void;
+	after<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
 	/**
 	 * Runs a callback before a function on an object has been run.
 	 * Return true from the callback to prevent the function from running
 	 * @returns A function to remove the patch
 	 */
-	before(id: string, object: any, method: string, callback: PatcherBeforeCallback): () => void;
+	before<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
 	/**
 	 * Runs a function instead of a function on an object
 	 * @returns A function to remove the patch
 	 */
-	instead(id: string, object: any, method: string, callback: PatcherInsteadCallback): () => void;
+	instead<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
 	/** Removes all patches with a given id */
 	unpatchAll(id: string): void;
 }
@@ -7497,18 +7501,18 @@ class ScopedPatcherApi {
 	 * Runs a callback after a function on an object has been run
 	 * @returns A function to remove the patch
 	 */
-	after(object: any, method: string, callback: PatcherAfterCallback): () => void;
+	after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
 	/**
 	 * Runs a callback before a function on an object has been run.
 	 * Return true from the callback to prevent the function from running
 	 * @returns A function to remove the patch
 	 */
-	before(object: any, method: string, callback: PatcherBeforeCallback): () => void;
+	before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
 	/**
 	 * Runs a function instead of a function on an object
 	 * @returns A function to remove the patch
 	 */
-	instead(object: any, method: string, callback: PatcherInsteadCallback): () => void;
+	instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
 }
 
 type RunInScopeCallback = (code: string, run: (evalCode: string) => void) => true | void;

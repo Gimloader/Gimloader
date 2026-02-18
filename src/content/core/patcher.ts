@@ -1,22 +1,15 @@
-/** @inline */
-export type PatcherAfterCallback = (thisVal: any, args: IArguments, returnVal: any) => any;
-
-/** @inline */
-export type PatcherBeforeCallback = (thisVal: any, args: IArguments) => boolean | void;
-
-/** @inline */
-export type PatcherInsteadCallback = (thisVal: any, args: IArguments) => void;
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/patcher";
 
 type Patch =
-    | { callback: PatcherBeforeCallback; point: "before" }
-    | { callback: PatcherAfterCallback; point: "after" }
-    | { callback: PatcherInsteadCallback; point: "instead" };
+    | { callback: PatcherBeforeCallback<any>; point: "before" }
+    | { callback: PatcherAfterCallback<any>; point: "after" }
+    | { callback: PatcherInsteadCallback<any>; point: "instead" };
 
 export default class Patcher {
-    static patches: Map<object, Map<string, { original: any; patches: Patch[] }>> = new Map();
+    static patches: Map<object, Map<PropertyKey, { original: any; patches: Patch[] }>> = new Map();
     static unpatchers: Map<string, (() => void)[]> = new Map();
 
-    static applyPatches(object: object, property: string) {
+    static applyPatches(object: object, property: PropertyKey) {
         const properties = this.patches.get(object);
         if(!properties) return;
 
@@ -34,7 +27,7 @@ export default class Patcher {
             switch (patch.point) {
                 case "before":
                     object[property] = function() {
-                        const cancel = patch.callback(this, arguments);
+                        const cancel = patch.callback(this, arguments as any);
                         if(cancel) return;
                         return original.apply(this, arguments);
                     };
@@ -42,7 +35,7 @@ export default class Patcher {
                 case "after":
                     object[property] = function() {
                         const returnValue = original.apply(this, arguments);
-                        const newReturn = patch.callback(this, arguments, returnValue);
+                        const newReturn = patch.callback(this, arguments as any, returnValue);
 
                         if(newReturn) return newReturn;
                         return returnValue;
@@ -50,7 +43,7 @@ export default class Patcher {
                     break;
                 case "instead":
                     object[property] = function() {
-                        return patch.callback(this, arguments);
+                        return patch.callback(this, arguments as any);
                     };
                     break;
             }
@@ -69,7 +62,7 @@ export default class Patcher {
         }
     }
 
-    static addPatch(object: object, property: string, patch: Patch) {
+    static addPatch(object: object, property: PropertyKey, patch: Patch) {
         if(!this.patches.has(object)) {
             this.patches.set(object, new Map([[property, { original: object[property], patches: [] }]]));
         }
@@ -90,7 +83,7 @@ export default class Patcher {
         this.applyPatches(object, property);
     }
 
-    static getRemovePatch(id: string | null, object: object, property: string, patch: Patch) {
+    static getRemovePatch(id: string | null, object: object, property: PropertyKey, patch: Patch) {
         const unpatch = () => {
             if(id) {
                 // remove the patch from the id's list of unpatchers
@@ -144,34 +137,43 @@ export default class Patcher {
         return unpatch;
     }
 
-    static after(id: string | null, object: object, property: string, callback: PatcherAfterCallback) {
+    static after<O extends object, K extends FunctionKeys<O>>(
+        id: string | null,
+        object: O,
+        property: K,
+        callback: PatcherAfterCallback<O[K]>
+    ) {
         const patch: Patch = { callback, point: "after" };
 
         this.addPatch(object, property, patch);
 
-        const remove = this.getRemovePatch(id, object, property, patch);
-
-        return remove;
+        return this.getRemovePatch(id, object, property, patch);
     }
 
-    static before(id: string | null, object: object, property: string, callback: PatcherBeforeCallback) {
+    static before<O extends object, K extends FunctionKeys<O>>(
+        id: string | null,
+        object: O,
+        property: K,
+        callback: PatcherBeforeCallback<O[K]>
+    ) {
         const patch: Patch = { callback, point: "before" };
 
         this.addPatch(object, property, patch);
 
-        const remove = this.getRemovePatch(id, object, property, patch);
-
-        return remove;
+        return this.getRemovePatch(id, object, property, patch);
     }
 
-    static instead(id: string | null, object: object, property: string, callback: PatcherInsteadCallback) {
+    static instead<O extends object, K extends FunctionKeys<O>>(
+        id: string | null,
+        object: O,
+        property: K,
+        callback: PatcherInsteadCallback<O[K]>
+    ) {
         const patch: Patch = { callback, point: "instead" };
 
         this.addPatch(object, property, patch);
 
-        const remove = this.getRemovePatch(id, object, property, patch);
-
-        return remove;
+        return this.getRemovePatch(id, object, property, patch);
     }
 
     static unpatchAll(id: string) {

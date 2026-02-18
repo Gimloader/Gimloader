@@ -1,1 +1,2 @@
 Fixed poller setting not updating when loading a config
+Improved patcher types

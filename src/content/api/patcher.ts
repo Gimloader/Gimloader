@@ -1,4 +1,4 @@
-import type { PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$core/patcher";
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/patcher";
 import Patcher from "$core/patcher";
 import { validate } from "$content/utils";
 
@@ -7,7 +7,12 @@ class PatcherApi {
      * Runs a callback after a function on an object has been run
      * @returns A function to remove the patch
      */
-    after(id: string, object: any, method: string, callback: PatcherAfterCallback) {
+    after<O extends object, K extends FunctionKeys<O>>(
+        id: string,
+        object: O,
+        method: K,
+        callback: PatcherAfterCallback<O[K]>
+    ) {
         validate("patcher.after", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.after(id, object, method, callback);
@@ -18,7 +23,12 @@ class PatcherApi {
      * Return true from the callback to prevent the function from running
      * @returns A function to remove the patch
      */
-    before(id: string, object: any, method: string, callback: PatcherBeforeCallback) {
+    before<O extends object, K extends FunctionKeys<O>>(
+        id: string,
+        object: O,
+        method: K,
+        callback: PatcherBeforeCallback<O[K]>
+    ) {
         validate("patcher.before", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.before(id, object, method, callback);
@@ -28,7 +38,12 @@ class PatcherApi {
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
      */
-    instead(id: string, object: any, method: string, callback: PatcherInsteadCallback) {
+    instead<O extends object, K extends FunctionKeys<O>>(
+        id: string,
+        object: O,
+        method: K,
+        callback: PatcherInsteadCallback<O[K]>
+    ) {
         validate("patcher.instead", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.instead(id, object, method, callback);
@@ -53,7 +68,11 @@ class ScopedPatcherApi {
      * Runs a callback after a function on an object has been run
      * @returns A function to remove the patch
      */
-    after(object: any, method: string, callback: PatcherAfterCallback) {
+    after<O extends object, K extends FunctionKeys<O>>(
+        object: O,
+        method: K,
+        callback: PatcherAfterCallback<O[K]>
+    ) {
         validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.after(this.#id, object, method, callback);
@@ -64,7 +83,11 @@ class ScopedPatcherApi {
      * Return true from the callback to prevent the function from running
      * @returns A function to remove the patch
      */
-    before(object: any, method: string, callback: PatcherBeforeCallback) {
+    before<O extends object, K extends FunctionKeys<O>>(
+        object: O,
+        method: K,
+        callback: PatcherBeforeCallback<O[K]>
+    ) {
         validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.before(this.#id, object, method, callback);
@@ -74,7 +97,11 @@ class ScopedPatcherApi {
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
      */
-    instead(object: any, method: string, callback: PatcherInsteadCallback) {
+    instead<O extends object, K extends FunctionKeys<O>>(
+        object: O,
+        method: K,
+        callback: PatcherInsteadCallback<O[K]>
+    ) {
         validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
 
         return Patcher.instead(this.#id, object, method, callback);
