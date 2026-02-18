@@ -1,2 +1,3 @@
 Fixed poller setting not updating when loading a config
 Improved patcher types
+Added script version number to loging

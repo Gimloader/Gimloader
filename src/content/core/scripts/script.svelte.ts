@@ -111,7 +111,8 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
                         this.exported = exports;
 
                         this.onImport?.(exports);
-                        log(`Loaded ${this.type} ${this.headers.name}`);
+                        const version = this.headers.version ? " v" + this.headers.version : "";
+                        log(`Loaded ${this.type} ${this.headers.name}${version}`);
 
                         res();
                     })
