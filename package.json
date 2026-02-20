@@ -3,7 +3,6 @@
   "version": "1.11.0",
   "description": "A plugin loader and manager for Gimkit",
   "type": "module",
-  "typing": "bnudled.d.ts",
   "scripts": {
     "build": "bun run scripts/build.ts",
     "watch": "bun run scripts/build.ts -w",
@@ -74,7 +73,7 @@
     "eventemitter2": "^6.4.9",
     "idb-keyval": "^6.2.2",
     "monaco-editor": "^0.52.2",
-    "svelte": "^5.43.0",
+    "svelte": "5.43.0",
     "svelte-awesome-color-picker": "^4.1.0",
     "svelte-dnd-action": "^0.9.66",
     "svelte-material-icons": "^3.0.5",

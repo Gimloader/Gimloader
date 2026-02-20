@@ -22,52 +22,76 @@ import createSettingsApi from "./settings";
 import Commands from "$content/core/commands.svelte";
 import { nop } from "$shared/utils";
 import Modals from "$content/core/modals.svelte";
+import Svelte from "./svelte";
 
 class Api {
-    /**
-     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
-     * @hidden
-     */
-    static parcel = Object.freeze(new ParcelApi());
-
     /** Functions to edit Gimkit's code */
     static rewriter = Object.freeze(new RewriterApi());
+    /** Functions to edit Gimkit's code */
+    rewriter: Readonly<ScopedRewriterApi>;
 
     /** Functions to listen for key combinations */
     static hotkeys = Object.freeze(new HotkeysApi());
+    /** Functions to listen for key combinations */
+    hotkeys: Readonly<ScopedHotkeysApi>;
 
     /**
      * Ways to interact with the current connection to the server,
      * and functions to send general requests
      */
     static net = Object.freeze(new NetApi());
+    /**
+     * Ways to interact with the current connection to the server,
+     * and functions to send general requests
+     */
+    net: Readonly<ScopedNetApi>;
 
     /** Functions for interacting with the DOM */
     static UI = Object.freeze(new UIApi());
+    /** Functions for interacting with the DOM */
+    UI: Readonly<ScopedUIApi>;
 
     /** Functions for persisting data between reloads */
     static storage = Object.freeze(new StorageApi());
+    /** Functions for persisting data between reloads */
+    storage: Readonly<ScopedStorageApi>;
 
     /** Functions for intercepting the arguments and return values of functions */
     static patcher = Object.freeze(new PatcherApi());
+    /** Functions for intercepting the arguments and return values of functions */
+    patcher: Readonly<ScopedPatcherApi>;
 
     /** Functions for adding commands to the command palette */
     static commands = Object.freeze(new CommandsApi());
+    /** Functions for adding commands to the command palette */
+    commands: Readonly<ScopedCommandsApi>;
 
     /** Methods for getting info on libraries */
     static libs = Object.freeze(new LibsApi());
+    /** Methods for getting info on libraries */
+    libs = Api.libs;
 
     /** Gets the exported values of a library */
     static lib = this.libs.get;
+    /** Gets the exported values of a library */
+    lib = Api.libs.get;
 
     /** Methods for getting info on plugins */
     static plugins = Object.freeze(new PluginsApi());
+    /** Methods for getting info on plugins */
+    plugins = Api.plugins;
 
     /** Gets the exported values of a plugin, if it has been enabled */
     static plugin = this.plugins.get;
+    /** Gets the exported values of a plugin, if it has been enabled */
+    plugin = Api.plugins.get;
 
     /** Gimkit's internal react instance */
     static get React() {
+        return UI.React;
+    }
+    /** Gimkit's internal react instance */
+    get React() {
         return UI.React;
     }
 
@@ -75,17 +99,54 @@ class Api {
     static get ReactDOM() {
         return UI.ReactDOM;
     }
+    /** Gimkit's internal reactDom instance */
+    get ReactDOM() {
+        return UI.ReactDOM;
+    }
 
     /** A variety of Gimkit internal objects available in 2d gamemodes */
     static get stores() {
         return GimkitInternals.stores;
     }
+    /** A variety of gimkit internal objects available in 2d gamemodes */
+    get stores() {
+        return GimkitInternals.stores;
+    }
+
+    /**
+     * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
+     * Should never be used by hand.
+     */
+    static svelte_5_43_0 = Svelte;
+    /**
+     * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
+     * Should never be used by hand.
+     */
+    svelte_5_43_0 = Svelte;
+
+    /**
+     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
+     * @hidden
+     */
+    static parcel = Object.freeze(new ParcelApi());
+    /**
+     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
+     * @hidden
+     */
+    parcel: Readonly<ScopedParcelApi>;
 
     /**
      * @deprecated Use GL.UI.notification
      * @hidden
      */
     static get notification() {
+        return GimkitInternals.notification;
+    }
+    /**
+     * @deprecated Use api.UI.notification
+     * @hidden
+     */
+    get notification() {
         return GimkitInternals.notification;
     }
 
@@ -181,73 +242,8 @@ class Api {
         this.onStop(cleanup);
     }
 
-    /**
-     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
-     * @hidden
-     */
-    parcel: Readonly<ScopedParcelApi>;
-
-    /** Functions to edit Gimkit's code */
-    rewriter: Readonly<ScopedRewriterApi>;
-
-    /** Functions to listen for key combinations */
-    hotkeys: Readonly<ScopedHotkeysApi>;
-
-    /**
-     * Ways to interact with the current connection to the server,
-     * and functions to send general requests
-     */
-    net: Readonly<ScopedNetApi>;
-
-    /** Functions for interacting with the DOM */
-    UI: Readonly<ScopedUIApi>;
-
-    /** Functions for persisting data between reloads */
-    storage: Readonly<ScopedStorageApi>;
-
-    /** Functions for intercepting the arguments and return values of functions */
-    patcher: Readonly<ScopedPatcherApi>;
-
-    /** Functions for adding commands to the command palette */
-    commands: Readonly<ScopedCommandsApi>;
-
     /** A utility for creating persistent settings menus, only available to plugins */
     settings: PluginSettings;
-
-    /** Methods for getting info on libraries */
-    libs = Api.libs;
-
-    /** Gets the exported values of a library */
-    lib = Api.libs.get;
-
-    /** Methods for getting info on plugins */
-    plugins = Api.plugins;
-
-    /** Gets the exported values of a plugin, if it has been enabled */
-    plugin = Api.plugins.get;
-
-    /** Gimkit's internal react instance */
-    get React() {
-        return UI.React;
-    }
-
-    /** Gimkit's internal reactDom instance */
-    get ReactDOM() {
-        return UI.ReactDOM;
-    }
-
-    /** A variety of gimkit internal objects available in 2d gamemodes */
-    get stores() {
-        return GimkitInternals.stores;
-    }
-
-    /**
-     * @deprecated Use api.UI.notification
-     * @hidden
-     */
-    get notification() {
-        return GimkitInternals.notification;
-    }
 
     /** Run a callback when the script is disabled */
     onStop: (callback: () => void) => void;
