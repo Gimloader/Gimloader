@@ -1,4 +1,1 @@
-Fixed poller setting not updating when loading a config
-Improved patcher types
-Added script version number to loging
-Exposed svelte v5.43.0 for scripts
+Fixed changelog modal overflowing
