@@ -6,6 +6,7 @@ import type { PluginInfo } from "$types/state";
 import Modals from "../modals.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
+import Commands from "../commands.svelte";
 
 export default new class PluginManager extends ScriptManager<Plugin, PluginInfo> {
     singular = "plugin";
@@ -118,5 +119,41 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         if(info.enabled) plugin.start(false);
 
         return plugin;
+    }
+
+    addCommands() {
+        super.addCommands();
+
+        const hasSettings = (p: Plugin) => p.openSettingsMenu.length > 0;
+        const isDisabled = (p: Plugin) => !p.enabled;
+        const isEnabled = (p: Plugin) => p.enabled;
+
+        // Add plugin settings command
+        Commands.addCommand(null, {
+            text: "Open plugin settings",
+            keywords: ["preferences", "options", "configure"],
+            hidden: () => this.scripts.filter(hasSettings).length === 0
+        }, async (context) => {
+            const plugin = await this.selectScript(context, "Select plugin to view settings of", hasSettings);
+            if(plugin) plugin.openSettingsMenu.forEach(fn => fn());
+        });
+
+        // Add plugin enable command
+        Commands.addCommand(null, {
+            text: "Enable plugin",
+            hidden: () => this.scripts.filter(isDisabled).length === 0
+        }, async (context) => {
+            const plugin = await this.selectScript(context, "Select plugin to enable", isDisabled);
+            if(plugin) plugin.toggleConfirm(true);
+        });
+
+        // Add plugin disable command
+        Commands.addCommand(null, {
+            text: "Disable plugin",
+            hidden: () => this.scripts.filter(isEnabled).length === 0
+        }, async (context) => {
+            const plugin = await this.selectScript(context, "Select plugin to disable", isEnabled);
+            if(plugin) plugin.toggleConfirm(false);
+        });
     }
 }();

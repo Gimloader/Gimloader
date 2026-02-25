@@ -7,7 +7,6 @@ import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
 import { gameState } from "$content/stores";
 import Modals from "../modals.svelte";
 import { scripts } from "./map";
-import Commands from "../commands.svelte";
 import Port from "$shared/net/port.svelte";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
@@ -25,18 +24,9 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     exported: any;
     errored: boolean = $state(false);
 
-    cleanupDeleteCommand: () => void;
-
     constructor(info: T, headers?: ScriptHeaders) {
         this.code = info.code;
         this.updateHeaders(headers);
-
-        this.cleanupDeleteCommand = Commands.addCommand(null, {
-            text: `Delete ${this.headers.name}`,
-            keywords: ["remove", "uninstall"]
-        }, () => {
-            this.deleteConfirm();
-        });
     }
 
     updateHeaders(headers?: ScriptHeaders) {
@@ -249,6 +239,5 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     delete() {
         this.stop();
-        this.cleanupDeleteCommand();
     }
 }

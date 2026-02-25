@@ -6,6 +6,8 @@ import { parseScriptHeaders } from "$shared/parseHeader";
 import Modals from "../modals.svelte";
 import { toast } from "svelte-sonner";
 import { scripts } from "./map";
+import Commands from "../commands.svelte";
+import type { CommandContext } from "$types/commands";
 
 export default abstract class ScriptManager<T extends Script, I extends ScriptInfo> {
     abstract singular: string;
@@ -30,6 +32,8 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
             this.scripts.push(script);
             scripts.set(script.headers.name, script);
         }
+
+        this.addCommands();
     }
 
     updateState(scriptInfo: I[]) {
@@ -175,5 +179,28 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         scripts.delete(name);
         Port.send(`${this.type}Delete`, { name });
         toast.warning(`Overwrote ${this.singular} ${name}`);
+    }
+
+    async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T> {
+        const scripts = filter ? this.scripts.filter(filter) : this.scripts;
+        
+        const name = await context.select({
+            title,
+            options: scripts.map(s => ({ label: s.headers.name, value: s.headers.name }))
+        });
+
+        return this.getScript(name);
+    }
+
+    addCommands() {
+        // Add a command for deleting a script
+        Commands.addCommand(null, {
+            text: `Delete ${this.singular}`,
+            keywords: ["remove", "uninstall"],
+            hidden: () => this.scripts.length === 0
+        }, async (context) => {
+            const script = await this.selectScript(context, `Select ${this.singular} to delete`);
+            script.deleteConfirm();
+        });
     }
 }

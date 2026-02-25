@@ -1,1 +1,2 @@
 Fixed changelog modal overflowing
+Consolidated individual commands for each script into a few general ones

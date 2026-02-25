@@ -14,7 +14,7 @@ const SelectSchema = z.object({
     title: z.string(),
     options: z.array(z.object({
         label: z.string(),
-        value: z.string()
+        value: z.any()
     })).min(1)
 });
 
