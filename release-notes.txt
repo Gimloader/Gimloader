@@ -2,3 +2,4 @@ Fixed changelog modal overflowing
 Consolidated individual commands for each script into a few general ones
 Fixed command palette not working when a modal is open
 Fixed arrow keys not working properly in select input on command palette
+Disabled Gimkit's "Stop!" message in the console

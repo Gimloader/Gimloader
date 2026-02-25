@@ -18,10 +18,11 @@ function makeHookUnenumerable() {
 }
 
 export function disableConsoleWarning() {
+    // biome-ignore lint/suspicious/noConsole: Used to disable other console logs
     const log = console.log;
     let remainingIgnores = 2;
 
-    console.log = function(...data: any[]) {
+    console.log = (...data: any[]) => {
         // Allow all Gimloader logs through
         if(data[0] === "%c[GL]") return log(...data);
 
