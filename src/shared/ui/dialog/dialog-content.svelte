@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Dialog as DialogPrimitive } from "bits-ui";
     import XIcon from "@lucide/svelte/icons/x";
-    import { onMount, type Snippet } from "svelte";
+    import type { Snippet } from "svelte";
     import * as Dialog from "./index.js";
     import { cn, type WithoutChildrenOrChild } from "$shared/shadcn.js";
 
@@ -25,6 +25,9 @@
     $effect(() => {
         ref?.addEventListener("keydown", (e) => {
             if(e.key === "Escape") return;
+
+            // Allow keybinds
+            if(e.ctrlKey || e.altKey) return;
             e.stopPropagation();
         });
     });

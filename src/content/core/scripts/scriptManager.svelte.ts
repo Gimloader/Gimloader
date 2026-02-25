@@ -183,7 +183,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
 
     async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T> {
         const scripts = filter ? this.scripts.filter(filter) : this.scripts;
-        
+
         const name = await context.select({
             title,
             options: scripts.map(s => ({ label: s.headers.name, value: s.headers.name }))

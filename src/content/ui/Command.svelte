@@ -6,7 +6,6 @@
     import { computeCommandScore } from "bits-ui";
     import { watch } from "runed";
     import type { Action } from "svelte/action";
-    import { stopPropagation } from "svelte/legacy";
 
     let selectedIndex = $state(0);
     let searched = $state("");
@@ -62,13 +61,13 @@
         return options;
     });
 
-    function inputKeydown(e: KeyboardEvent) {
+    function inputKeydown(e: KeyboardEvent, max: number) {
         if(!Commands.open) return;
 
         if(e.key === "ArrowDown") {
-            selectedIndex = (selectedIndex + 1) % items.length;
+            selectedIndex = (selectedIndex + 1) % max;
         } else if(e.key === "ArrowUp") {
-            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            selectedIndex = (selectedIndex - 1 + max) % max;
         } else if(e.key === "Enter") {
             onSelect(selectedIndex);
         }
@@ -158,7 +157,7 @@
                     bind:value={searched}
                     spellcheck={false}
                     class={inputClass}
-                    onkeydown={inputKeydown}
+                    onkeydown={(e) => inputKeydown(e, items.length)}
                 />
             </div>
             <div class="max-h-80 scroll-py-1 overflow-y-auto overflow-x-hidden p-2">
@@ -178,7 +177,7 @@
                     bind:value={selectSearch}
                     spellcheck={false}
                     class={inputClass}
-                    onkeydown={inputKeydown}
+                    onkeydown={(e) => inputKeydown(e, selectItems.length)}
                 />
             </div>
             <div class="max-h-80 scroll-py-1 overflow-y-auto overflow-x-hidden p-2">
@@ -194,7 +193,7 @@
                     spellcheck={false}
                     maxlength={Commands.action.options.maxLength}
                     class={inputClass}
-                    onkeydown={inputKeydown}
+                    onkeydown={(e) => inputKeydown(e, 1)}
                 />
             </div>
         {:else}
@@ -208,7 +207,7 @@
                     min={Commands.action.options.min}
                     max={Commands.action.options.max}
                     step={Commands.action.options.decimal ? null : 1}
-                    onkeydown={inputKeydown}
+                    onkeydown={(e) => inputKeydown(e, 1)}
                 />
             </div>
         {/if}
