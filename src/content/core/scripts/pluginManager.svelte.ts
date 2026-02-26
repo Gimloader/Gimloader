@@ -7,6 +7,7 @@ import Modals from "../modals.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
 import Commands from "../commands.svelte";
+import { downloadScript } from "../net/download";
 
 export default new class PluginManager extends ScriptManager<Plugin, PluginInfo> {
     singular = "plugin";
@@ -119,6 +120,46 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         if(info.enabled) plugin.start(false);
 
         return plugin;
+    }
+
+    async require(requirer: string, name: string, downloadUrl?: string) {
+        // Try to enable the plugin if it already exists
+        const existing = this.getScript(name);
+        if(existing) {
+            if(existing.enabled) return existing.exported;
+
+            const confirmed = await Modals.open("dependency", {
+                script: existing,
+                type: "confirm",
+                title: `${requirer} is asking to enable ${name}`
+            });
+
+            if(!confirmed) throw new Error("User declined enabling dependency");
+
+            const success = await existing.enableConfirm(true);
+            if(!success) throw new Error(`Failed to enable dependency ${name}`);
+
+            await existing.start(false);
+            return existing.exported;
+        }
+
+        if(!downloadUrl) throw new Error(`Plugin ${name} is required but cannot be automatically downloaded`);
+
+        // Ask about downloading the plugin
+        const confirmed = await Modals.open("confirm", {
+            title: "Download Confirmation",
+            text: `${requirer} is asking to install and enable ${name}. Do you want to proceed?`
+        });
+
+        if(!confirmed) throw new Error("User declined downloading dependency");
+
+        // Download the plugin
+        await downloadScript(downloadUrl, "plugin", true);
+        const plugin = this.getScript(name);
+        if(!plugin) throw new Error(`Failed to download dependency ${name}`);
+
+        await plugin.start(false);
+        return plugin.exported;
     }
 
     addCommands() {

@@ -8,11 +8,11 @@ import { ScopedStorageApi, StorageApi } from "./storage";
 import { PatcherApi, ScopedPatcherApi } from "./patcher";
 import { RewriterApi, ScopedRewriterApi } from "./rewriter";
 import { CommandsApi, ScopedCommandsApi } from "./commands";
+import { PluginsApi, ScopedPluginsApi } from "./plugins";
 import GimkitInternals from "$core/internals";
 import Net from "$core/net/net";
 import UI from "$core/ui/ui";
 import LibsApi from "./libs";
-import PluginsApi from "./plugins";
 import setupScoped from "$content/scopedApi";
 import Hotkeys from "$core/hotkeys/hotkeys.svelte";
 import Patcher from "$core/patcher";
@@ -79,7 +79,7 @@ class Api {
     /** Methods for getting info on plugins */
     static plugins = Object.freeze(new PluginsApi());
     /** Methods for getting info on plugins */
-    plugins = Api.plugins;
+    plugins: Readonly<ScopedPluginsApi>;
 
     /** Gets the exported values of a plugin, if it has been enabled */
     static plugin = this.plugins.get;
@@ -210,6 +210,7 @@ class Api {
         this.storage = Object.freeze(new ScopedStorageApi(scoped.id));
         this.patcher = Object.freeze(new ScopedPatcherApi(scoped.id));
         this.commands = Object.freeze(new ScopedCommandsApi(scoped.id));
+        this.plugins = Object.freeze(new ScopedPluginsApi(scoped.id));
         if(scoped.script instanceof Plugin) {
             this.settings = createSettingsApi(scoped.script);
         }

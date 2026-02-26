@@ -114,10 +114,12 @@ export class Plugin extends Script<PluginInfo> {
                     type: "confirm",
                     title
                 });
-                if(!confirmed) return;
+                if(!confirmed) return false;
 
-                this.enableConfirm(true);
-                return;
+                return this.enableConfirm(true);
+            }
+            case "success": {
+                return true;
             }
         }
     }
