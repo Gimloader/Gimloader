@@ -4,8 +4,8 @@ import { Script } from "./script.svelte";
 
 export class Library extends Script<ScriptInfo> {
     type: ScriptType = "library";
-
     warnAbout = false;
+
     getDependencyStrings() {
         return {
             library: {

@@ -29,6 +29,24 @@ class LibsApi {
     }
 }
 
+class ScopedLibsApi extends LibsApi {
+    readonly #id: string;
+
+    constructor(id: string) {
+        super();
+        this.#id = id;
+    }
+
+    /** Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+    require(name: string, downloadUrl?: string) {
+        validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
+
+        return LibManager.require(this.#id, name, downloadUrl);
+    }
+}
+
 Object.freeze(LibsApi);
 Object.freeze(LibsApi.prototype);
-export default LibsApi;
+Object.freeze(ScopedLibsApi);
+Object.freeze(ScopedLibsApi.prototype);
+export { LibsApi, ScopedLibsApi };

@@ -8,6 +8,7 @@ import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
+import { scripts } from "./map";
 
 export default new class PluginManager extends ScriptManager<Plugin, PluginInfo> {
     singular = "plugin";
@@ -123,6 +124,9 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
     }
 
     async require(requirer: string, name: string, downloadUrl?: string) {
+        const requirerScript = scripts.get(requirer);
+        if(!requirerScript) throw new Error(`Requirer script ${requirer} not found`);
+
         // Try to enable the plugin if it already exists
         const existing = this.getScript(name);
         if(existing) {
@@ -139,7 +143,10 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
             const success = await existing.enableConfirm(true);
             if(!success) throw new Error(`Failed to enable dependency ${name}`);
 
-            await existing.start(false);
+            // Require the script
+            if(!requirerScript.requires.includes(existing)) requirerScript.requires.push(existing);
+            await existing.require(requirerScript, true, false, [requirer]);
+
             return existing.exported;
         }
 
@@ -148,18 +155,21 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         // Ask about downloading the plugin
         const confirmed = await Modals.open("confirm", {
             title: "Download Confirmation",
-            text: `${requirer} is asking to install and enable ${name}. Do you want to proceed?`
+            text: `${requirer} is asking to install and enable the plugin ${name}. Do you want to proceed?`
         });
 
         if(!confirmed) throw new Error("User declined downloading dependency");
 
         // Download the plugin
         await downloadScript(downloadUrl, "plugin", true);
-        const plugin = this.getScript(name);
-        if(!plugin) throw new Error(`Failed to download dependency ${name}`);
+        const script = this.getScript(name);
+        if(!script) throw new Error(`Failed to download dependency ${name}`);
 
-        await plugin.start(false);
-        return plugin.exported;
+        // Require the script
+        if(!requirerScript.requires.includes(script)) requirerScript.requires.push(script);
+        await script.require(requirerScript, true, false, [requirer]);
+
+        return script.exported;
     }
 
     addCommands() {

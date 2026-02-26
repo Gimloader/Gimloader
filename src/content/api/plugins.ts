@@ -1,7 +1,7 @@
 import PluginManager from "$core/scripts/pluginManager.svelte";
 import { validate } from "$content/utils";
 
-class BasePluginsApi {
+class PluginsApi {
     /** A list of all the plugins installed */
     get list() {
         return PluginManager.getScriptNames();
@@ -37,16 +37,7 @@ class BasePluginsApi {
     }
 }
 
-class PluginsApi extends BasePluginsApi {
-    /** Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
-    require(id: string, name: string, downloadUrl?: string) {
-        validate("plugins.require", arguments, ["id", "string"], ["name", "string"], ["downloadUrl?", "string"]);
-
-        return PluginManager.require(id, name, downloadUrl);
-    }
-}
-
-class ScopedPluginsApi extends BasePluginsApi {
+class ScopedPluginsApi extends PluginsApi {
     readonly #id: string;
 
     constructor(id: string) {
@@ -62,8 +53,8 @@ class ScopedPluginsApi extends BasePluginsApi {
     }
 }
 
-Object.freeze(BasePluginsApi);
-Object.freeze(BasePluginsApi.prototype);
 Object.freeze(PluginsApi);
 Object.freeze(PluginsApi.prototype);
+Object.freeze(ScopedPluginsApi);
+Object.freeze(ScopedPluginsApi.prototype);
 export { PluginsApi, ScopedPluginsApi };

@@ -1,1 +1,1 @@
-Added plugin.require api
+Added plugins.require and libs.require api
