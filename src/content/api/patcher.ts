@@ -2,6 +2,13 @@ import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, Patcher
 import Patcher from "$core/patcher";
 import { validate } from "$content/utils";
 
+function checkMethod(fnName: string, object: object, method: PropertyKey) {
+    const type = typeof object?.[method];
+    if(type === "function") return;
+
+    throw new Error(`${fnName} expected object.${String(method)} to be a function, but got ${type}`);
+}
+
 class PatcherApi {
     /**
      * Runs a callback after a function on an object has been run
@@ -13,7 +20,8 @@ class PatcherApi {
         method: K,
         callback: PatcherAfterCallback<O[K]>
     ) {
-        validate("patcher.after", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.after", arguments, ["id", "string"], ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.after", object, method);
 
         return Patcher.after(id, object, method, callback);
     }
@@ -29,7 +37,8 @@ class PatcherApi {
         method: K,
         callback: PatcherBeforeCallback<O[K]>
     ) {
-        validate("patcher.before", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.before", arguments, ["id", "string"], ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.before", object, method);
 
         return Patcher.before(id, object, method, callback);
     }
@@ -44,7 +53,8 @@ class PatcherApi {
         method: K,
         callback: PatcherInsteadCallback<O[K]>
     ) {
-        validate("patcher.instead", arguments, ["id", "string"], ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.instead", arguments, ["id", "string"], ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.instead", object, method);
 
         return Patcher.instead(id, object, method, callback);
     }
@@ -73,7 +83,8 @@ class ScopedPatcherApi {
         method: K,
         callback: PatcherAfterCallback<O[K]>
     ) {
-        validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.after", arguments, ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.after", object, method);
 
         return Patcher.after(this.#id, object, method, callback);
     }
@@ -88,7 +99,8 @@ class ScopedPatcherApi {
         method: K,
         callback: PatcherBeforeCallback<O[K]>
     ) {
-        validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.before", arguments, ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.before", object, method);
 
         return Patcher.before(this.#id, object, method, callback);
     }
@@ -102,7 +114,8 @@ class ScopedPatcherApi {
         method: K,
         callback: PatcherInsteadCallback<O[K]>
     ) {
-        validate("patcher.after", arguments, ["object", "object"], ["method", "string"], ["callback", "function"]);
+        validate("patcher.instead", arguments, ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.instead", object, method);
 
         return Patcher.instead(this.#id, object, method, callback);
     }
