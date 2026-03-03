@@ -1,2 +1,3 @@
 Added plugins.require and libs.require api
 Fixed patcher incorrectly throwing an error on properties of functions
+Updated location to download official plugins from
