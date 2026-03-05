@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { NumberSetting } from "$types/settings";
+    import type { NumberSetting } from "$types/api/settings";
 
     let { value = $bindable(), setting }: { value: number; setting: NumberSetting<string> } = $props();
     let inputValue = $state(value);

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type ConfigurableHotkey from "$core/hotkeys/configurable.svelte";
-    import type { HotkeyTrigger } from "$types/hotkeys";
+    import type { HotkeyTrigger } from "$types/api/hotkeys";
     import { Button } from "$shared/ui/button";
     import * as Popover from "$shared/ui/popover";
     import Undo from "svelte-material-icons/Undo.svelte";

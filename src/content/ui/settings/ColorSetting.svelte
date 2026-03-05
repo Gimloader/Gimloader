@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ColorSetting } from "$types/settings";
+    import type { ColorSetting } from "$types/api/settings";
     import ColorPicker, { type RgbaColor } from "svelte-awesome-color-picker";
 
     let { value = $bindable(), setting }: { value: string; setting: ColorSetting<string> } = $props();

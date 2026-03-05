@@ -320,8 +320,8 @@ export default new class Net extends EventEmitter2 {
         }
     }
 
-    pluginOnLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode: string | string[] = []) {
-        if(!Array.isArray(gamemode)) gamemode = [gamemode];
+    pluginOnLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode: string | ReadonlyArray<string> = []) {
+        if(typeof gamemode === "string") gamemode = [gamemode];
 
         if(this.loaded) {
             callback(this.type, this.gamemode);

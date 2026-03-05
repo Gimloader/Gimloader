@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SettingGroup } from "$types/settings";
+    import type { SettingGroup } from "$types/api/settings";
     import Setting from "./Setting.svelte";
     import ChevronDown from "svelte-material-icons/ChevronDown.svelte";
     import ChevronUp from "svelte-material-icons/ChevronUp.svelte";

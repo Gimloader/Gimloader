@@ -1,7 +1,7 @@
 /** @inline */
 export interface CommandOptions {
     text: string | (() => string);
-    keywords?: string[];
+    keywords?: ReadonlyArray<string>;
     hidden?: () => boolean;
 }
 
@@ -16,7 +16,7 @@ export interface BaseCommandOptions {
 }
 
 export interface CommandSelectOptions extends BaseCommandOptions {
-    options: { label: string; value: string }[];
+    options: ReadonlyArray<{ label: string; value: string }>;
 }
 
 export interface CommandNumberOptions extends BaseCommandOptions {

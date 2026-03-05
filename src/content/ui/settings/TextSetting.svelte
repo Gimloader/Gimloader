@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { TextSetting } from "$types/settings";
+    import type { TextSetting } from "$types/api/settings";
 
     let { value = $bindable(), setting }: { value: string; setting: TextSetting<string> } = $props();
 </script>

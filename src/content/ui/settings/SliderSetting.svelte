@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SliderSetting } from "$types/settings";
+    import type { SliderSetting } from "$types/api/settings";
 
     let { value = $bindable(), setting }: { value: number; setting: SliderSetting<string> } = $props();
     const ticks = $derived(setting.ticks ?? [setting.min, setting.max]);

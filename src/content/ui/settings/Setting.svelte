@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { PluginSetting } from "$types/settings";
+    import type { PluginSetting } from "$types/api/settings";
     import Storage from "$core/storage.svelte";
     import { watch } from "runed";
     import DropdownSetting from "./DropdownSetting.svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { DropdownSetting } from "$types/settings";
+    import type { DropdownSetting } from "$types/api/settings";
     import * as Select from "$shared/ui/select";
     import Eraser from "svelte-material-icons/Eraser.svelte";
 

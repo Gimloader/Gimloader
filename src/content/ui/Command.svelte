@@ -1,7 +1,7 @@
 <script lang="ts">
     import Commands from "$content/core/commands.svelte";
     import * as Dialog from "$shared/ui/dialog";
-    import type { CommandCallback } from "$types/commands";
+    import type { CommandCallback } from "$types/api/commands";
     import Search from "@lucide/svelte/icons/search";
     import { computeCommandScore } from "bits-ui";
     import { watch } from "runed";
@@ -29,7 +29,7 @@
         for(let command of Commands.commands) {
             if(command.hidden?.()) continue;
             const text = typeof command.text === "function" ? command.text() : command.text;
-            const score = computeCommandScore(text, searched, command.keywords);
+            const score = computeCommandScore(text, searched, command.keywords as string[]);
 
             if(score === 0) continue;
             options.push({ text, score, callback: command.callback });

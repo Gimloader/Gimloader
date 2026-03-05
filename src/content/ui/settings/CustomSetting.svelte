@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { CustomSection, CustomSetting } from "$types/settings";
+    import type { CustomSection, CustomSetting } from "$types/api/settings";
     import { onMount } from "svelte";
 
     let { value = $bindable(), setting }: {

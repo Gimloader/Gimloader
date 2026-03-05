@@ -34,7 +34,7 @@ class BaseNetApi extends EventEmitter2 {
 
     /** Gimkit's internal Colyseus state */
     get state(): Schema.GimkitState {
-        if(Net.type !== "Colyseus") return;
+        if(Net.type !== "Colyseus") return undefined;
         return Net.room?.state;
     }
 
@@ -81,7 +81,7 @@ class NetApi extends BaseNetApi {
      * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded
      * @returns A function to cancel waiting for load
      */
-    onLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | string[]) {
+    onLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | ReadonlyArray<string>) {
         validate("Net.onLoad", arguments, ["id", "string"], ["callback", "function"], ["gamemode?", GamemodeSchema]);
 
         return Net.pluginOnLoad(id, callback, gamemode);
@@ -201,7 +201,7 @@ class ScopedNetApi extends BaseNetApi {
      * If the \@gamemode header is set the callback will only fire if the gamemode matches one of the provided gamemodes.
      * @returns A function to cancel waiting for load
      */
-    onLoad(callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | string[]) {
+    onLoad(callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | ReadonlyArray<string>) {
         validate("Net.onLoad", arguments, ["callback", "function"], ["gamemode?", GamemodeSchema]);
         if(gamemode === undefined) gamemode = this.#defaultGamemode;
 

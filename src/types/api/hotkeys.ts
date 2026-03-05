@@ -3,7 +3,7 @@ export interface HotkeyTrigger {
     /** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
     key?: string;
     /** Should be keyboardevent [codes](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
-    keys?: string[];
+    keys?: ReadonlyArray<string>;
     ctrl?: boolean;
     shift?: boolean;
     alt?: boolean;

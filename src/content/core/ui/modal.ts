@@ -16,7 +16,7 @@ export interface ModalOptions {
     style?: string;
     className?: string;
     closeOnBackgroundClick?: boolean;
-    buttons?: ModalButton[];
+    buttons?: ReadonlyArray<ModalButton>;
     onClosed?: () => void;
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { RadioSetting } from "$types/settings";
+    import type { RadioSetting } from "$types/api/settings";
     import * as RadioGroup from "$shared/ui/radio-group";
 
     let { value = $bindable(), setting }: { value: string; setting: RadioSetting<string> } = $props();

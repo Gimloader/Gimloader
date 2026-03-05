@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { MultiselectSetting } from "$types/settings";
+    import type { MultiselectSetting } from "$types/api/settings";
     import * as Select from "$shared/ui/select";
 
     let { value = $bindable(), setting }: { value: string[]; setting: MultiselectSetting<string> } = $props();
