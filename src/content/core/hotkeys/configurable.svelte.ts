@@ -1,4 +1,4 @@
-import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyTrigger } from "$types/hotkeys";
+import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyTrigger } from "$types/api/hotkeys";
 import Hotkeys from "./hotkeys.svelte";
 
 export default class ConfigurableHotkey {

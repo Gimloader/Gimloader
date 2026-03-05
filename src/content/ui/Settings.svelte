@@ -3,7 +3,7 @@
     import { Switch } from "$shared/ui/switch";
     import Storage from "$core/storage.svelte";
     import StateManager from "$core/state";
-    import type { Settings } from "$types/state";
+    import type { Settings } from "$types/net/state";
 
     function saveKey(key: keyof Settings) {
         Storage.updateSetting(key, Storage.settings[key]);

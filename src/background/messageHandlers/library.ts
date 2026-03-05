@@ -1,5 +1,5 @@
-import type { LibraryInfo, State } from "$types/state";
-import type { Messages, OnceMessages, OnceResponses } from "$types/messages";
+import type { LibraryInfo, State } from "$types/net/state";
+import type { Messages, OnceMessages, OnceResponses } from "$types/net/messages";
 import ScriptHandler from "./script";
 import Scripts from "$bg/scripts";
 import Server from "$bg/net/server";

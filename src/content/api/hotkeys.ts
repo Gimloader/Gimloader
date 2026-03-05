@@ -1,4 +1,4 @@
-import type { ConfigurableHotkeyOptions, HotkeyOptions } from "$types/hotkeys";
+import type { ConfigurableHotkeyOptions, HotkeyOptions } from "$types/api/hotkeys";
 import Hotkeys from "$core/hotkeys/hotkeys.svelte";
 import { validate } from "$content/utils";
 import * as z from "zod";

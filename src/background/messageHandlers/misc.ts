@@ -1,8 +1,8 @@
 import Server from "$bg/net/server";
 import { sanitizeHotkeys, sanitizeLibraries, sanitizePlugins, sanitizePluginStorage, sanitizeSettings, saveDebounced } from "$bg/state";
 import Updater from "$bg/net/updater";
-import type { OnceMessages, OnceResponses, ScriptType } from "$types/messages";
-import type { State } from "$types/state";
+import type { OnceMessages, OnceResponses, ScriptType } from "$types/net/messages";
+import type { State } from "$types/net/state";
 import Scripts from "$bg/scripts";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Poller from "$bg/net/poller";

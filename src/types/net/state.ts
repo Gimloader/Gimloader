@@ -1,4 +1,4 @@
-import type { HotkeyTrigger } from "./hotkeys";
+import type { HotkeyTrigger } from "../api/hotkeys";
 
 export interface ScriptInfo {
     code: string;

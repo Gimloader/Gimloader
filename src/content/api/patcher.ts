@@ -1,4 +1,4 @@
-import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/patcher";
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/api/patcher";
 import Patcher from "$core/patcher";
 import { validate } from "$content/utils";
 

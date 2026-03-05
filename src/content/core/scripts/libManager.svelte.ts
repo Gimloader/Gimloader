@@ -1,6 +1,6 @@
 import ScriptManager from "./scriptManager.svelte";
 import { Library } from "./library.svelte";
-import type { LibraryInfo } from "$types/state";
+import type { LibraryInfo } from "$types/net/state";
 import Port from "$shared/net/port.svelte";
 import Modals from "../modals.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";

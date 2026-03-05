@@ -1,4 +1,4 @@
-import type { State } from "$types/state";
+import type { State } from "$types/net/state";
 import Storage from "$core/storage.svelte";
 import LibManager from "$core/scripts/libManager.svelte";
 import PluginManager from "$core/scripts/pluginManager.svelte";

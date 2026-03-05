@@ -2,6 +2,7 @@ import Net, { type ConnectionType, type RequesterOptions } from "$core/net/net";
 import { validate } from "$content/utils";
 import EventEmitter2 from "eventemitter2";
 import * as z from "zod";
+import type { Schema } from "$types/schema";
 
 const GamemodeSchema = z.union([z.string(), z.array(z.string())]);
 
@@ -29,6 +30,12 @@ class BaseNetApi extends EventEmitter2 {
     /** The room that the client is connected to, or null if there is no connection */
     get room() {
         return Net.room;
+    }
+
+    /** Gimkit's internal Colyseus state */
+    get state(): Schema.GimkitState {
+        if(Net.type !== "Colyseus") return;
+        return Net.room?.state;
     }
 
     /** Whether the user is the one hosting the current game */

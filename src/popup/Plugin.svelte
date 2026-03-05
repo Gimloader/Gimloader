@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { PluginInfo } from "$types/state";
+    import type { PluginInfo } from "$types/net/state";
     import { Switch } from "$shared/ui/switch";
     import DeleteOutline from "svelte-material-icons/DeleteOutline.svelte";
     import { createConfirmToast } from "$shared/toast/create";

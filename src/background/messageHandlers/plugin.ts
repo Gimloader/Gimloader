@@ -1,11 +1,11 @@
-import type { PluginInfo, State } from "$types/state";
+import type { PluginInfo, State } from "$types/net/state";
 import Server from "$bg/net/server";
-import type { Messages, OnceMessages, OnceResponses, ScriptEdit, StateMessages } from "$types/messages";
+import type { Messages, OnceMessages, OnceResponses, ScriptEdit, StateMessages } from "$types/net/messages";
 import ScriptHandler from "./script";
 import Scripts from "$bg/scripts";
 import { englishList } from "$shared/utils";
 import Downloader from "$bg/net/downloader";
-import type { Dependency } from "$types/downloads";
+import type { Dependency } from "$types/net/downloads";
 
 export default new class PluginsHandler extends ScriptHandler {
     constructor() {

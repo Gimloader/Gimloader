@@ -1,5 +1,5 @@
-import type { Messages, OnceMessages, OnceResponses } from "$types/messages";
-import type { State } from "$types/state";
+import type { Messages, OnceMessages, OnceResponses } from "$types/net/messages";
+import type { State } from "$types/net/state";
 import HotkeysHandler from "$bg/messageHandlers/hotkeys";
 import JsCacheHandler from "$bg/messageHandlers/jsCache";
 import LibrariesHandler from "$bg/messageHandlers/library";

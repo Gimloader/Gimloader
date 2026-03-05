@@ -1,4 +1,4 @@
-import type { Settings } from "$types/state";
+import type { Settings } from "$types/net/state";
 
 export const isFirefox = navigator.userAgent.includes("Firefox");
 

@@ -1,5 +1,5 @@
-import type { ScriptType } from "$types/messages";
-import type { ScriptInfo } from "$types/state";
+import type { ScriptType } from "$types/net/messages";
+import type { ScriptInfo } from "$types/net/state";
 import { Script } from "./script.svelte";
 
 export class Library extends Script<ScriptInfo> {

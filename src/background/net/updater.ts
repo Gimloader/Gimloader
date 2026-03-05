@@ -1,7 +1,7 @@
 import type { ScriptHeaders } from "$types/scripts";
-import type { OnceMessages, OnceResponses } from "$types/messages";
-import type { State } from "$types/state";
-import type { Dependency, Update } from "$types/downloads";
+import type { OnceMessages, OnceResponses } from "$types/net/messages";
+import type { State } from "$types/net/state";
+import type { Dependency, Update } from "$types/net/downloads";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
 import { statePromise } from "../state";

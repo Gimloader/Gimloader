@@ -1,6 +1,6 @@
 import Commands from "$content/core/commands.svelte";
 import { validate } from "$content/utils";
-import type { CommandCallback, CommandOptions } from "$types/commands";
+import type { CommandCallback, CommandOptions } from "$types/api/commands";
 import * as z from "zod";
 
 const CommandOptionsSchema = z.union([

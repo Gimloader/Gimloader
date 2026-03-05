@@ -1,6 +1,6 @@
 import Port from "$shared/net/port.svelte";
 import { nop } from "$shared/utils";
-import type { ScriptType } from "$types/messages";
+import type { ScriptType } from "$types/net/messages";
 import * as z from "zod";
 import rawChangelog from "../../release-notes.txt";
 

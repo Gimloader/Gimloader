@@ -7,7 +7,7 @@
     import State from "$shared/net/bareState.svelte";
     import { parseScriptHeaders } from "$shared/parseHeader";
     import type { CreateEditor, Editor } from "$types/editor";
-    import type { ScriptType } from "$types/messages";
+    import type { ScriptType } from "$types/net/messages";
 
     let { createEditor }: { createEditor: CreateEditor } = $props();
 

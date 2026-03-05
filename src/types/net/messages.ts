@@ -1,4 +1,4 @@
-import type { HotkeyTrigger } from "./hotkeys";
+import type { HotkeyTrigger } from "../api/hotkeys";
 import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, SavedState, State } from "./state";
 
 export type ScriptType = "plugin" | "library";

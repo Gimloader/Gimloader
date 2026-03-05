@@ -1,4 +1,4 @@
-import type { PluginSettings } from "$types/settings";
+import type { PluginSettings } from "$types/api/settings";
 import { Plugin } from "$core/scripts/plugin.svelte";
 import { HotkeysApi, ScopedHotkeysApi } from "./hotkeys";
 import { ParcelApi, ScopedParcelApi } from "./parcel";

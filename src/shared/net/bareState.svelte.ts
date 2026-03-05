@@ -1,4 +1,4 @@
-import type { LibraryInfo, PluginInfo, Settings, State } from "$types/state";
+import type { LibraryInfo, PluginInfo, Settings, State } from "$types/net/state";
 import Port from "./port.svelte";
 
 export default new class BareState {

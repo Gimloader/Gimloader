@@ -1,4 +1,4 @@
-import type { ScriptType } from "$types/messages";
+import type { ScriptType } from "$types/net/messages";
 import { toast } from "svelte-sonner";
 import Port from "$shared/net/port.svelte";
 import Modals from "../modals.svelte";

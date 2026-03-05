@@ -1,5 +1,5 @@
-import type { DeleteResult, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/messages";
-import type { State } from "$types/state";
+import type { DeleteResult, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
+import type { State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { saveDebounced } from "$bg/state";
 import Scripts from "$bg/scripts";

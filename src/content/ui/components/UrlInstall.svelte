@@ -2,7 +2,7 @@
     import * as Dialog from "$shared/ui/dialog";
     import { Button } from "$shared/ui/button";
     import { downloadScript } from "$content/core/net/download";
-    import type { ScriptType } from "$types/messages";
+    import type { ScriptType } from "$types/net/messages";
 
     interface Props {
         open: boolean;

@@ -2,7 +2,7 @@ import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
 import Port from "$shared/net/port.svelte";
 import { Deferred } from "$content/utils";
-import type { PluginInfo } from "$types/state";
+import type { PluginInfo } from "$types/net/state";
 import Modals from "../modals.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";

@@ -6994,6 +6994,186 @@ interface RequesterOptions {
 	both?: () => void;
 	error?: (error: any) => void;
 }
+namespace Schema {
+	type ObjectSchema<T extends object> = T & {
+		listen<K extends keyof T>(key: K, callback: (value: T[K], lastValue: T[K]) => void, immediate?: boolean): () => void;
+		onChange(callback: () => void): () => void;
+	};
+	type CollectionSchema<T, K> = {
+		onAdd(callback: (value: T, index: K) => void, immediate?: boolean): () => void;
+		onRemove(callback: (value: T, index: K) => void): () => void;
+		onChange(callback: (item: T, index: K) => void): () => void;
+	};
+	type MapSchema<T> = {
+		[key: string]: T;
+	} & Map<string, T> & CollectionSchema<T, string>;
+	type ArraySchema<T> = T[] & CollectionSchema<T, number>;
+	interface AppearanceState {
+		skin: string;
+		tintModifierId: string;
+		trailId: string;
+		transparencyModifierId: string;
+	}
+	interface AssignmentState {
+		hasSavedProgress: boolean;
+		objective?: string;
+		percentageComplete?: number;
+	}
+	interface ClassDesignerState {
+		lastActivatedClassDeviceId: string;
+		lastClassDeviceActivationId: number;
+	}
+	interface HealthState {
+		classImmunityActive: boolean;
+		fragility: number;
+		lives: number;
+		maxHealth: number;
+		maxShield: number;
+		shield: number;
+		showHealthBar: boolean;
+		spawnImmunityActive: boolean;
+	}
+	interface InteractiveSlotState {
+		clipSize: number;
+		count: number;
+		currentClip: number;
+		durability: number;
+		itemId: string;
+		waiting: boolean;
+		waitingEndTime: number;
+		waitingStartTime: number;
+	}
+	interface InventoryState {
+		activeInteractiveSlot: number;
+		infiniteAmmo: boolean;
+		interactiveSlots: MapSchema<InteractiveSlotState>;
+		interactiveSlotsOrder: ArraySchema<number>;
+	}
+	interface PermissionsState {
+		adding: boolean;
+		editing: boolean;
+		manageCodeGrids: boolean;
+		removing: boolean;
+	}
+	interface PhysicsState {
+		isGrounded: boolean;
+	}
+	interface ProjectilesState {
+		aimAngle: number;
+		damageMultiplier: number;
+	}
+	interface XPState {
+		unredeemedXP: number;
+	}
+	interface ZoneAbilitiesOverridesState {
+		allowItemDrop: boolean;
+		allowResourceDrop: boolean;
+		allowWeaponDrop: boolean;
+		allowWeaponFire: boolean;
+	}
+	interface CharacterState {
+		appearance: ObjectSchema<AppearanceState>;
+		assignment: ObjectSchema<AssignmentState>;
+		classDesigner: ObjectSchema<ClassDesignerState>;
+		completedInitialPlacement: boolean;
+		health: ObjectSchema<HealthState>;
+		id: string;
+		inventory: ObjectSchema<InventoryState>;
+		isActive: boolean;
+		isRespawning: boolean;
+		lastPlayersTeamId: string;
+		movementSpeed: number;
+		name: string;
+		openDeviceUI: string;
+		openDeviceUIChangeCounter: number;
+		permissions: ObjectSchema<PermissionsState>;
+		phase: boolean;
+		physics: ObjectSchema<PhysicsState>;
+		projectiles: ObjectSchema<ProjectilesState>;
+		roleLevel: number;
+		scale: number;
+		score: number;
+		teamId: string;
+		teleportCount: number;
+		type: string;
+		x: number;
+		xp: ObjectSchema<XPState>;
+		y: number;
+		zoneAbilitiesOverrides: ObjectSchema<ZoneAbilitiesOverridesState>;
+	}
+	interface ActionCategoryState {
+		id: string;
+		name: string;
+		plural: string;
+	}
+	interface ActionItemState {
+		id: string;
+		category: string;
+		name: string;
+		url: string;
+	}
+	interface CallToActionState {
+		categories: ArraySchema<ActionCategoryState>;
+		items: ArraySchema<ActionItemState>;
+	}
+	interface GameSessionState {
+		callToAction: ObjectSchema<CallToActionState>;
+		countdownEnd: number;
+		phase: string;
+		resultsEnd: number;
+	}
+	interface SessionState {
+		allowGoogleTranslate: boolean;
+		cosmosBlocked: boolean;
+		gameOwnerId: string;
+		gameSession: ObjectSchema<GameSessionState>;
+		gameTime: number;
+		globalPermissions: ObjectSchema<PermissionsState>;
+		loadingPhase: boolean;
+		mapCreatorRoleLevel: number;
+		mapStyle: string;
+		modeType: string;
+		phase: string;
+		version: string;
+	}
+	interface DevicesState {
+		codeGrids: MapSchema<any>;
+	}
+	interface WorldState {
+		devices: ObjectSchema<DevicesState>;
+		height: number;
+		width: number;
+	}
+	interface CustomAssetState {
+		data: string;
+		icon: string;
+		id: string;
+		name: string;
+		optionId: string;
+	}
+	interface HooksState {
+		hookJSON: string;
+	}
+	interface MatchmakerState {
+		gameCode: string;
+	}
+	interface TeamState {
+		characters: ArraySchema<number>;
+		id: string;
+		name: string;
+		score: number;
+	}
+	interface GimkitState {
+		characters: MapSchema<CharacterState>;
+		customAssets: MapSchema<CustomAssetState>;
+		hooks: ObjectSchema<HooksState>;
+		mapSettings: string;
+		matchmaker: ObjectSchema<MatchmakerState>;
+		session: ObjectSchema<SessionState>;
+		teams: ArraySchema<TeamState>;
+		world: ObjectSchema<WorldState>;
+	}
+}
 class BaseNetApi extends EventEmitter2 {
 	constructor();
 	/** Which type of server the client is currently connected to */
@@ -7002,6 +7182,8 @@ class BaseNetApi extends EventEmitter2 {
 	get gamemode(): string;
 	/** The room that the client is connected to, or null if there is no connection */
 	get room(): any;
+	/** Gimkit's internal Colyseus state */
+	get state(): Schema.GimkitState;
 	/** Whether the user is the one hosting the current game */
 	get isHost(): boolean;
 	/** Sends a message to the server on a specific channel */
@@ -7658,6 +7840,12 @@ class LibsApi {
 	/** Gets the exported values of a library */
 	get<T extends keyof Gimloader.Libraries>(name: T): Gimloader.Libraries[T];
 }
+class ScopedLibsApi extends LibsApi {
+	
+	constructor(id: string);
+	/** Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+	require(name: string, downloadUrl?: string): Promise<any>;
+}
 class PluginsApi {
 	/** A list of all the plugins installed */
 	get list(): string[];
@@ -7674,6 +7862,12 @@ class PluginsApi {
 	getPlugin(name: string): {
 		return: any;
 	};
+}
+class ScopedPluginsApi extends PluginsApi {
+	
+	constructor(id: string);
+	/** Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+	require(name: string, downloadUrl?: string): Promise<any>;
 }
 class Api {
 	
@@ -7714,7 +7908,7 @@ class Api {
 	/** Methods for getting info on libraries */
 	static libs: Readonly<LibsApi>;
 	/** Methods for getting info on libraries */
-	libs: Readonly<LibsApi>;
+	libs: Readonly<ScopedLibsApi>;
 	/** Gets the exported values of a library */
 	static lib: <T extends keyof Gimloader.Libraries>(name: T) => Gimloader.Libraries[T];
 	/** Gets the exported values of a library */
@@ -7722,7 +7916,7 @@ class Api {
 	/** Methods for getting info on plugins */
 	static plugins: Readonly<PluginsApi>;
 	/** Methods for getting info on plugins */
-	plugins: Readonly<PluginsApi>;
+	plugins: Readonly<ScopedPluginsApi>;
 	/** Gets the exported values of a plugin, if it has been enabled */
 	static plugin: <T extends keyof Gimloader.Plugins>(name: T) => Gimloader.Plugins[T];
 	/** Gets the exported values of a plugin, if it has been enabled */

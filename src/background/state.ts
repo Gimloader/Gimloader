@@ -1,7 +1,7 @@
-import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, PluginStorage, SavedState, Settings, State } from "$types/state";
+import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, PluginStorage, SavedState, Settings, State } from "$types/net/state";
 import { defaultSettings } from "$shared/consts";
 import debounce from "debounce";
-import type { ScriptType } from "$types/messages";
+import type { ScriptType } from "$types/net/messages";
 import Scripts from "./scripts";
 
 export const statePromise = new Promise<State>(async (res) => {

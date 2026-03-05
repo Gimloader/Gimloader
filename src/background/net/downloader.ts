@@ -1,11 +1,11 @@
-import type { OnceMessages, OnceResponses, ScriptType } from "$types/messages";
-import type { State } from "$types/state";
+import type { OnceMessages, OnceResponses, ScriptType } from "$types/net/messages";
+import type { State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { formatDownloadUrl } from "$shared/net/util";
 import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
 import Scripts from "$bg/scripts";
 import { englishList } from "$shared/utils";
-import type { Dependency } from "$types/downloads";
+import type { Dependency } from "$types/net/downloads";
 
 export default class Downloader {
     static maxDepth = 16;

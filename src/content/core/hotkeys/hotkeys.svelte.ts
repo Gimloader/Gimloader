@@ -1,5 +1,5 @@
-import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyOptions, HotkeyTrigger } from "$types/hotkeys";
-import type { ConfigurableHotkeysState } from "$types/state";
+import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyOptions, HotkeyTrigger } from "$types/api/hotkeys";
+import type { ConfigurableHotkeysState } from "$types/net/state";
 import ConfigurableHotkey from "./configurable.svelte";
 import { clearId, splicer } from "$content/utils";
 import Port from "$shared/net/port.svelte";

@@ -1,4 +1,4 @@
-import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/patcher";
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/api/patcher";
 
 type Patch =
     | { callback: PatcherBeforeCallback<any>; point: "before" }

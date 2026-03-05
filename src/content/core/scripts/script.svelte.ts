@@ -1,6 +1,6 @@
 import type { ScriptHeaders } from "$types/scripts";
-import type { ScriptType } from "$types/messages";
-import type { ScriptInfo } from "$types/state";
+import type { ScriptType } from "$types/net/messages";
+import type { ScriptInfo } from "$types/net/state";
 import { error } from "$shared/utils";
 import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";

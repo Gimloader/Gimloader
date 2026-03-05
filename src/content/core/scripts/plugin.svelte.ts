@@ -1,7 +1,7 @@
-import type { ScriptType } from "$types/messages";
+import type { ScriptType } from "$types/net/messages";
 import type { ScriptHeaders } from "$types/scripts";
-import type { PluginSettingsDescription } from "$types/settings";
-import type { PluginInfo } from "$types/state";
+import type { PluginSettingsDescription } from "$types/api/settings";
+import type { PluginInfo } from "$types/net/state";
 import Port from "$shared/net/port.svelte";
 import { Script } from "./script.svelte";
 import Modals from "../modals.svelte";

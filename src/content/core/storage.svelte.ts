@@ -1,8 +1,8 @@
 import { clearId, splicer } from "$content/utils";
 import { defaultSettings } from "$shared/consts";
 import Port from "$shared/net/port.svelte";
-import type { SettingsChangeCallback } from "$types/settings";
-import type { PluginStorage, Settings } from "$types/state";
+import type { SettingsChangeCallback } from "$types/api/settings";
+import type { PluginStorage, Settings } from "$types/net/state";
 import EventEmitter2 from "eventemitter2";
 
 /** @inline */

@@ -1,4 +1,4 @@
-import type { Command, CommandAction, CommandCallback, CommandContext, CommandOptions } from "$types/commands";
+import type { Command, CommandAction, CommandCallback, CommandContext, CommandOptions } from "$types/api/commands";
 import Hotkeys from "./hotkeys/hotkeys.svelte";
 import { clearId, validate } from "$content/utils";
 import * as z from "zod";

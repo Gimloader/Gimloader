@@ -1,6 +1,6 @@
 import { toast } from "svelte-sonner";
 import Port from "$shared/net/port.svelte";
-import type { UpdateResponse } from "$types/downloads";
+import type { UpdateResponse } from "$types/net/downloads";
 import type { Script } from "../scripts/script.svelte";
 
 export async function checkUpdate(script: Script) {

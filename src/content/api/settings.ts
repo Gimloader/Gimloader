@@ -1,5 +1,5 @@
 import type { Plugin } from "$core/scripts/plugin.svelte";
-import type { PluginSettings, PluginSettingsDescription, SettingsMethods } from "$types/settings";
+import type { PluginSettings, PluginSettingsDescription, SettingsMethods } from "$types/api/settings";
 import { validate } from "$content/utils";
 import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
