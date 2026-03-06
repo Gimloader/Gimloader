@@ -8,7 +8,7 @@ export namespace Schema {
         onAdd(callback: (value: T, index: K) => void, immediate?: boolean): () => void;
         onRemove(callback: (value: T, index: K) => void): () => void;
         onChange(callback: (item: T, index: K) => void): () => void;
-    };
+    }
 
     export type MapSchema<T> = { [key: string]: T } & Map<string, T> & CollectionSchema<T, string>;
     export type ArraySchema<T> = T[] & CollectionSchema<T, number>;
