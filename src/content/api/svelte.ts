@@ -11,7 +11,21 @@ import * as Reactivity from "svelte/reactivity";
 import * as Store from "svelte/store";
 import * as Transition from "svelte/transition";
 
-const Svelte = {
+export interface SvelteExport {
+    Index: any;
+    Client: any;
+    Animate: any;
+    Attachments: any;
+    Easing: any;
+    Events: any;
+    Motion: any;
+    WindowReactivity: any;
+    Reactivity: any;
+    Store: any;
+    Transition: any;
+}
+
+const Svelte: SvelteExport = {
     Index,
     Client,
     Animate,

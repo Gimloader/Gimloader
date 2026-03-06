@@ -4,7 +4,7 @@ export namespace Schema {
         onChange(callback: () => void): () => void;
     };
 
-    export type CollectionSchema<T, K> = {
+    export interface CollectionSchema<T, K> {
         onAdd(callback: (value: T, index: K) => void, immediate?: boolean): () => void;
         onRemove(callback: (value: T, index: K) => void): () => void;
         onChange(callback: (item: T, index: K) => void): () => void;
@@ -185,7 +185,7 @@ export namespace Schema {
     }
 
     export interface TeamState {
-        characters: ArraySchema<number>;
+        characters: ArraySchema<string>;
         id: string;
         name: string;
         score: number;
