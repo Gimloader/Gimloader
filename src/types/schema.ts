@@ -1,14 +1,20 @@
 export namespace Schema {
-    export type ObjectSchema<T extends object> = T & {
+    export interface ColyseusMethods {
+        $callbacks: Record<string, any>;
+        $changes: any;
+        toJson(): any;
+    }
+
+    export type ObjectSchema<T extends object> = T & ColyseusMethods & {
         listen<K extends keyof T>(key: K, callback: (value: T[K], lastValue: T[K]) => void, immediate?: boolean): () => void;
         onChange(callback: () => void): () => void;
     };
 
-    export interface CollectionSchema<T, K> {
+    export type CollectionSchema<T, K> = ColyseusMethods & {
         onAdd(callback: (value: T, index: K) => void, immediate?: boolean): () => void;
         onRemove(callback: (value: T, index: K) => void): () => void;
         onChange(callback: (item: T, index: K) => void): () => void;
-    }
+    };
 
     export type MapSchema<T> = { [key: string]: T } & Map<string, T> & CollectionSchema<T, string>;
     export type ArraySchema<T> = T[] & CollectionSchema<T, number>;
@@ -34,6 +40,7 @@ export namespace Schema {
     export interface HealthState {
         classImmunityActive: boolean;
         fragility: number;
+        health: number;
         lives: number;
         maxHealth: number;
         maxShield: number;
@@ -53,11 +60,17 @@ export namespace Schema {
         waitingStartTime: number;
     }
 
+    export interface SlotState {
+        amount: number;
+    }
+
     export interface InventoryState {
         activeInteractiveSlot: number;
         infiniteAmmo: boolean;
-        interactiveSlots: MapSchema<InteractiveSlotState>;
+        interactiveSlots: MapSchema<ObjectSchema<InteractiveSlotState>>;
         interactiveSlotsOrder: ArraySchema<number>;
+        maxSlots: number;
+        slots: MapSchema<ObjectSchema<SlotState>>;
     }
 
     export interface PermissionsState {
@@ -132,8 +145,8 @@ export namespace Schema {
     }
 
     export interface CallToActionState {
-        categories: ArraySchema<ActionCategoryState>;
-        items: ArraySchema<ActionItemState>;
+        categories: ArraySchema<ObjectSchema<ActionCategoryState>>;
+        items: ArraySchema<ObjectSchema<ActionItemState>>;
     }
 
     export interface GameSessionState {
@@ -192,13 +205,15 @@ export namespace Schema {
     }
 
     export interface GimkitState {
-        characters: MapSchema<CharacterState>;
-        customAssets: MapSchema<CustomAssetState>;
+        characters: MapSchema<ObjectSchema<CharacterState>>;
+        customAssets: MapSchema<ObjectSchema<CustomAssetState>>;
         hooks: ObjectSchema<HooksState>;
         mapSettings: string;
         matchmaker: ObjectSchema<MatchmakerState>;
         session: ObjectSchema<SessionState>;
-        teams: ArraySchema<TeamState>;
+        teams: ArraySchema<ObjectSchema<TeamState>>;
         world: ObjectSchema<WorldState>;
     }
+
+    export type GimkitSchema = ObjectSchema<GimkitState>;
 }

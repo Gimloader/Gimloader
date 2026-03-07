@@ -33,7 +33,7 @@ class BaseNetApi extends EventEmitter2 {
     }
 
     /** Gimkit's internal Colyseus state */
-    get state(): Schema.GimkitState {
+    get state(): Schema.GimkitSchema {
         if(Net.type !== "Colyseus") return undefined;
         return Net.room?.state;
     }
