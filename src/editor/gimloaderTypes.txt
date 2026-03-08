@@ -7003,6 +7003,7 @@ namespace Schema {
 	type ObjectSchema<T extends object> = T & ColyseusMethods & {
 		listen<K extends keyof T>(key: K, callback: (value: T[K], lastValue: T[K]) => void, immediate?: boolean): () => void;
 		onChange(callback: () => void): () => void;
+		onRemove(callback: () => void): () => void;
 	};
 	type CollectionSchema<T, K> = ColyseusMethods & {
 		onAdd(callback: (value: T, index: K) => void, immediate?: boolean): () => void;
@@ -7709,7 +7710,7 @@ class ScopedPatcherApi {
 	instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
 }
 
-type RunInScopeCallback = (code: string, run: (evalCode: string) => void) => true | void;
+type RunInScopeCallback = (code: string, run: (evalCode: string) => any) => true | void;
 
 interface Exposer {
 	check?: string;

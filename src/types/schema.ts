@@ -8,6 +8,7 @@ export namespace Schema {
     export type ObjectSchema<T extends object> = T & ColyseusMethods & {
         listen<K extends keyof T>(key: K, callback: (value: T[K], lastValue: T[K]) => void, immediate?: boolean): () => void;
         onChange(callback: () => void): () => void;
+        onRemove(callback: () => void): () => void;
     };
 
     export type CollectionSchema<T, K> = ColyseusMethods & {

@@ -26,7 +26,7 @@ interface ParseHook {
 }
 
 /** @inline */
-export type RunInScopeCallback = (code: string, run: (evalCode: string) => void) => true | void;
+export type RunInScopeCallback = (code: string, run: (evalCode: string) => any) => true | void;
 
 interface RunInScope {
     id?: string;
