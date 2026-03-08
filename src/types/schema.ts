@@ -1,3 +1,5 @@
+import type { GameSessionPhase, SessionMapStyle, SessionModeType, SessionPhase, SessionVersion } from "./stores/session";
+
 export namespace Schema {
     export interface ColyseusMethods {
         $callbacks: Record<string, any>;
@@ -153,7 +155,14 @@ export namespace Schema {
     export interface GameSessionState {
         callToAction: ObjectSchema<CallToActionState>;
         countdownEnd: number;
-        phase: string;
+        /**
+         * `countdown` either before the game has started or while the game is starting
+         *
+         * `game` while the game is started
+         *
+         * `results` after the game ends until the game has been started again
+         */
+        phase: GameSessionPhase;
         resultsEnd: number;
     }
 
@@ -166,10 +175,10 @@ export namespace Schema {
         globalPermissions: ObjectSchema<PermissionsState>;
         loadingPhase: boolean;
         mapCreatorRoleLevel: number;
-        mapStyle: string;
-        modeType: string;
-        phase: string;
-        version: string;
+        mapStyle: SessionMapStyle;
+        modeType: SessionModeType;
+        phase: SessionPhase;
+        version: SessionVersion;
     }
 
     export interface DevicesState {
