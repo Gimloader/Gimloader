@@ -1,9 +1,10 @@
-import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/api/patcher";
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback, PatcherSwapCallback } from "$types/api/patcher";
 
 type Patch =
     | { callback: PatcherBeforeCallback<any>; point: "before" }
     | { callback: PatcherAfterCallback<any>; point: "after" }
-    | { callback: PatcherInsteadCallback<any>; point: "instead" };
+    | { callback: PatcherInsteadCallback<any>; point: "instead" }
+    | { callback: PatcherSwapCallback<any>; point: "swap" };
 
 export default class Patcher {
     static patches: Map<object, Map<PropertyKey, { original: any; patches: Patch[] }>> = new Map();
@@ -44,6 +45,11 @@ export default class Patcher {
                 case "instead":
                     object[property] = function() {
                         return patch.callback(this, arguments as any);
+                    };
+                    break;
+                case "swap":
+                    object[property] = function() {
+                        return patch.callback.apply(this, arguments as any);
                     };
                     break;
             }
@@ -170,6 +176,19 @@ export default class Patcher {
         callback: PatcherInsteadCallback<O[K]>
     ) {
         const patch: Patch = { callback, point: "instead" };
+
+        this.addPatch(object, property, patch);
+
+        return this.getRemovePatch(id, object, property, patch);
+    }
+
+    static swap<O extends object, K extends FunctionKeys<O>>(
+        id: string | null,
+        object: O,
+        property: K,
+        callback: PatcherSwapCallback<O[K]>
+    ) {
+        const patch: Patch = { callback, point: "swap" };
 
         this.addPatch(object, property, patch);
 

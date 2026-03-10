@@ -1,2 +1,3 @@
 Added net.state with types, which is Gimkit's colyseus state
 Replaced arrays with ReadonlyArrays in api types
+Added patcher.swap api

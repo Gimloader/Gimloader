@@ -22,3 +22,6 @@ export type PatcherInsteadCallback<T> = (
     thisVal: any,
     args: T extends BaseFunction ? Parameters<T> : any[]
 ) => any;
+
+/** @inline */
+export type PatcherSwapCallback<T> = (...args: T extends BaseFunction ? Parameters<T> : any[]) => any;

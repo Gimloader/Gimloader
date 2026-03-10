@@ -1,4 +1,4 @@
-import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback } from "$types/api/patcher";
+import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback, PatcherSwapCallback } from "$types/api/patcher";
 import Patcher from "$core/patcher";
 import { validate } from "$content/utils";
 
@@ -57,6 +57,22 @@ class PatcherApi {
         checkMethod("patcher.instead", object, method);
 
         return Patcher.instead(id, object, method, callback);
+    }
+
+    /**
+     * Replaces a function on an object with another function
+     * @returns A function to remove the patch
+     */
+    swap<O extends object, K extends FunctionKeys<O>>(
+        id: string,
+        object: O,
+        method: K,
+        callback: PatcherSwapCallback<O[K]>
+    ) {
+        validate("patcher.swap", arguments, ["id", "string"], ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.swap", object, method);
+
+        return Patcher.swap(id, object, method, callback);
     }
 
     /** Removes all patches with a given id */
@@ -118,6 +134,21 @@ class ScopedPatcherApi {
         checkMethod("patcher.instead", object, method);
 
         return Patcher.instead(this.#id, object, method, callback);
+    }
+
+    /**
+     * Replaces a function on an object with another function
+     * @returns A function to remove the patch
+     */
+    swap<O extends object, K extends FunctionKeys<O>>(
+        object: O,
+        method: K,
+        callback: PatcherSwapCallback<O[K]>
+    ) {
+        validate("patcher.swap", arguments, ["object", "any"], ["method", "string"], ["callback", "function"]);
+        checkMethod("patcher.swap", object, method);
+
+        return Patcher.swap(this.#id, object, method, callback);
     }
 }
 
