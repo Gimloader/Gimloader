@@ -25,7 +25,7 @@
         <CustomSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
     </div>
 {:else}
-    <div class="border-b border-gray-200 flex items-start">
+    <div class="border-b border-gray-200 flex items-start py-1">
         <div>
             <div class="font-semibold text-lg">
                 {setting.title}

@@ -72,7 +72,7 @@
     </div>
     {#each ticks as tick}
         {@const left = ((tick - setting.min) / (setting.max - setting.min)) * 100}
-        <div style:left="{left}%" class="absolute top-1/2 w-0.5 h-8 bg-gray-300 z-10 -translate-1/2"></div>
+        <div style:left="{left}%" class="absolute top-0 w-0.5 h-4 bg-gray-300 z-10 -translate-x-1/2"></div>
         <div style:left="{left}%" class="absolute -translate-x-1/2 text-center top-5 select-none">
             {formatValue(tick)}
         </div>
