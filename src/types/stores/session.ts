@@ -53,6 +53,7 @@ export type SessionMapStyle = "platformer" | "topDown";
 export type SessionModeType = "liveGame" | "assignment";
 export type SessionPhase = "preGame" | "game";
 export type SessionVersion = "published" | "saved";
+type OwnerRole = "player" | "spectator";
 
 export default interface Session {
     allowGoogleTranslate: boolean;
@@ -71,7 +72,7 @@ export default interface Session {
     mapCreatorRoleLevel: number;
     mapStyle: SessionMapStyle;
     modeType: SessionModeType;
-    ownerRole: "player" | "spectator";
+    ownerRole: OwnerRole;
     phase: SessionPhase;
     phaseChangedAt: number;
     version: SessionVersion;
