@@ -1,2 +1,3 @@
 Added patcher.swap api
 Improved look of plugin settings menus
+Replaced const with let in all parsed js for easier reassignment
