@@ -181,7 +181,7 @@ export default class Rewriter {
     }
 
     static importRegex = /(import(?:.+?from)?)"([^"]+)";/g;
-    static constRegex = /([^\w\d$]|^)const([^\w\d$])/g;
+    static constRegex = /([^\w\d$" ]|[^" ] *|^)const(?![\w\d$])/g;
     static parse(js: string, name: string, root: boolean, skipPluginHooks: boolean): ParsedJs {
         // Remove dependency preloading
         if(js.startsWith("const __vite__mapDeps")) {
@@ -201,7 +201,7 @@ export default class Rewriter {
         js = js.replace(this.importRegex, "");
 
         // Replace all instances of const with let for easier reassignment
-        js = js.replace(this.constRegex, "$1let$2");
+        js = js.replace(this.constRegex, "$1let");
 
         // Run parse hooks
         const hooks = this.getParseHooks(name, root, skipPluginHooks);
