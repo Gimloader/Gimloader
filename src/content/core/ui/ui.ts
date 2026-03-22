@@ -6,6 +6,7 @@ import tailwindStyles from "$content/css/tailwind.css";
 import { domLoaded } from "$content/utils";
 import Rewriter from "../rewriter";
 import { nop } from "$shared/utils";
+import fixCanvasCrash from "./fixCanvasCrash";
 
 export default class UI {
     static React: typeof React;
@@ -22,6 +23,7 @@ export default class UI {
         });
 
         addPluginButtons();
+        fixCanvasCrash();
         this.addCoreStyles();
     }
 
@@ -63,5 +65,36 @@ export default class UI {
     static addCoreStyles() {
         this.addStyles(null, styles);
         this.addStyles(null, tailwindStyles);
+    }
+
+    static rootStateNode: any = null;
+    static forceReactUpdate() {
+        const stateNode = this.rootStateNode ?? this.findStateNode();
+        if(!stateNode) throw new Error("forceReactUpdate called before DOM has loaded");
+
+        const render = stateNode.render;
+        stateNode.render = () => {
+            stateNode.render = render;
+        };
+
+        stateNode.forceUpdate(() => stateNode.forceUpdate());
+    }
+
+    static findStateNode() {
+        const root = document.getElementById("root");
+        if(!root) return;
+
+        const child = root.firstChild;
+        const key = Object.keys(child).find(k => k.startsWith("__reactFiber$"));
+
+        let current = child[key];
+        while(current?.return) {
+            current = current.return;
+            const stateNode = current.stateNode;
+            if(stateNode && typeof stateNode.forceUpdate === "function") {
+                this.rootStateNode = stateNode;
+                return stateNode;
+            }
+        }
     }
 }

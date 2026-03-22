@@ -26,7 +26,7 @@ interface ParseHook {
 }
 
 /** @inline */
-export type RunInScopeCallback = (code: string, run: (evalCode: string) => any) => true | void;
+export type RunInScopeCallback = (code: string, run: (evalCode: string) => any, initial: boolean) => true | void;
 
 interface RunInScope {
     id?: string;
@@ -257,7 +257,7 @@ export default class Rewriter {
             if(!this.shouldRunHook(name, root, hook.prefix)) continue;
 
             try {
-                const result = hook.callback(code, evalCode);
+                const result = hook.callback(code, evalCode, true);
                 if(result === true) {
                     this.runInScopes.splice(i, 1);
                     i--;
@@ -312,7 +312,7 @@ export default class Rewriter {
 
             try {
                 const evalCode = this.evaluate[name];
-                const result = callback(this.scriptCode[name], evalCode);
+                const result = callback(this.scriptCode[name], evalCode, false);
                 if(result === true) return nop;
             } catch (e) {
                 console.error("Error in runInScope hook:", e);

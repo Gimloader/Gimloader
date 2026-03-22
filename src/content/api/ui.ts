@@ -30,6 +30,11 @@ class BaseUIApi {
         showModal(element, options);
     }
 
+    /** Forces Gimkit's react tree to fully rerender */
+    forceReactUpdate() {
+        UI.forceReactUpdate();
+    }
+
     /**
      * Gimkit's notification object, only available when joining or playing a game
      *
