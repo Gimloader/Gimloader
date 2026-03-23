@@ -1,4 +1,1 @@
-Added patcher.swap api
-Improved look of plugin settings menus
-Replaced const with let in all parsed js for easier reassignment. This has a small chance of breaking certain plugins.
-Added UI.forceReactUpdate method
+Hotfix for crashes that can happen when loading shaders
