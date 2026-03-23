@@ -67,8 +67,19 @@ export default class UI {
         this.addStyles(null, tailwindStyles);
     }
 
-    static rootStateNode: any = null;
+    static updatingReact = false;
     static forceReactUpdate() {
+        if(this.updatingReact) return;
+        this.updatingReact = true;
+
+        setTimeout(() => {
+            this.runForceReactUpdate();
+            this.updatingReact = false;
+        }, 0);
+    }
+
+    static rootStateNode: any = null;
+    static runForceReactUpdate() {
         const stateNode = this.rootStateNode ?? this.findStateNode();
         if(!stateNode) throw new Error("forceReactUpdate called before DOM has loaded");
 
