@@ -36,4 +36,4 @@ export const glslTypes = [
     "mat4",
     "sampler2D",
     "samplerCube"
-]
+];
