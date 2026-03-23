@@ -5,6 +5,7 @@ import PluginManager from "./scripts/pluginManager.svelte";
 import Port from "$shared/net/port.svelte";
 import { englishList, error, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
+import { glslTypes } from "$shared/consts";
 
 interface Import {
     text: string;
@@ -181,7 +182,7 @@ export default class Rewriter {
     }
 
     static importRegex = /(import(?:.+?from)?)"([^"]+)";/g;
-    static constRegex = /([^\w\d$" ]|[^" ] *|^)const(?![\w\d$])/g;
+    static constRegex = new RegExp(`([^\\w\\d$"]|^)const(?![\\w\\d$])(?!${glslTypes.map(t => " " + t).join("|")})`, "g");
     static parse(js: string, name: string, root: boolean, skipPluginHooks: boolean): ParsedJs {
         // Remove dependency preloading
         if(js.startsWith("const __vite__mapDeps")) {

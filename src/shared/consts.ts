@@ -17,3 +17,23 @@ export const defaultSettings: Settings = {
 };
 
 export const flipDurationMs = 300;
+
+export const glslTypes = [
+    "bool",
+    "int",
+    "float",
+    "bvec2",
+    "bvec3",
+    "bvec4",
+    "ivec2",
+    "ivec3",
+    "ivec4",
+    "vec2",
+    "vec3",
+    "vec4",
+    "mat2",
+    "mat3",
+    "mat4",
+    "sampler2D",
+    "samplerCube"
+]
