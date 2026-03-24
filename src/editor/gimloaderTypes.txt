@@ -5014,26 +5014,47 @@ interface CallToActionItem {
 	name: string;
 	url: string;
 }
-interface Widget {
-	type: string;
+interface BaseWidget {
 	id: string;
 	y: number;
 	placement: string;
+}
+interface StatisticWidget extends BaseWidget {
+	type: "Statistic";
+	gameTimeName: string;
+	gameTimeValue: string;
+}
+interface GameTimeWidget extends BaseWidget {
+	type: "Game Time";
 	statName: string;
 	statValue: number;
 }
+type Widget = StatisticWidget | GameTimeWidget;
+type GameSessionPhase = "countdown" | "game" | "results";
 interface GameSession {
 	callToAction: {
 		categories: CallToActionCategory[];
 		items: CallToActionItem[];
 	};
 	countdownEnd: number;
-	phase: string;
+	/**
+	 * `countdown` either before the game has started or while the game is starting
+	 *
+	 * `game` while the game is started
+	 *
+	 * `results` after the game ends until the game has been started again
+	 */
+	phase: GameSessionPhase;
 	resultsEnd: number;
 	widgets: {
 		widgets: Widget[];
 	};
 }
+type SessionMapStyle = "platformer" | "topDown";
+type SessionModeType = "liveGame" | "assignment";
+type SessionPhase = "preGame" | "game";
+type SessionVersion = "published" | "saved";
+type OwnerRole = "player" | "spectator";
 interface Session {
 	allowGoogleTranslate: boolean;
 	amIGameOwner: boolean;
@@ -5051,12 +5072,12 @@ interface Session {
 	globalPermissions: Permissions;
 	loadingPhase: boolean;
 	mapCreatorRoleLevel: number;
-	mapStyle: string;
-	modeType: string;
-	ownerRole: string;
-	phase: string;
+	mapStyle: SessionMapStyle;
+	modeType: SessionModeType;
+	ownerRole: OwnerRole;
+	phase: SessionPhase;
 	phaseChangedAt: number;
-	version: string;
+	version: SessionVersion;
 }
 interface Achievement {
 	id: string;
@@ -5128,6 +5149,7 @@ interface CharacterPermissions {
 	manageCodeGrids: boolean;
 	removing: boolean;
 }
+type CharacterType = "character" | "sentry";
 interface CharacterInfo {
 	allowWeaponFire: boolean;
 	existsBeforeReconnect: boolean;
@@ -5140,7 +5162,7 @@ interface CharacterInfo {
 	permissions: CharacterPermissions;
 	score: number;
 	teamId: string;
-	type: string;
+	type: CharacterType;
 }
 interface Characters {
 	characters: Map<string, CharacterInfo>;
@@ -6038,7 +6060,7 @@ interface CharacterOptions {
 	x: number;
 	y: number;
 	scale: number;
-	type: string;
+	type: CharacterType;
 }
 interface CharacterManager {
 	characterContainer: GameObjects.Container;
@@ -6511,7 +6533,7 @@ interface Character {
 	spine: any;
 	teamId: string;
 	tint: Tint;
-	type: string;
+	type: CharacterType;
 	vfx: VFX;
 	destroy(): void;
 	setIsMain(isMain: boolean): void;
@@ -6994,6 +7016,11 @@ interface RequesterOptions {
 	both?: () => void;
 	error?: (error: any) => void;
 }
+type GameSessionPhase = "countdown" | "game" | "results";
+type SessionMapStyle = "platformer" | "topDown";
+type SessionModeType = "liveGame" | "assignment";
+type SessionPhase = "preGame" | "game";
+type SessionVersion = "published" | "saved";
 namespace Schema {
 	interface ColyseusMethods {
 		$callbacks: Record<string, any>;
@@ -7131,7 +7158,14 @@ namespace Schema {
 	interface GameSessionState {
 		callToAction: ObjectSchema<CallToActionState>;
 		countdownEnd: number;
-		phase: string;
+		/**
+		 * `countdown` either before the game has started or while the game is starting
+		 *
+		 * `game` while the game is started
+		 *
+		 * `results` after the game ends until the game has been started again
+		 */
+		phase: GameSessionPhase;
 		resultsEnd: number;
 	}
 	interface SessionState {
@@ -7143,10 +7177,10 @@ namespace Schema {
 		globalPermissions: ObjectSchema<PermissionsState>;
 		loadingPhase: boolean;
 		mapCreatorRoleLevel: number;
-		mapStyle: string;
-		modeType: string;
-		phase: string;
-		version: string;
+		mapStyle: SessionMapStyle;
+		modeType: SessionModeType;
+		phase: SessionPhase;
+		version: SessionVersion;
 	}
 	interface DevicesState {
 		codeGrids: MapSchema<any>;
