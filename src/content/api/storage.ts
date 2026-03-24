@@ -31,7 +31,17 @@ class StorageApi {
         return this.deleteValue;
     }
 
-    /** Adds a listener for when a plugin's stored value with a certain key changes */
+    /**
+     * Adds a listener for when a plugin's stored value with a certain key changes
+     * @returns a function that removes the listener when called
+     * @example
+     * ```js
+     * GL.storage.onChange("MyPlugin", "key", (value, remote) => {
+     *     console.log("Value is now", value);
+     *     console.log("Value was updated", remote ? "remotely" : "locally");
+     * });
+     * ```
+     */
     onChange(pluginName: string, key: string, callback: ValueChangeCallback) {
         validate("storage.onChange", arguments, ["pluginName", "string"], ["key", "string"], ["callback", "function"]);
 
@@ -81,7 +91,17 @@ class ScopedStorageApi {
         Storage.deletePluginValue(this.#id, key);
     }
 
-    /** Adds a listener for when a stored value with a certain key changes  */
+    /**
+     * Adds a listener for when a stored value with a certain key changes
+     * @returns a function that removes the listener when called
+     * @example
+     * ```js
+     * api.storage.onChange("key", (value, remote) => {
+     *     console.log("Value is now", value);
+     *     console.log("Value was updated", remote ? "remotely" : "locally");
+     * });
+     * ```
+     */
     onChange(key: string, callback: ValueChangeCallback) {
         return Storage.onPluginValueUpdate(this.#id, key, callback);
     }

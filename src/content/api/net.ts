@@ -54,18 +54,19 @@ class BaseNetApi extends EventEmitter2 {
 /**
  * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
  * and uses wildcards with ":" as a delimiter.
- *
- * The following events are emitted:
- *
- * ```ts
+ * ```js
  * // fired when data is recieved on a certain channel
- * net.on("CHANNEL", (data, editFn) => {})
+ * GL.net.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
  *
  * // fired when data is sent on a certain channel
- * net.on("send:CHANNEL", (data, editFn) => {})
+ * GL.net.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
  *
  * // you can also use wildcards, eg
- * net.on("send:*", () => {})
+ * GL.net.on("send:*", () => {});
  * ```
  */
 class NetApi extends BaseNetApi {
@@ -94,14 +95,36 @@ class NetApi extends BaseNetApi {
         Net.pluginOffLoad(id);
     }
 
-    /** Runs a callback when a request is made that matches a certain path (can have wildcards) */
+    /**
+     * Runs a callback when a request is made that matches a certain path (can have wildcards)
+     * @returns A function to stop the modification
+     * @example
+     * ```js
+     * GL.net.modifyFetchRequest("MyPlugin", "/api/experiences", (request) => {
+     *     console.log(request.data);
+     *     request.data.modified = true;
+     *
+     *     return null; // Cancel the request
+     * });
+     * ```
+     */
     modifyFetchRequest(id: string, path: string, callback: (options: RequesterOptions) => any) {
         validate("net.modifyFetchRequest", arguments, ["id", "string"], ["path", "string"], ["callback", "function"]);
 
         return Net.modifyFetchRequest(id, path, callback);
     }
 
-    /** Runs a callback when a response is recieved for a request under a certain path (can have wildcards) */
+    /**
+     * Runs a callback when a response is recieved for a request under a certain path (can have wildcards)
+     * @returns A function to stop the modification
+     * @example
+     * ```js
+     * GL.net.modifyFetchResponse("MyPlugin", "/api/experience/map/hooks", (data) => {
+     *     console.log(data);
+     *     return "modified data";
+     * });
+     * ```
+     */
     modifyFetchResponse(id: string, path: string, callback: (response: any) => any) {
         validate("net.modifyFetchResponse", arguments, ["id", "string"], ["path", "string"], ["callback", "function"]);
 
@@ -171,18 +194,19 @@ class NetApi extends BaseNetApi {
 /**
  * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
  * and uses wildcards with ":" as a delimiter.
- *
- * The following events are emitted:
- *
- * ```ts
+ * ```js
  * // fired when data is recieved on a certain channel
- * net.on("CHANNEL", (data, editFn) => {})
+ * api.net.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
  *
  * // fired when data is sent on a certain channel
- * net.on("send:CHANNEL", (data, editFn) => {})
+ * api.net.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
  *
  * // you can also use wildcards, eg
- * net.on("send:*", () => {})
+ * api.net.on("send:*", () => {});
  * ```
  */
 class ScopedNetApi extends BaseNetApi {
@@ -208,14 +232,36 @@ class ScopedNetApi extends BaseNetApi {
         return Net.pluginOnLoad(this.#id, callback, gamemode);
     }
 
-    /** Runs a callback when a request is made that matches a certain path (can have wildcards) */
+    /**
+     * Runs a callback when a request is made that matches a certain path (can have wildcards)
+     * @returns A function to stop the modification
+     * @example
+     * ```js
+     * api.net.modifyFetchRequest("/api/experiences", (request) => {
+     *     console.log(request.data);
+     *     request.data.modified = true;
+     *
+     *     return null; // Cancel the request
+     * });
+     * ```
+     */
     modifyFetchRequest(path: string, callback: (options: RequesterOptions) => any) {
         validate("net.modifyFetchRequest", arguments, ["path", "string"], ["callback", "function"]);
 
         return Net.modifyFetchRequest(this.#id, path, callback);
     }
 
-    /** Runs a callback when a response is recieved for a request under a certain path (can have wildcards) */
+    /**
+     * Runs a callback when a response is recieved for a request under a certain path (can have wildcards)
+     * @returns A function to stop the modification
+     * @example
+     * ```js
+     * api.net.modifyFetchResponse("/api/experience/map/hooks", (data) => {
+     *     console.log(data);
+     *     return "modified data";
+     * });
+     * ```
+     */
     modifyFetchResponse(path: string, callback: (response: any) => any) {
         validate("net.modifyFetchResponse", arguments, ["path", "string"], ["callback", "function"]);
 

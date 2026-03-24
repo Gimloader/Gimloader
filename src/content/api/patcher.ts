@@ -13,6 +13,15 @@ class PatcherApi {
     /**
      * Runs a callback after a function on an object has been run
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: () => 100 };
+     * GL.patcher.after("MyPlugin", object, "method", (thisVal, args, returnVal) => {
+     *     console.log("Came after:", returnVal);
+     * });
+     *
+     * object.method(); // Logs "Came after: 100"
+     * ```
      */
     after<O extends object, K extends FunctionKeys<O>>(
         id: string,
@@ -30,6 +39,15 @@ class PatcherApi {
      * Runs a callback before a function on an object has been run.
      * Return true from the callback to prevent the function from running
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * GL.patcher.before("MyPlugin", object, "method", (thisVal, args) => {
+     *     console.log("Came before:", args);
+     * });
+     *
+     * object.method(5, 6); // Logs "Came before: [5, 6]"
+     * ```
      */
     before<O extends object, K extends FunctionKeys<O>>(
         id: string,
@@ -46,6 +64,15 @@ class PatcherApi {
     /**
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * GL.patcher.instead("MyPlugin", object, "method", (thisVal, args) => {
+     *     return args[0] + args[1];
+     * });
+     *
+     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+     * ```
      */
     instead<O extends object, K extends FunctionKeys<O>>(
         id: string,
@@ -62,6 +89,15 @@ class PatcherApi {
     /**
      * Replaces a function on an object with another function
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * GL.patcher.swap("MyPlugin", object, "method", (arg1, arg2) => {
+     *     return arg1 + arg2;
+     * });
+     *
+     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+     * ```
      */
     swap<O extends object, K extends FunctionKeys<O>>(
         id: string,
@@ -93,6 +129,15 @@ class ScopedPatcherApi {
     /**
      * Runs a callback after a function on an object has been run
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: () => 100 };
+     * api.patcher.after(object, "method", (thisVal, args, returnVal) => {
+     *     console.log("Came after:", returnVal);
+     * });
+     *
+     * object.method(); // Logs "Came after: 100"
+     * ```
      */
     after<O extends object, K extends FunctionKeys<O>>(
         object: O,
@@ -109,6 +154,15 @@ class ScopedPatcherApi {
      * Runs a callback before a function on an object has been run.
      * Return true from the callback to prevent the function from running
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * api.patcher.before(object, "method", (thisVal, args) => {
+     *     console.log("Came before:", args);
+     * });
+     *
+     * object.method(5, 6); // Logs "Came before: [5, 6]"
+     * ```
      */
     before<O extends object, K extends FunctionKeys<O>>(
         object: O,
@@ -124,6 +178,15 @@ class ScopedPatcherApi {
     /**
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * api.patcher.instead(object, "method", (thisVal, args) => {
+     *     return args[0] + args[1];
+     * });
+     *
+     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+     * ```
      */
     instead<O extends object, K extends FunctionKeys<O>>(
         object: O,
@@ -139,6 +202,15 @@ class ScopedPatcherApi {
     /**
      * Replaces a function on an object with another function
      * @returns A function to remove the patch
+     * @example
+     * ```js
+     * const object = { method: (arg1, arg2) => 100 };
+     * api.patcher.swap(object, "method", (arg1, arg2) => {
+     *     return arg1 + arg2;
+     * });
+     *
+     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+     * ```
      */
     swap<O extends object, K extends FunctionKeys<O>>(
         object: O,

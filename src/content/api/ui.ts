@@ -23,7 +23,28 @@ const ModalOptionsSchema = z.object({
 });
 
 class BaseUIApi {
-    /** Shows a customizable modal to the user */
+    /**
+     * Shows a customizable modal to the user
+     * @example
+     * ```js
+     * const element = document.createElement("div");
+     * element.textContent = "Hello, world!";
+     *
+     * GL.UI.showModal(element, {
+     *     id: "my-modal",
+     *     title: "My Modal",
+     *     style: "width: 300px;",
+     *     className: "someClass",
+     *     closeOnBackgroundClick: true,
+     *     onClosed: () => {},
+     *     buttons: [
+     *         { text: "OK", style: "primary", onClick: () => {} },
+     *         { text: "Cancel", style: "close" },
+     *         { text: "Revert", style: "danger", onClick: () => {} }
+     *     ]
+     * });
+     * ```
+     */
     showModal(element: HTMLElement | React.ReactElement, options: ModalOptions = {}) {
         validate("UI.showModal", arguments, ["element", "any"], ["options?", ModalOptionsSchema]);
 
@@ -67,6 +88,14 @@ class UIApi extends BaseUIApi {
     /**
      * Adds a style to the DOM
      * @returns A function to remove the styles
+     * @example
+     * ```js
+     * const styles = `#element {
+     *     color: red;
+     * }`;
+     *
+     * GL.UI.addStyles("MyPlugin", styles);
+     * ```
      */
     addStyles(id: string, style: string) {
         validate("UI.removeStyles", arguments, ["id", "string"], ["style", "string"]);
@@ -94,6 +123,14 @@ class ScopedUIApi extends BaseUIApi {
     /**
      * Adds a style to the DOM
      * @returns A function to remove the styles
+     * @example
+     * ```js
+     * const styles = `#element {
+     *     color: red;
+     * }`;
+     *
+     * GL.UI.addStyles("MyPlugin", styles);
+     * ```
      */
     addStyles(style: string) {
         validate("UI.removeStyles", arguments, ["style", "string"]);

@@ -45,7 +45,13 @@ class ScopedPluginsApi extends PluginsApi {
         this.#id = id;
     }
 
-    /** Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+    /**
+     * Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports
+     * @example
+     * ```js
+     * api.libs.require("Desynchronize", "https://raw.githubusercontent.com/Gimloader/builds/main/plugins/Desynchronize.js");
+     * ```
+     */
     require(name: string, downloadUrl?: string) {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 

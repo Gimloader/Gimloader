@@ -37,7 +37,13 @@ class ScopedLibsApi extends LibsApi {
         this.#id = id;
     }
 
-    /** Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+    /**
+     * Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports.
+     * @example
+     * ```js
+     * api.libs.require("Communication", "https://raw.githubusercontent.com/Gimloader/builds/main/libraries/Communication.js");
+     * ```
+     */
     require(name: string, downloadUrl?: string) {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 

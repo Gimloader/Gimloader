@@ -103,6 +103,17 @@ class HotkeysApi extends BaseHotkeysApi {
     /**
      * Adds a hotkey with a given id
      * @returns A function to remove the hotkey
+     * @example
+     * ```js
+     * GL.hotkeys.addHotkey("MyPlugin", {
+     *     key: "Digit1",
+     *     ctrl: true,
+     *     shift: true,
+     *     preventDefault: true
+     * }, (e) => {
+     *     console.log("Hotkey pressed", e.key);
+     * });
+     * ```
      */
     addHotkey(id: string, options: HotkeyOptions, callback: KeyboardCallback) {
         validate("hotkeys.addHotkey", arguments, ["id", "string"], ["options", HotkeyOptionsSchema], ["callback", "function"]);
@@ -121,6 +132,21 @@ class HotkeysApi extends BaseHotkeysApi {
      * Adds a hotkey which can be changed by the user
      * @param id A unique id for the hotkey, such as `myplugin-myhotkey`
      * @returns A function to remove the hotkey
+     * @example
+     * ```js
+     * GL.hotkeys.addConfigurableHotkey("MyPlugin-MyHotkey", {
+     *     category: "My Plugin",
+     *     title: "Do a thing",
+     *     preventDefault: true,
+     *     default: {
+     *         key: "Digit1",
+     *         ctrl: true,
+     *         shift: true
+     *     }
+     * }, (e) => {
+     *     console.log("Configurable hotkey pressed", e.key);
+     * });
+     * ```
      */
     addConfigurableHotkey(id: string, options: ConfigurableHotkeyOptions, callback: KeyboardCallback) {
         validate("hotkeys.addConfigurableHotkey", arguments, ["id", "string"], ["options", ConfigurableHotkeyOptionsSchema], ["callback", "function"]);
@@ -190,6 +216,17 @@ class ScopedHotkeysApi extends BaseHotkeysApi {
     /**
      * Adds a hotkey which will fire when certain keys are pressed
      * @returns A function to remove the hotkey
+     * @example
+     * ```js
+     * api.hotkeys.addHotkey({
+     *     key: "Digit1",
+     *     ctrl: true,
+     *     shift: true,
+     *     preventDefault: true
+     * }, (e) => {
+     *     console.log("Hotkey pressed", e.key);
+     * });
+     * ```
      */
     addHotkey(options: HotkeyOptions, callback: KeyboardCallback) {
         validate("hotkeys.addHotkey", arguments, ["options", HotkeyOptionsSchema], ["callback", "function"]);
@@ -200,6 +237,21 @@ class ScopedHotkeysApi extends BaseHotkeysApi {
     /**
      * Adds a hotkey which can be changed by the user
      * @returns A function to remove the hotkey
+     * @example
+     * ```js
+     * api.hotkeys.addConfigurableHotkey({
+     *     category: "My Plugin",
+     *     title: "Do a thing",
+     *     preventDefault: true,
+     *     default: {
+     *         key: "Digit1",
+     *         ctrl: true,
+     *         shift: true
+     *     }
+     * }, (e) => {
+     *     console.log("Configurable hotkey pressed", e.key);
+     * });
+     * ```
      */
     addConfigurableHotkey(options: ConfigurableHotkeyOptions, callback: KeyboardCallback) {
         validate("hotkeys.addConfigurableHotkey", arguments, ["options", ConfigurableHotkeyOptionsSchema], ["callback", "function"]);

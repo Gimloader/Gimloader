@@ -6745,6 +6745,17 @@ class HotkeysApi extends BaseHotkeysApi {
 	/**
 	 * Adds a hotkey with a given id
 	 * @returns A function to remove the hotkey
+	 * @example
+	 * ```js
+	 * GL.hotkeys.addHotkey("MyPlugin", {
+	 *     key: "Digit1",
+	 *     ctrl: true,
+	 *     shift: true,
+	 *     preventDefault: true
+	 * }, (e) => {
+	 *     console.log("Hotkey pressed", e.key);
+	 * });
+	 * ```
 	 */
 	addHotkey(id: string, options: HotkeyOptions, callback: KeyboardCallback): () => void;
 	/** Removes all hotkeys with a given id */
@@ -6753,6 +6764,21 @@ class HotkeysApi extends BaseHotkeysApi {
 	 * Adds a hotkey which can be changed by the user
 	 * @param id A unique id for the hotkey, such as `myplugin-myhotkey`
 	 * @returns A function to remove the hotkey
+	 * @example
+	 * ```js
+	 * GL.hotkeys.addConfigurableHotkey("MyPlugin-MyHotkey", {
+	 *     category: "My Plugin",
+	 *     title: "Do a thing",
+	 *     preventDefault: true,
+	 *     default: {
+	 *         key: "Digit1",
+	 *         ctrl: true,
+	 *         shift: true
+	 *     }
+	 * }, (e) => {
+	 *     console.log("Configurable hotkey pressed", e.key);
+	 * });
+	 * ```
 	 */
 	addConfigurableHotkey(id: string, options: ConfigurableHotkeyOptions, callback: KeyboardCallback): () => void;
 	/** Removes a configurable hotkey with a given id */
@@ -6784,54 +6810,51 @@ class ScopedHotkeysApi extends BaseHotkeysApi {
 	/**
 	 * Adds a hotkey which will fire when certain keys are pressed
 	 * @returns A function to remove the hotkey
+	 * @example
+	 * ```js
+	 * api.hotkeys.addHotkey({
+	 *     key: "Digit1",
+	 *     ctrl: true,
+	 *     shift: true,
+	 *     preventDefault: true
+	 * }, (e) => {
+	 *     console.log("Hotkey pressed", e.key);
+	 * });
+	 * ```
 	 */
 	addHotkey(options: HotkeyOptions, callback: KeyboardCallback): () => void;
 	/**
 	 * Adds a hotkey which can be changed by the user
 	 * @returns A function to remove the hotkey
+	 * @example
+	 * ```js
+	 * api.hotkeys.addConfigurableHotkey({
+	 *     category: "My Plugin",
+	 *     title: "Do a thing",
+	 *     preventDefault: true,
+	 *     default: {
+	 *         key: "Digit1",
+	 *         ctrl: true,
+	 *         shift: true
+	 *     }
+	 * }, (e) => {
+	 *     console.log("Configurable hotkey pressed", e.key);
+	 * });
+	 * ```
 	 */
 	addConfigurableHotkey(options: ConfigurableHotkeyOptions, callback: KeyboardCallback): () => void;
 }
 class BaseParcelApi {
-	/**
-	 * Gets a module based on a filter, returns null if none are found
-	 * Be cautious when using this- plugins will often run before any modules load in,
-	 * meaning that if this is run on startup it will likely return nothing.
-	 * Consider using getLazy instead.
-	 */
 	query(): any;
-	/**
-	 * Returns an array of all loaded modules matching a filter
-	 * Be cautious when using this- plugins will often run before any modules load in,
-	 * meaning that if this is run on startup it will likely return nothing.
-	 * Consider using getLazy instead.
-	 */
 	queryAll(): any[];
 }
 class ParcelApi extends BaseParcelApi {
-	/**
-	 * Waits for a module to be loaded, then runs a callback
-	 * @returns A function to cancel waiting for the module
-	 */
 	getLazy(): () => void;
-	/** Cancels any calls to getLazy with the same id */
 	stopLazy(): void;
-	/**
-	 * @deprecated Use {@link getLazy} instead
-	 * @hidden
-	 */
 	get interceptRequire(): () => () => void;
-	/**
-	 * @deprecated Use {@link stopLazy} instead
-	 * @hidden
-	 */
 	get stopIntercepts(): () => void;
 }
 class ScopedParcelApi extends BaseParcelApi {
-	/**
-	 * Waits for a module to be loaded, then runs a callback
-	 * @returns A function to cancel waiting for the module
-	 */
 	getLazy(): () => void;
 }
 type event$1 = (symbol | string);
@@ -7211,9 +7234,31 @@ class NetApi extends BaseNetApi {
 	onLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | ReadonlyArray<string>): () => void;
 	/** Cancels any calls to {@link onLoad} with the same id */
 	offLoad(id: string): void;
-	/** Runs a callback when a request is made that matches a certain path (can have wildcards) */
+	/**
+	 * Runs a callback when a request is made that matches a certain path (can have wildcards)
+	 * @returns A function to stop the modification
+	 * @example
+	 * ```js
+	 * GL.net.modifyFetchRequest("MyPlugin", "/api/experiences", (request) => {
+	 *     console.log(request.data);
+	 *     request.data.modified = true;
+	 *
+	 *     return null; // Cancel the request
+	 * });
+	 * ```
+	 */
 	modifyFetchRequest(id: string, path: string, callback: (options: RequesterOptions) => any): () => void;
-	/** Runs a callback when a response is recieved for a request under a certain path (can have wildcards) */
+	/**
+	 * Runs a callback when a response is recieved for a request under a certain path (can have wildcards)
+	 * @returns A function to stop the modification
+	 * @example
+	 * ```js
+	 * GL.net.modifyFetchResponse("MyPlugin", "/api/experience/map/hooks", (data) => {
+	 *     console.log(data);
+	 *     return "modified data";
+	 * });
+	 * ```
+	 */
 	modifyFetchResponse(id: string, path: string, callback: (response: any) => any): () => void;
 	/** Stops any modifications made by {@link modifyFetchRequest} with the same id */
 	stopModifyRequest(id: string): void;
@@ -7251,9 +7296,31 @@ class ScopedNetApi extends BaseNetApi {
 	 * @returns A function to cancel waiting for load
 	 */
 	onLoad(callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | ReadonlyArray<string>): () => void;
-	/** Runs a callback when a request is made that matches a certain path (can have wildcards) */
+	/**
+	 * Runs a callback when a request is made that matches a certain path (can have wildcards)
+	 * @returns A function to stop the modification
+	 * @example
+	 * ```js
+	 * api.net.modifyFetchRequest("/api/experiences", (request) => {
+	 *     console.log(request.data);
+	 *     request.data.modified = true;
+	 *
+	 *     return null; // Cancel the request
+	 * });
+	 * ```
+	 */
 	modifyFetchRequest(path: string, callback: (options: RequesterOptions) => any): () => void;
-	/** Runs a callback when a response is recieved for a request under a certain path (can have wildcards) */
+	/**
+	 * Runs a callback when a response is recieved for a request under a certain path (can have wildcards)
+	 * @returns A function to stop the modification
+	 * @example
+	 * ```js
+	 * api.net.modifyFetchResponse("/api/experience/map/hooks", (data) => {
+	 *     console.log(data);
+	 *     return "modified data";
+	 * });
+	 * ```
+	 */
 	modifyFetchResponse(path: string, callback: (response: any) => any): () => void;
 }
 interface ModalButton {
@@ -7587,8 +7654,31 @@ type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
 type AntdMessage = MessageMethods & MessageBaseMethods;
 type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
 class BaseUIApi {
-	/** Shows a customizable modal to the user */
+	/**
+	 * Shows a customizable modal to the user
+	 * @example
+	 * ```js
+	 * const element = document.createElement("div");
+	 * element.textContent = "Hello, world!";
+	 *
+	 * GL.UI.showModal(element, {
+	 *     id: "my-modal",
+	 *     title: "My Modal",
+	 *     style: "width: 300px;",
+	 *     className: "someClass",
+	 *     closeOnBackgroundClick: true,
+	 *     onClosed: () => {},
+	 *     buttons: [
+	 *         { text: "OK", style: "primary", onClick: () => {} },
+	 *         { text: "Cancel", style: "close" },
+	 *         { text: "Revert", style: "danger", onClick: () => {} }
+	 *     ]
+	 * });
+	 * ```
+	 */
 	showModal(element: HTMLElement | React$1.ReactElement, options?: ModalOptions): void;
+	/** Forces Gimkit's react tree to fully rerender */
+	forceReactUpdate(): void;
 	/**
 	 * Gimkit's notification object, only available when joining or playing a game
 	 *
@@ -7612,6 +7702,14 @@ class UIApi extends BaseUIApi {
 	/**
 	 * Adds a style to the DOM
 	 * @returns A function to remove the styles
+	 * @example
+	 * ```js
+	 * const styles = `#element {
+	 *     color: red;
+	 * }`;
+	 *
+	 * GL.UI.addStyles("MyPlugin", styles);
+	 * ```
 	 */
 	addStyles(id: string, style: string): () => void;
 	/** Remove all styles with a given id */
@@ -7623,6 +7721,14 @@ class ScopedUIApi extends BaseUIApi {
 	/**
 	 * Adds a style to the DOM
 	 * @returns A function to remove the styles
+	 * @example
+	 * ```js
+	 * const styles = `#element {
+	 *     color: red;
+	 * }`;
+	 *
+	 * GL.UI.addStyles("MyPlugin", styles);
+	 * ```
 	 */
 	addStyles(style: string): () => void;
 }
@@ -7640,7 +7746,17 @@ class StorageApi {
 	 * @hidden
 	 */
 	get removeValue(): (pluginName: string, key: string) => void;
-	/** Adds a listener for when a plugin's stored value with a certain key changes */
+	/**
+	 * Adds a listener for when a plugin's stored value with a certain key changes
+	 * @returns a function that removes the listener when called
+	 * @example
+	 * ```js
+	 * GL.storage.onChange("MyPlugin", "key", (value, remote) => {
+	 *     console.log("Value is now", value);
+	 *     console.log("Value was updated", remote ? "remotely" : "locally");
+	 * });
+	 * ```
+	 */
 	onChange(pluginName: string, key: string, callback: ValueChangeCallback): () => void;
 	/** Removes a listener added by onChange */
 	offChange(pluginName: string, key: string, callback: ValueChangeCallback): void;
@@ -7656,7 +7772,17 @@ class ScopedStorageApi {
 	setValue(key: string, value: any): void;
 	/** Removes a value which has been saved */
 	deleteValue(key: string): void;
-	/** Adds a listener for when a stored value with a certain key changes  */
+	/**
+	 * Adds a listener for when a stored value with a certain key changes
+	 * @returns a function that removes the listener when called
+	 * @example
+	 * ```js
+	 * api.storage.onChange("key", (value, remote) => {
+	 *     console.log("Value is now", value);
+	 *     console.log("Value was updated", remote ? "remotely" : "locally");
+	 * });
+	 * ```
+	 */
 	onChange(key: string, callback: ValueChangeCallback): () => void;
 }
 type BaseFunction = (...args: any[]) => any;
@@ -7669,23 +7795,66 @@ type PatcherAfterCallback<T> = (thisVal: any, args: T extends BaseFunction ? Par
 type PatcherBeforeCallback<T> = (thisVal: any, args: T extends BaseFunction ? Parameters<T> : any[]) => boolean | void;
 
 type PatcherInsteadCallback<T> = (thisVal: any, args: T extends BaseFunction ? Parameters<T> : any[]) => any;
+
+type PatcherSwapCallback<T> = (...args: T extends BaseFunction ? Parameters<T> : any[]) => any;
 class PatcherApi {
 	/**
 	 * Runs a callback after a function on an object has been run
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: () => 100 };
+	 * GL.patcher.after("MyPlugin", object, "method", (thisVal, args, returnVal) => {
+	 *     console.log("Came after:", returnVal);
+	 * });
+	 *
+	 * object.method(); // Logs "Came after: 100"
+	 * ```
 	 */
 	after<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
 	/**
 	 * Runs a callback before a function on an object has been run.
 	 * Return true from the callback to prevent the function from running
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * GL.patcher.before("MyPlugin", object, "method", (thisVal, args) => {
+	 *     console.log("Came before:", args);
+	 * });
+	 *
+	 * object.method(5, 6); // Logs "Came before: [5, 6]"
+	 * ```
 	 */
 	before<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
 	/**
 	 * Runs a function instead of a function on an object
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * GL.patcher.instead("MyPlugin", object, "method", (thisVal, args) => {
+	 *     return args[0] + args[1];
+	 * });
+	 *
+	 * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+	 * ```
 	 */
 	instead<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
+	/**
+	 * Replaces a function on an object with another function
+	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * GL.patcher.swap("MyPlugin", object, "method", (arg1, arg2) => {
+	 *     return arg1 + arg2;
+	 * });
+	 *
+	 * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+	 * ```
+	 */
+	swap<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherSwapCallback<O[K]>): () => void;
 	/** Removes all patches with a given id */
 	unpatchAll(id: string): void;
 }
@@ -7695,22 +7864,63 @@ class ScopedPatcherApi {
 	/**
 	 * Runs a callback after a function on an object has been run
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: () => 100 };
+	 * api.patcher.after(object, "method", (thisVal, args, returnVal) => {
+	 *     console.log("Came after:", returnVal);
+	 * });
+	 *
+	 * object.method(); // Logs "Came after: 100"
+	 * ```
 	 */
 	after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
 	/**
 	 * Runs a callback before a function on an object has been run.
 	 * Return true from the callback to prevent the function from running
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * api.patcher.before(object, "method", (thisVal, args) => {
+	 *     console.log("Came before:", args);
+	 * });
+	 *
+	 * object.method(5, 6); // Logs "Came before: [5, 6]"
+	 * ```
 	 */
 	before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
 	/**
 	 * Runs a function instead of a function on an object
 	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * api.patcher.instead(object, "method", (thisVal, args) => {
+	 *     return args[0] + args[1];
+	 * });
+	 *
+	 * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+	 * ```
 	 */
 	instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
+	/**
+	 * Replaces a function on an object with another function
+	 * @returns A function to remove the patch
+	 * @example
+	 * ```js
+	 * const object = { method: (arg1, arg2) => 100 };
+	 * api.patcher.swap(object, "method", (arg1, arg2) => {
+	 *     return arg1 + arg2;
+	 * });
+	 *
+	 * console.log(object.method(5, 6)); // Logs "11" instead of "100"
+	 * ```
+	 */
+	swap<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherSwapCallback<O[K]>): () => void;
 }
 
-type RunInScopeCallback = (code: string, run: (evalCode: string) => any) => true | void;
+type RunInScopeCallback = (code: string, run: (evalCode: string) => any, initial: boolean) => true | void;
 
 interface Exposer {
 	check?: string;
@@ -7727,6 +7937,16 @@ class RewriterApi {
 	 * @param prefix Limits the hook to only running on scripts beginning with this prefix.
 	 * Passing `true` will only run on the index script, and passing `false` will run on all scripts.
 	 * @param modifier A function that will modify the code, which should return the modified code.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * GL.rewriter.addParseHook("MyPlugin", "App", (code) => {
+	 *     let index = code.indexOf("something");
+	 *     code = code.slice(0, index) + `console.log("something else")` + code.slice(index);
+	 *     code += "console.log(someVar)";
+	 *     return code;
+	 * });
+	 * ```
 	 */
 	addParseHook(pluginName: string, prefix: string | boolean, modifier: (code: string) => string): () => void;
 	/** Removes all parse hooks created by a certain plugin */
@@ -7737,6 +7957,14 @@ class RewriterApi {
 	 * @param id A unique identifier for the shared value.
 	 * @param value The value to be shared.
 	 * @returns A string representing the code to access the shared value.
+	 * @example
+	 * ```js
+	 * const callback = GL.rewriter.createShared("MyPlugin", "uniqueId", (val) => {
+	 *     console.log(val);
+	 * });
+	 *
+	 * eval(`${callback}("15")`); // Don't actually do this, but it logs 15
+	 * ```
 	 */
 	createShared(pluginName: string, id: string, value: any): string;
 	/** Removes all values created by {@link createShared} by a certain plugin */
@@ -7746,11 +7974,32 @@ class RewriterApi {
 	/**
 	 * Runs code in the scope of modules when they are loaded, or when runInScope is called with them already loaded.
 	 * Returning true from the callback will remove the hook.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * GL.rewriter.runInScope("MyPlugin", "App", (code, run, initial) => {
+	 *     if(code.includes("something")) {
+	 *         run(`someVar=15`);
+	 *     }
+	 * });
+	 * ```
 	 */
 	runInScope(pluginName: string, prefix: string | boolean, callback: RunInScopeCallback): () => void;
 	/** Stops all hooks created by {@link runInScope} */
 	removeRunInScope(pluginName: string): void;
-	/** A utility function that exposes a variable based on regex to get its name. */
+	/**
+	 * A utility function that exposes a variable based on regex to get its name.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * GL.rewriter.exposeVar("MyPlugin", "App", {
+	 *     check: "StringThatMustExistInFile",
+	 *     find: /let (\w+) = something/g,
+	 *     multiple: false,
+	 *     callback: (var) => console.log(var)
+	 * });
+	 * ```
+	 */
 	exposeVar(pluginName: string, prefix: string | boolean, exposer: Exposer): () => void;
 }
 class ScopedRewriterApi {
@@ -7763,6 +8012,16 @@ class ScopedRewriterApi {
 	 * @param prefix Limits the hook to only running on scripts beginning with this prefix.
 	 * Passing `true` will only run on the index script, and passing `false` will run on all scripts.
 	 * @param modifier A function that will modify the code, which should return the modified code.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * api.rewriter.addParseHook("App", (code) => {
+	 *     let index = code.indexOf("something");
+	 *     code = code.slice(0, index) + `console.log("something else")` + code.slice(index);
+	 *     code += "console.log(someVar)";
+	 *     return code;
+	 * });
+	 * ```
 	 */
 	addParseHook(prefix: string | boolean, modifier: (code: string) => string): () => void;
 	/**
@@ -7770,6 +8029,14 @@ class ScopedRewriterApi {
 	 * @param id A unique identifier for the shared value.
 	 * @param value The value to be shared.
 	 * @returns A string representing the code to access the shared value.
+	 * @example
+	 * ```js
+	 * const callback = api.rewriter.createShared("uniqueId", (val) => {
+	 *     console.log(val);
+	 * });
+	 *
+	 * eval(`${callback}("15")`); // Don't actually do this, but it logs 15
+	 * ```
 	 */
 	createShared(id: string, value: any): string;
 	/** Removes the shared value with a certain id created by {@link createShared} */
@@ -7777,9 +8044,30 @@ class ScopedRewriterApi {
 	/**
 	 * Runs code in the scope of modules when they are loaded, or when runInScope is called with them already loaded.
 	 * Returning true from the callback will remove the hook.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * api.rewriter.runInScope("App", (code, run, initial) => {
+	 *     if(code.includes("something")) {
+	 *         run(`someVar=15`);
+	 *     }
+	 * });
+	 * ```
 	 */
 	runInScope(prefix: string | boolean, callback: RunInScopeCallback): () => void;
-	/** A utility function that exposes a variable based on regex to get its name. */
+	/**
+	 * A utility function that exposes a variable based on regex to get its name.
+	 * @returns A function that removes the hook when called
+	 * @example
+	 * ```js
+	 * api.rewriter.exposeVar("App", {
+	 *     check: "StringThatMustExistInFile",
+	 *     find: /let (\w+) = something/g,
+	 *     multiple: false,
+	 *     callback: (var) => console.log(var)
+	 * });
+	 * ```
+	 */
 	exposeVar(prefix: string | boolean, exposer: Exposer): () => void;
 }
 
@@ -7814,7 +8102,38 @@ interface CommandContext {
 
 type CommandCallback = (context: CommandContext) => void | Promise<void>;
 class CommandsApi {
-	/** Adds a command to the user's command palette. Can request additional input within the callback. */
+	/**
+	 * Adds a command to the user's command palette. Can request additional input within the callback.
+	 * @returns A function to remove the command
+	 * @example
+	 * ```js
+	 * GL.commands.addCommand("MyPlugin", {
+	 *     text: "Do a thing",
+	 *     keywords: ["execute", "run"],
+	 *     hidden: () => false
+	 * }, async (context) => {
+	 *     const choice = await context.select({
+	 *         title: "Choose an option",
+	 *         options: [
+	 *             { label: "Option 1", value: "one" },
+	 *             { label: "Option 2", value: "two" }
+	 *          ]
+	 *     });
+	 *     const number = await context.number({
+	 *         title: "Pick a number"
+	 *         min: 1,
+	 *         max: 10,
+	 *         decimal: true
+	 *     });
+	 *     const string = await context.string({
+	 *         title: "Enter a string",
+	 *         maxLength: 20
+	 *     });
+	 *
+	 *     console.log("User chose:", { choice, number, string });
+	 * });
+	 * ```
+	 */
 	addCommand(id: string, options: CommandOptions, callback: CommandCallback): () => void;
 	/** Removes all commands that were added with the same id */
 	removeCommands(id: string): void;
@@ -7822,7 +8141,38 @@ class CommandsApi {
 class ScopedCommandsApi {
 	
 	constructor(id: string);
-	/** Adds a command to the user's command palette. Can request additional input within the callback. */
+	/**
+	 * Adds a command to the user's command palette. Can request additional input within the callback.
+	 * @returns A function to remove the command
+	 * @example
+	 * ```js
+	 * api.commands.addCommand({
+	 *     text: "Do a thing",
+	 *     keywords: ["execute", "run"],
+	 *     hidden: () => false
+	 * }, async (context) => {
+	 *     const choice = await context.select({
+	 *         title: "Choose an option",
+	 *         options: [
+	 *             { label: "Option 1", value: "one" },
+	 *             { label: "Option 2", value: "two" }
+	 *         ]
+	 *     });
+	 *     const number = await context.number({
+	 *         title: "Pick a number"
+	 *         min: 1,
+	 *         max: 10,
+	 *         decimal: true
+	 *     });
+	 *     const string = await context.string({
+	 *         title: "Enter a string",
+	 *         maxLength: 20
+	 *     });
+	 *
+	 *     console.log("User chose:", { choice, number, string });
+	 * });
+	 * ```
+	 */
 	addCommand(options: CommandOptions, callback: CommandCallback): () => void;
 }
 interface ScriptHeaders {
@@ -7856,7 +8206,13 @@ class LibsApi {
 class ScopedLibsApi extends LibsApi {
 	
 	constructor(id: string);
-	/** Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+	/**
+	 * Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports.
+	 * @example
+	 * ```js
+	 * api.libs.require("Communication", "https://raw.githubusercontent.com/Gimloader/builds/main/libraries/Communication.js");
+	 * ```
+	 */
 	require(name: string, downloadUrl?: string): Promise<any>;
 }
 class PluginsApi {
@@ -7879,7 +8235,13 @@ class PluginsApi {
 class ScopedPluginsApi extends PluginsApi {
 	
 	constructor(id: string);
-	/** Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports. */
+	/**
+	 * Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports
+	 * @example
+	 * ```js
+	 * api.libs.require("Desynchronize", "https://raw.githubusercontent.com/Gimloader/builds/main/plugins/Desynchronize.js");
+	 * ```
+	 */
 	require(name: string, downloadUrl?: string): Promise<any>;
 }
 interface SvelteExport {
