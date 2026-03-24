@@ -5,6 +5,7 @@ import type Movement from "./character/movement";
 import type Physics from "./character/physics";
 import type { Vector } from "@dimforge/rapier2d-compat";
 import type { GameObjects, Tweens } from "phaser";
+import type { CharacterType } from "../characters";
 
 interface Updates {
     update(update: { delta: number }): void;
@@ -351,7 +352,7 @@ export default interface Character {
     spine: any; // SpineGameObject from @esotericsoftware/spine-phaser-v3
     teamId: string;
     tint: Tint;
-    type: string;
+    type: CharacterType;
     vfx: VFX;
     destroy(): void;
     setIsMain(isMain: boolean): void;

@@ -6,6 +6,7 @@ import type { Vector } from "@dimforge/rapier2d-compat";
 import type WorldManager from "./scene/worldManager";
 import type InputManager from "./scene/inputManager";
 import type TileManager from "./scene/tileManager";
+import type { CharacterType } from "../characters";
 
 interface ShowOverlayOptions {
     x: number;
@@ -104,7 +105,7 @@ interface CharacterOptions {
     x: number;
     y: number;
     scale: number;
-    type: string;
+    type: CharacterType;
 }
 
 interface CharacterManager {

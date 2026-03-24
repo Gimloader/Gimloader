@@ -5,6 +5,8 @@ interface CharacterPermissions {
     removing: boolean;
 }
 
+export type CharacterType = "character" | "sentry";
+
 interface CharacterInfo {
     allowWeaponFire: boolean;
     existsBeforeReconnect: boolean;
@@ -17,7 +19,7 @@ interface CharacterInfo {
     permissions: CharacterPermissions;
     score: number;
     teamId: string;
-    type: string;
+    type: CharacterType;
 }
 
 export default interface Characters {
