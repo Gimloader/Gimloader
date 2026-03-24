@@ -193,7 +193,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         if(!this.started) return;
 
         try {
-            for(const stop of this.onStop) stop?.();
+            // Call onStop in reverse order
+            for(let i = this.onStop.length - 1; i >= 0; i--) {
+                this.onStop[i]?.();
+            }
         } catch (e) {
             error(`Error stopping ${this.headers.name}:`, e);
         }
