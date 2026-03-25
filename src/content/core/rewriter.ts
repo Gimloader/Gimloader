@@ -152,8 +152,9 @@ export default class Rewriter {
             URL.revokeObjectURL(blobUrl);
 
             // Create an error message that lists plugins that might be causing the issue
-            const usedHooks = this.getParseHooks(name, root, false)
+            let usedHooks = this.getParseHooks(name, root, false)
                 .map(hook => hook.id).filter(name => name);
+            usedHooks = [...new Set(usedHooks)];
 
             // If no hooks were used, just give up
             if(usedHooks.length === 0) {
