@@ -1,3 +1,4 @@
 Fixed forceReactUpdate causing UI to disappear if called twice simultaneously
 Added examples to more api types
 Reversed order onStop callbacks are called
+Added GL.UI.onComponentLoad method

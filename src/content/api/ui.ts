@@ -4,7 +4,11 @@ import UI from "$core/ui/ui";
 import { validate } from "$content/utils";
 import type * as React from "react";
 import * as z from "zod";
-import GimkitInternals from "$content/core/internals";
+import GimkitInternals, { type Internals } from "$content/core/internals";
+
+const gimkitComponents = ["notification", "message", "modal"] as const;
+type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
+const ComponentsSchema = z.union(gimkitComponents.map((type) => z.literal(type)));
 
 const ButtonSchema = z.object({
     text: z.string(),
@@ -109,6 +113,31 @@ class UIApi extends BaseUIApi {
 
         UI.removeStyles(id);
     }
+
+    /**
+     * Waits for a component to load, and calls the callback with the component as an argument.
+     * If the component has already loaded the callback will be fired immediately.
+     * The available components are "notification", "message", and "modal".
+     * @returns A function that cancels waiting
+     * @example
+     * ```js
+     * GL.UI.onComponentLoad("MyPlugin", "message", (message) => {
+     *     message.success({ content: "This is a message!" });
+     * });
+     * ```
+     */
+    onComponentLoad<K extends keyof GimkitComponents>(id: string, type: K, callback: (component: GimkitComponents[K]) => void) {
+        validate("UI.onComponentLoad", arguments, ["id", "string"], ["type", ComponentsSchema], ["callback", "function"]);
+
+        return GimkitInternals.onLoad(id, type, callback);
+    }
+
+    /** Cancels any calls made to {@link onComponentLoad} with the same id */
+    offComponentLoad(id: string) {
+        validate("UI.offComponentLoad", arguments, ["id", "string"]);
+
+        GimkitInternals.offLoad(id);
+    }
 }
 
 class ScopedUIApi extends BaseUIApi {
@@ -129,13 +158,31 @@ class ScopedUIApi extends BaseUIApi {
      *     color: red;
      * }`;
      *
-     * GL.UI.addStyles("MyPlugin", styles);
+     * api.UI.addStyles(styles);
      * ```
      */
     addStyles(style: string) {
         validate("UI.removeStyles", arguments, ["style", "string"]);
 
         return UI.addStyles(this.#id, style);
+    }
+
+    /**
+     * Waits for a component to load, and calls the callback with the component as an argument.
+     * If the component has already loaded the callback will be fired immediately.
+     * The available components are "notification", "message", and "modal".
+     * @returns A function that cancels waiting
+     * @example
+     * ```js
+     * api.UI.onComponentLoad("message", (message) => {
+     *     message.success({ content: "This is a message!" });
+     * });
+     * ```
+     */
+    onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void) {
+        validate("UI.onComponentLoad", arguments, ["type", ComponentsSchema], ["callback", "function"]);
+
+        return GimkitInternals.onLoad(this.#id, type, callback);
     }
 }
 

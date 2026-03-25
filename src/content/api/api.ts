@@ -239,6 +239,7 @@ class Api {
             Storage.removeValueListeners(scoped.id);
             Storage.removeSettingListeners(scoped.id);
             Commands.removeCommands(scoped.id);
+            GimkitInternals.offLoad(scoped.id);
         };
 
         this.onStop(cleanup);

@@ -125,7 +125,7 @@ export default new class Net extends EventEmitter2 {
             return code;
         });
 
-        Internals.events.once("stores", () => {
+        Internals.onLoad(null, "stores", () => {
             this.waitForColyseusLoad();
         });
     }
