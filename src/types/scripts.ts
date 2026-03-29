@@ -1,7 +1,7 @@
 export interface ScriptHeaders {
     name: string;
     description: string;
-    author: string;
+    author: string[];
     version: string | null;
     reloadRequired: string;
     isLibrary: string;
@@ -20,7 +20,7 @@ export interface ScriptHeaders {
 export interface OfficialScriptInfo {
     title: string;
     description: string;
-    author: string;
+    author: string | string[];
     downloadUrl: string;
     webpage: string;
 }

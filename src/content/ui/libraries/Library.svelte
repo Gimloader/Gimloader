@@ -14,6 +14,7 @@
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
     import Modals from "$content/core/modals.svelte";
     import InformationOutline from "svelte-material-icons/InformationOutline.svelte";
+    import AuthorDisplay from "../components/AuthorDisplay.svelte";
 
     interface Props {
         startDrag: () => void;
@@ -58,7 +59,7 @@
         </h2>
     {/snippet}
     {#snippet author()}
-        By {library?.headers.author}
+        <AuthorDisplay author={library?.headers.author} />
     {/snippet}
     {#snippet description()}
         {library?.headers.description}

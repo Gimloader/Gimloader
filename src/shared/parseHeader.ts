@@ -4,7 +4,7 @@ export function parseScriptHeaders(code: string): ScriptHeaders {
     const baseHeaders: ScriptHeaders = {
         name: "Unnamed Plugin",
         description: "No description provided",
-        author: "Unknown Author",
+        author: [],
         version: null,
         reloadRequired: "false",
         isLibrary: "false",

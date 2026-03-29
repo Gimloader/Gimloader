@@ -10,6 +10,7 @@
     import Search from "../components/Search.svelte";
     import { downloadScript } from "$content/core/net/download";
     import { error } from "$shared/utils";
+    import AuthorDisplay from "../components/AuthorDisplay.svelte";
 
     let officialPlugins: OfficialScriptInfo[] = $state([]);
     let searchValue = $state("");
@@ -70,7 +71,7 @@
                         </Button>
                     {/snippet}
                     {#snippet author()}
-                        By {plugin.author}
+                        <AuthorDisplay author={plugin.author} />
                     {/snippet}
                     {#snippet description()}
                         {plugin.description}
