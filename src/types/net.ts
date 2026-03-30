@@ -395,7 +395,7 @@ export interface SentMessages {
          */
         data: string;
         /**
-         * Base-64 image
+         * Base-64 encoded
          */
         icon: string;
         id: string;
