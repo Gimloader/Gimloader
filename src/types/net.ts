@@ -1,5 +1,7 @@
 import type { Vector } from "@dimforge/rapier2d-compat";
 import type WorldOptions from "./stores/worldOptions";
+import type { CircleShort, RotatedEllipse } from "./stores/shapes";
+import type { SessionModeType } from "./stores/session";
 
 interface MessageForDevice {
     data: any;
@@ -42,9 +44,9 @@ export interface ReceivedMessages {
         message: string;
     };
     "ALL_PROPS": {
-        circleColliders: any[];
-        defaultLayer: any;
-        ellipseColliders: any;
+        circleColliders: CircleShort[];
+        defaultLayer?: string;
+        ellipseColliders: RotatedEllipse[];
         id: string;
         imageUrl: string;
         minimumRoleLevel: undefined;
@@ -59,7 +61,7 @@ export interface ReceivedMessages {
             w: number;
         }[];
         scaleMultip: number;
-        seasonTicketRequired: any;
+        seasonTicketRequired?: boolean;
         shadows: {
             x: number;
             y: number;
@@ -127,7 +129,7 @@ export interface ReceivedMessages {
         }[];
         hit: any[];
     };
-    "RESET": any;
+    "RESET": undefined;
     "SAVED": undefined;
     "TERRAIN_CHANGES": {
         added: {
@@ -142,10 +144,10 @@ export interface ReceivedMessages {
         devices: {
             addedDevices: {
                 devices: any[];
-                values: any[];
+                values: string[];
             };
             initial: boolean;
-            removedDevices: any[];
+            removedDevices: string[];
         };
     };
     "WORLD_OPTIONS": WorldOptions;
@@ -173,8 +175,8 @@ export interface SentMessages {
     "MAP_PING": number;
     "DROP_ITEM": {
         amount: number;
-        interactiveSlotNumber: any;
-        itemId: string;
+        interactiveSlotNumber?: number;
+        itemId?: string;
     };
     "MESSAGE_FOR_DEVICE": MessageForDevice;
     "PLACE_TERRAIN": {
@@ -192,8 +194,8 @@ export interface SentMessages {
     "PLACE_DEVICE": {
         x: number;
         y: number;
-        copyingFromExistingDevice: any;
-        depth: any;
+        copyingFromExistingDevice?: string;
+        depth?: number;
         deviceTypeId: string;
         hooks: {
             connections: any[];
@@ -207,8 +209,8 @@ export interface SentMessages {
         id: string;
     };
     "START_GAME": {
-        customTeams: any;
-        modeType: string;
+        customTeams: Record<string, string>;
+        modeType: SessionModeType;
         ownerAsSpectator: boolean;
     };
     "END_GAME": undefined;
