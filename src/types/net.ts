@@ -234,11 +234,9 @@ export interface SentMessages {
         characterId: string;
     };
     "SAVE": undefined;
-
     /** Unused by Gimkit */
     "PUBLISH": any;
     "REQUEST_INITIAL_WORLD": undefined;
-
     /** Tells the game that you switched cosmetics and they should refetch your character. */
     "REFETCH_LATEST_APPEARANCE": undefined;
     "UPDATE_AUTH_TOKEN": {
@@ -274,16 +272,13 @@ export interface SentMessages {
         order: number;
     };
     "RELOAD": undefined;
-
     /** Drops or consumes the current item in your inventory. */
     "CONSUME": Vector | Record<string, never>;
     "AIMING": {
         angle: number;
     };
-
     /** Adds a minute of game time. */
     "ADD_GAME_TIME": undefined;
-
     /** Requests for the server to send the 1k+ Creative props. Will result in `ALL_PROPS` being sent. */
     "REQUEST_ALL_PROPS": undefined;
     "SET_GLOBAL_PERMISSIONS": {
