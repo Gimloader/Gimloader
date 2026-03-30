@@ -358,7 +358,7 @@ export interface SentMessages {
     /**
      * Drops or consumes the current item in your inventory.
      */
-    "CONSUME": any;
+    "CONSUME": Vector | {};
     "AIMING": {
         angle: number;
     };
