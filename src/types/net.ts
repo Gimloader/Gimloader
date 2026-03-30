@@ -174,9 +174,7 @@ export interface ReceivedMessages {
         y: number;
         packetId: number;
 
-        /**
-         * A stringified {@link PhysicsState} object.
-         */
+        /** A stringified {@link PhysicsState} object. */
         physicsState: string;
         teleport: boolean;
     };
@@ -272,9 +270,7 @@ export interface SentMessages {
         layerId: any;
         name: string;
 
-        /**
-         * A stringified {@link PlaceDeviceOptions} object.
-         */
+        /** A stringified {@link PlaceDeviceOptions} object. */
         object: string;
     };
     "REMOVE_DEVICE": {
@@ -307,26 +303,18 @@ export interface SentMessages {
     };
     "SAVE": undefined;
 
-    /**
-     * Unused by Gimkit
-     */
+    /** Unused by Gimkit */
     "PUBLISH": any;
     "REQUEST_INITIAL_WORLD": undefined;
 
-    /**
-     * Tells the game that you switched cosmetics and they should refetch your character.
-     */
+    /** Tells the game that you switched cosmetics and they should refetch your character. */
     "REFETCH_LATEST_APPEARANCE": undefined;
     "UPDATE_AUTH_TOKEN": {
         token: string;
     };
-    /**
-     * Unused by Gimkit
-     */
+    /** Unused by Gimkit */
     "HOOK_ACTION": any;
-    /**
-     * Unused by Gimkit
-     */
+    /** Unused by Gimkit */
     "HOOK_OPTION_ACTION": any;
     "PLACE_STICKER": {
         placement: string;
@@ -355,22 +343,16 @@ export interface SentMessages {
     };
     "RELOAD": undefined;
 
-    /**
-     * Drops or consumes the current item in your inventory.
-     */
+    /** Drops or consumes the current item in your inventory. */
     "CONSUME": Vector | {};
     "AIMING": {
         angle: number;
     };
 
-    /**
-     * Adds a minute of game time.
-     */
+    /** Adds a minute of game time. */
     "ADD_GAME_TIME": undefined;
 
-    /**
-     * Requests for the server to send the 1k+ Creative props. Will result in `ALL_PROPS` being sent.
-     */
+    /** Requests for the server to send the 1k+ Creative props. Will result in `ALL_PROPS` being sent. */
     "REQUEST_ALL_PROPS": undefined;
     "SET_GLOBAL_PERMISSIONS": {
         adding: boolean;
@@ -381,22 +363,16 @@ export interface SentMessages {
     "TOGGLE_PHASE": {
         enabled: boolean;
     };
-    /**
-     * Only in creative modes
-     */
+    /** Only in creative modes */
     "SET_SPEED": {
         speed: number;
     };
     "INPUT": number[];
     "REQUEST_TELEPORT": Vector;
     "ADD_CUSTOM_ASSET": {
-        /**
-         * A stringified {@link CustomAssetData} object representing the figures in the drawing.
-         */
+        /** A stringified {@link CustomAssetData} object representing the figures in the drawing. */
         data: string;
-        /**
-         * Base-64 encoded
-         */
+        /** Base-64 encoded */
         icon: string;
         id: string;
         name: string;
