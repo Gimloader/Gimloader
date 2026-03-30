@@ -36,74 +36,6 @@ export interface PhysicsState {
     lastGroundedAngle: number;
 }
 
-export interface PlaceDeviceOptions {
-    backgroundTerrain: string;
-    platformerBackground: string;
-    bottomTerrain: string;
-    gameClockMode: string;
-    countdownTimeMinutes: number;
-    allowedGameClockModeType: string;
-    musicUrl: string;
-    presetMusicId: string;
-    musicVolume: number;
-    minPlayers: number;
-    teams: string;
-    teamSize: number;
-    teamsNumber: number;
-    splitModeForSpecificTeamAmount: string;
-    latePlayersJoinAsSpectators: boolean;
-    allyIndicator: string;
-    enemyIndicator: string;
-    matchNametagToTeamColor: boolean;
-    allowGameOwnerToSpectate: boolean;
-    useInfiniteLives: boolean;
-    numOfLives: number;
-    healthMode: string;
-    maxHealth: number;
-    maxShield: number;
-    startingHealth: number;
-    startingShield: number;
-    startingFragility: number;
-    showHealthAndShield: boolean;
-    spawnImmunity: number;
-    playerVsPlayerDamageEnabled: boolean;
-    interactiveItemsSlots: number;
-    infiniteAmmo: boolean;
-    instantReload: boolean;
-    allowWeaponDrop: boolean;
-    allowItemDrop: boolean;
-    allowResourceDrop: boolean;
-    weaponRespawnBehavior: string;
-    itemRespawnBehavior: string;
-    resourceRespawnBehavior: string;
-    infiniteDurability: boolean;
-    droppedItemScope: string;
-    useScoreboard: boolean;
-    scoreType: string;
-    scoreResource: string;
-    propertyResource: string;
-    scoreName: string;
-    scoreGroup: string;
-    sortMode: string;
-    showScoreboardOnGameEnd: boolean;
-    includeSpectatorsInScoreboard: boolean;
-    showPlayersPlacement: boolean;
-    knockoutActivityFeedDisabled: boolean;
-    dynamicBuildingAllowFloatingBuilds: boolean;
-    dynamicBuildingHealthMultiplier: string;
-    disableDestructionOfDynamicBuildings: boolean;
-    grantWhenDynamicBuildingDestroyed: boolean;
-    maxGravityPerSecond: number;
-    timeToMaxGravityMS: number;
-    yTravelUntilMaxGravity: number;
-    jumpHeight: number;
-    jumpDurationMS: number;
-    jumpHangTimeMS: number;
-    subsequentJumpMultiplier: number;
-    maxJumps: number;
-    lookAroundWithMouse: boolean;
-}
-
 export interface ReceivedMessages {
     "ACTIVITY_FEED_MESSAGE": {
         id: string;
@@ -269,8 +201,6 @@ export interface SentMessages {
         id: string;
         layerId: any;
         name: string;
-
-        /** A stringified {@link PlaceDeviceOptions} object. */
         object: string;
     };
     "REMOVE_DEVICE": {
