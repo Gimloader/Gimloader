@@ -119,21 +119,21 @@ export interface ReceivedMessages {
         name: string;
         originX: number;
         originY: number;
-        rectColliders: ({
+        rectColliders: {
             angle: number;
             x: number;
             y: number;
             h: number;
             w: number;
-        })[];
+        }[];
         scaleMultip: number;
         seasonTicketRequired: any;
-        shadows: ({
+        shadows: {
             x: number;
             y: number;
             r1: number;
             r2: number;
-        })[];
+        }[];
     }[];
     "AUTH_ID": string;
     "CONSUME_ITEM_ERROR": {
