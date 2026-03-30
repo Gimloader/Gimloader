@@ -276,7 +276,7 @@ export interface SentMessages {
     "RELOAD": undefined;
 
     /** Drops or consumes the current item in your inventory. */
-    "CONSUME": Vector | {};
+    "CONSUME": Vector | Record<string, never>;
     "AIMING": {
         angle: number;
     };
