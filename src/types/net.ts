@@ -369,7 +369,7 @@ export interface SentMessages {
     "ADD_GAME_TIME": undefined;
 
     /**
-     * Requests for the server to send the 1k+ Creative props, not on an external request for some reason. Will result in `ALL_PROPS` being sent.
+     * Requests for the server to send the 1k+ Creative props. Will result in `ALL_PROPS` being sent.
      */
     "REQUEST_ALL_PROPS": undefined;
     "SET_GLOBAL_PERMISSIONS": {
