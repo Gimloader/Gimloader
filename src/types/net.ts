@@ -322,9 +322,9 @@ export interface SentMessages {
         stickerId: string;
     };
     "PLACE_WIRE": {
-        endConnection: string | undefined;
+        endConnection?: string;
         endDevice: string;
-        startConnection: string | undefined;
+        startConnection?: string;
         startDevice: string;
     };
     "REMOVE_WIRE": {
