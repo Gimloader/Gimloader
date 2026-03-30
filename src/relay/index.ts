@@ -1,11 +1,11 @@
-import { algorithm } from "$shared/consts";
+import { portCryptoAlgorithm } from "$shared/consts";
 
 let port: chrome.runtime.Port;
 let disconnected = false;
 let ready = false;
 let messageQueue: any[] = [];
 
-const keyPromise = crypto.subtle.generateKey(algorithm, true, ["sign", "verify"]);
+const keyPromise = crypto.subtle.generateKey(portCryptoAlgorithm, true, ["sign", "verify"]);
 
 window.addEventListener("message", async (e) => {
     if(!e.data?.json || e.data?.source !== "gimloader-out") return;
@@ -33,7 +33,7 @@ window.addEventListener("message", async (e) => {
     if(!signatureArr) return;
     const arr = new TextEncoder().encode(e.data.json);
     const signature = new Uint8Array(signatureArr).buffer;
-    const matches = await crypto.subtle.verify(algorithm, key, signature, arr);
+    const matches = await crypto.subtle.verify(portCryptoAlgorithm, key, signature, arr);
     if(!matches) return;
 
     port.postMessage(data);

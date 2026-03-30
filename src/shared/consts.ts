@@ -2,10 +2,29 @@ import type { Settings } from "$types/net/state";
 
 export const isFirefox = navigator.userAgent.includes("Firefox");
 
-export const algorithm: HmacKeyGenParams = {
+export const officialUrlBase = "https://github.com/Gimloader/client-plugins/tree/main";
+
+export const portCryptoAlgorithm: HmacKeyGenParams = {
     name: "HMAC",
     hash: { name: "SHA-512" }
 };
+
+export const signaturePublicKey = /** @__PURE__ */ crypto.subtle.importKey(
+    "jwk",
+    {
+        alg: "Ed25519",
+        crv: "Ed25519",
+        ext: true,
+        key_ops: [
+            "verify"
+        ],
+        kty: "OKP",
+        x: "GEnOcU0w06sf9cvel4XyYZUjOSO3piaWYhXUjC9k7hg"
+    },
+    { name: "Ed25519" },
+    false,
+    ["verify"]
+);
 
 export const defaultSettings: Settings = {
     pollerEnabled: false,

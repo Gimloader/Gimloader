@@ -7,6 +7,8 @@
     import { showEditor } from "$content/utils";
     import * as Tooltip from "$shared/ui/tooltip";
     import { Switch } from "$shared/ui/switch";
+    import AuthorDisplay from "../components/AuthorDisplay.svelte";
+    import VerifiedCheck from "../components/VerifiedCheck.svelte";
 
     import Delete from "svelte-material-icons/Delete.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte";
@@ -18,7 +20,6 @@
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
     import Modals from "$content/core/modals.svelte";
-    import AuthorDisplay from "../components/AuthorDisplay.svelte";
 
     interface Props {
         startDrag: () => void;
@@ -80,6 +81,7 @@
                     v{plugin?.headers.version}
                 </span>
             {/if}
+            <VerifiedCheck script={plugin} />
         </h2>
     {/snippet}
     {#snippet toggle()}
@@ -92,7 +94,9 @@
         </Switch>
     {/snippet}
     {#snippet author()}
-        <AuthorDisplay author={plugin?.headers.author} />
+        {#if !plugin?.headers.signature}
+            <AuthorDisplay author={plugin?.headers.author} />
+        {/if}
     {/snippet}
     {#snippet description()}
         {plugin?.headers.description}

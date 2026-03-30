@@ -12,6 +12,7 @@ export interface ScriptHeaders {
     deprecated: string | null;
     gamemode: string[];
     changelog: string[];
+    signature: string | null;
     /** Only available for plugins */
     needsPlugin: string[];
     hasSettings: string;
@@ -20,7 +21,6 @@ export interface ScriptHeaders {
 export interface OfficialScriptInfo {
     title: string;
     description: string;
-    author: string | string[];
     downloadUrl: string;
     webpage: string;
 }

@@ -10,7 +10,9 @@
     import Search from "../components/Search.svelte";
     import { downloadScript } from "$content/core/net/download";
     import { error } from "$shared/utils";
-    import AuthorDisplay from "../components/AuthorDisplay.svelte";
+    import * as Tooltip from "$shared/ui/tooltip";
+    import BadgeCheck from "@lucide/svelte/icons/badge-check";
+    import { officialUrlBase } from "$shared/consts";
 
     let officialPlugins: OfficialScriptInfo[] = $state([]);
     let searchValue = $state("");
@@ -63,15 +65,26 @@
                     {#snippet header()}
                         <h2 class="overflow-ellipsis overflow-hidden whitespace-nowrap grow text-xl font-bold! mb-0!">
                             {plugin.title}
+                            <Tooltip.Provider>
+                                <Tooltip.Root>
+                                    <Tooltip.Trigger>
+                                        {@const href =
+                                        `${officialUrlBase}/plugins/${plugin.title}`}
+                                        <a target="_blank" {href}>
+                                            <BadgeCheck class="text-primary" size={16} />
+                                        </a>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content side="bottom">
+                                        This plugin has been verified as an official Gimloader script.
+                                    </Tooltip.Content>
+                                </Tooltip.Root>
+                            </Tooltip.Provider>
                         </h2>
                     {/snippet}
                     {#snippet toggle()}
                         <Button class="px-2 py-2" onclick={() => downloadScript(plugin.downloadUrl, "plugin")}>
                             <Download size={20} />
                         </Button>
-                    {/snippet}
-                    {#snippet author()}
-                        <AuthorDisplay author={plugin.author} />
                     {/snippet}
                     {#snippet description()}
                         {plugin.description}
