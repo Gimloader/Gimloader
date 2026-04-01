@@ -10,8 +10,8 @@
         "baseUrl": ".",
         "paths": {
             "$assets/*": ["./assets/*"],
-            "$content/*": ["./src/content/*"],
             "$core/*": ["./src/content/core/*"],
+            "$content/*": ["./src/content/*"],
             "$bg/*": ["./src/background/*"],
             "$types/*": ["./src/types/*"],
             "$shared/*": ["./src/shared/*"]

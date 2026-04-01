@@ -19,7 +19,7 @@
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
-    import Modals from "$content/core/modals.svelte";
+    import Modals from "$core/modals.svelte";
 
     interface Props {
         startDrag: () => void;

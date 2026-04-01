@@ -12,9 +12,9 @@
     import BookSettings from "svelte-material-icons/BookSettings.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
-    import Modals from "$content/core/modals.svelte";
+    import Modals from "$core/modals.svelte";
     import AuthorDisplay from "../components/AuthorDisplay.svelte";
-    import { scripts } from "$content/core/scripts/map";
+    import { scripts } from "$core/scripts/map";
     import VerifiedCheck from "../components/VerifiedCheck.svelte";
 
     interface Props {

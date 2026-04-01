@@ -4,7 +4,7 @@ import { validate } from "$content/utils";
 import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
 import * as z from "zod";
-import Modals from "$content/core/modals.svelte";
+import Modals from "$core/modals.svelte";
 
 const BaseSchema = z.object({
     id: z.string(),

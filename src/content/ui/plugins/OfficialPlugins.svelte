@@ -8,7 +8,7 @@
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import Download from "svelte-material-icons/Download.svelte";
     import Search from "../components/Search.svelte";
-    import { downloadScript } from "$content/core/net/download";
+    import { downloadScript } from "$core/net/download";
     import { error } from "$shared/utils";
     import * as Tooltip from "$shared/ui/tooltip";
     import BadgeCheck from "@lucide/svelte/icons/badge-check";
