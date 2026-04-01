@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Script } from "$content/core/scripts/script.svelte";
+    import type { Script } from "$core/scripts/script.svelte";
     import BadgeCheck from "@lucide/svelte/icons/badge-check";
     import BadgeInfo from "@lucide/svelte/icons/badge-info";
     import BadgeAlert from "@lucide/svelte/icons/badge-alert";

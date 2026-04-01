@@ -19,9 +19,9 @@ import Patcher from "$core/patcher";
 import Storage from "$core/storage.svelte";
 import Rewriter from "$core/rewriter";
 import createSettingsApi from "./settings";
-import Commands from "$content/core/commands.svelte";
+import Commands from "$core/commands.svelte";
 import { nop } from "$shared/utils";
-import Modals from "$content/core/modals.svelte";
+import Modals from "$core/modals.svelte";
 import Svelte from "./svelte";
 
 class Api {

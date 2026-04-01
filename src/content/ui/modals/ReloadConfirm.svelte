@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as AlertDialog from "$shared/ui/alert-dialog";
-    import Modals from "$content/core/modals.svelte";
+    import Modals from "$core/modals.svelte";
     import { englishList } from "$shared/utils";
 
     function ignore() {

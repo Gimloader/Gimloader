@@ -4,7 +4,7 @@ import UI from "$core/ui/ui";
 import { validate } from "$content/utils";
 import type * as React from "react";
 import * as z from "zod";
-import GimkitInternals, { type Internals } from "$content/core/internals";
+import GimkitInternals, { type Internals } from "$core/internals";
 
 const gimkitComponents = ["notification", "message", "modal"] as const;
 type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;

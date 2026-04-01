@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Modals from "$content/core/modals.svelte";
+    import Modals from "$core/modals.svelte";
     import * as Dialog from "$shared/ui/dialog";
 
     function onOpenChangeComplete(open: boolean) {

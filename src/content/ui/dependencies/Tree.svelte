@@ -10,7 +10,7 @@
     import LinkOff from "svelte-material-icons/LinkOff.svelte";
     import Download from "svelte-material-icons/Download.svelte";
     import { Plugin } from "$core/scripts/plugin.svelte";
-    import { downloadScript } from "$content/core/net/download";
+    import { downloadScript } from "$core/net/download";
 
     interface Props {
         name: string;
