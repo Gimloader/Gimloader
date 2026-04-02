@@ -1,4 +1,3 @@
-import { SvelteSet } from "svelte/reactivity";
 import type { Plugin } from "./scripts/plugin.svelte";
 import type { Script } from "./scripts/script.svelte";
 import { mount, unmount, type Component } from "svelte";
@@ -27,9 +26,6 @@ interface ModalProps {
 }
 
 export default new class Modals {
-    reloadNeeded = new SvelteSet<string>();
-    reloadNames = $derived(Array.from(this.reloadNeeded));
-    updated: Updated[] = $state([]);
     components = new Map<keyof ModalProps, Component>();
 
     register<T extends keyof ModalProps>(type: T, component: Component) {
@@ -51,17 +47,5 @@ export default new class Modals {
                 }
             });
         });
-    }
-
-    addReloadNeeded(name: string) {
-        this.reloadNeeded.add(name);
-    }
-
-    addUpdated(name: string, version: string, changes: string[]) {
-        this.updated.push({ name, version, changes });
-    }
-
-    clearUpdated() {
-        this.updated = [];
     }
 }();

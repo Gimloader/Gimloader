@@ -14,7 +14,6 @@
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
     import Modals from "$core/modals.svelte";
     import AuthorDisplay from "../components/AuthorDisplay.svelte";
-    import { scripts } from "$core/scripts/map";
     import VerifiedCheck from "../components/VerifiedCheck.svelte";
 
     interface Props {
@@ -60,7 +59,7 @@
             <VerifiedCheck script={library} />
         </h2>
     {/snippet}
-    {#snippet author()}a
+    {#snippet author()}
         {#if !library?.headers.signature}
             <AuthorDisplay author={library?.headers.author} />
         {/if}

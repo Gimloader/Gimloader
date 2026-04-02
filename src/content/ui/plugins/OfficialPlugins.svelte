@@ -3,7 +3,6 @@
     import { onMount } from "svelte";
     import Card from "../components/Card.svelte";
     import { Button } from "$shared/ui/button";
-    import { officialPluginsOpen } from "../../stores";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import Download from "svelte-material-icons/Download.svelte";
@@ -13,6 +12,8 @@
     import * as Tooltip from "$shared/ui/tooltip";
     import BadgeCheck from "@lucide/svelte/icons/badge-check";
     import { officialUrlBase } from "$shared/consts";
+
+    let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
     let officialPlugins: OfficialScriptInfo[] = $state([]);
     let searchValue = $state("");
@@ -53,7 +54,7 @@
 
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px] mt-1">
-        <Button class="h-7" onclick={() => officialPluginsOpen.set(false)}>
+        <Button class="h-7" onclick={() => officialPluginsOpen = false}>
             &lt; Installed Plugins
         </Button>
         <Search bind:value={searchValue} />

@@ -3,11 +3,11 @@ import type { ScriptHeaders } from "$types/scripts";
 import type { ScriptInfo } from "$types/net/state";
 import Port from "$shared/net/port.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
-import Modals from "../modals.svelte";
 import { toast } from "svelte-sonner";
 import { scripts } from "./map";
 import Commands from "../commands.svelte";
 import type { CommandContext } from "$types/api/commands";
+import { addUpdated } from "$content/ui/modals/Changelog.svelte";
 
 export default abstract class ScriptManager<T extends Script, I extends ScriptInfo> {
     abstract singular: string;
@@ -109,7 +109,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         }
 
         if(updated && headers.changelog.length > 0) {
-            Modals.addUpdated(headers.name, headers.version, headers.changelog);
+            addUpdated(headers.name, headers.version, headers.changelog);
         }
 
         script.edit(code, headers);

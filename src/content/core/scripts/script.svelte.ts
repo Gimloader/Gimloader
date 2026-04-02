@@ -9,6 +9,7 @@ import Modals from "../modals.svelte";
 import { scripts } from "./map";
 import Port from "$shared/net/port.svelte";
 import { signaturePublicKey } from "$shared/consts";
+import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
 
@@ -131,7 +132,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     checkReloadNeeded() {
         if(this.reloadNeeded) {
-            Modals.addReloadNeeded(this.headers.name);
+            addReloadNeeded(this.headers.name);
         }
     }
 

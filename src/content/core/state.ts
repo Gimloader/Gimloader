@@ -9,8 +9,8 @@ import { changelog, readUserFile } from "$content/utils";
 import { toast } from "svelte-sonner";
 import Rewriter from "./rewriter";
 import { version } from "../../../package.json";
-import Modals from "./modals.svelte";
 import Commands from "./commands.svelte";
+import { addUpdated } from "$content/ui/modals/Changelog.svelte";
 
 export default class StateManager {
     static init() {
@@ -28,7 +28,7 @@ export default class StateManager {
         const updated = lastVersion && versionChanged;
 
         if(updated) {
-            Modals.addUpdated("Gimloader", version, changelog);
+            addUpdated("Gimloader", version, changelog);
         }
 
         Storage.init(state.pluginStorage, state.settings, state.pluginSettings);

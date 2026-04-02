@@ -10,11 +10,11 @@
     import Port from "$shared/net/port.svelte";
     import { flipDurationMs } from "$shared/consts";
     import ViewControl from "../components/ViewControl.svelte";
-    import { officialPluginsOpen } from "../../stores";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
-    import * as Dialog from "$shared/ui/dialog";
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
     import UrlInstall from "../components/UrlInstall.svelte";
+
+    let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
     let searchValue = $state("");
     let items = $state(PluginManager.scripts.map((plugin) => ({ id: plugin.headers.name })));
@@ -76,7 +76,7 @@
 
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px]">
-        <Button class="h-7" onclick={() => officialPluginsOpen.set(true)}>
+        <Button class="h-7" onclick={() => officialPluginsOpen = true}>
             Official Plugins
         </Button>
         <DropdownMenu.Root>
@@ -123,7 +123,7 @@
     {#if PluginManager.scripts.length === 0}
         <h2 class="text-xl w-full text-center">
             No plugins installed! Check out the
-            <button class="underline" onclick={() => officialPluginsOpen.set(true)}>
+            <button class="underline" onclick={() => officialPluginsOpen = true}>
                 Official Plugins
             </button>
             or import or create your own.
