@@ -1,1 +1,2 @@
 Added signing confirming scripts are official
+Hotfixed Colyseus stuff for new Gimkit update, plugins will be updated soon
