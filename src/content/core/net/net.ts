@@ -48,6 +48,7 @@ export default new class Net extends EventEmitter2 {
     requestCallbacks: RequestCallback[] = [];
     responseCallbacks: ResponseCallback[] = [];
     gamemode: string | null = null;
+    Callbacks: any;
 
     constructor() {
         super({
@@ -61,29 +62,59 @@ export default new class Net extends EventEmitter2 {
     }
 
     init() {
-        Rewriter.exposeObjectBefore("index", "netClient", ".Client=", (mod) => {
-            const proto = mod.Client.prototype;
-            if(proto.joinById) {
-                // Colyseus
-                Patcher.after(null, proto, "create", (_, __, roomPromise) => {
-                    roomPromise.then((room: any) => this.onColyseusRoom(room));
-                });
-
-                Patcher.after(null, proto, "joinById", (_, __, roomPromise) => {
-                    roomPromise.then((room: any) => this.onColyseusRoom(room));
-                });
-            } else {
-                // Blueboat
-                Patcher.after(null, proto, "createRoom", (_, __, room) => {
-                    this.onBlueboatRoom(room);
-                });
-
-                Patcher.after(null, proto, "joinRoom", (_, __, room) => {
-                    this.onBlueboatRoom(room);
-                });
-            }
+        // Patch the Colyseus callbacks
+        const onColyseusCallbacks = Rewriter.createShared(null, "colyseusCallbacks", (Callbacks: any) => {
+            this.Callbacks = Callbacks;
         });
 
+        Rewriter.addParseHook(null, "index", (code) => {
+            const index = code.indexOf("void 0,{instance");
+            if(index === -1) return;
+
+            const start = code.lastIndexOf("function", index) + 9;
+            const end = code.indexOf("(", start);
+            const name = code.slice(start, end);
+            const insertAt = code.indexOf("})}return", index) + 3;
+
+            return code.slice(0, insertAt) + `${onColyseusCallbacks}?.(${name});` + code.slice(insertAt);
+        });
+
+        // Patch the Colyseus client
+        const onColyseusClient = Rewriter.createShared(null, "colyseusClient", (client: any) => {
+            Patcher.after(null, client.prototype, "create", (_, __, roomPromise) => {
+                roomPromise.then((room: any) => this.onColyseusRoom(room));
+            });
+
+            Patcher.after(null, client.prototype, "joinById", (_, __, roomPromise) => {
+                roomPromise.then((room: any) => this.onColyseusRoom(room));
+            });
+        });
+
+        Rewriter.addParseHook(null, "index", (code) => {
+            const index = code.indexOf(`,"VERSION",`);
+            if(index === -1) return;
+
+            const start = code.lastIndexOf("(", index) + 1;
+            const name = code.slice(start, index);
+
+            return code + `${onColyseusClient}?.(${name});`;
+        });
+
+        // Patch the Blueboat client
+        Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
+            const proto = mod.Client.prototype;
+            if(!proto.createRoom || !proto.joinRoom) return;
+
+            Patcher.after(null, proto, "createRoom", (_, __, room) => {
+                this.onBlueboatRoom(room);
+            });
+
+            Patcher.after(null, proto, "joinRoom", (_, __, room) => {
+                this.onBlueboatRoom(room);
+            });
+        });
+
+        // Patch the requester
         const wrapRequester = Rewriter.createShared(null, "wrapRequester", (requester: Requester) => {
             const requestCallbacks = this.requestCallbacks;
             const responseCallbacks = this.responseCallbacks;

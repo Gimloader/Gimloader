@@ -12,9 +12,9 @@
     import BookSettings from "svelte-material-icons/BookSettings.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
-    import Modals from "$content/core/modals.svelte";
-    import InformationOutline from "svelte-material-icons/InformationOutline.svelte";
+    import Modals from "$core/modals.svelte";
     import AuthorDisplay from "../components/AuthorDisplay.svelte";
+    import VerifiedCheck from "../components/VerifiedCheck.svelte";
 
     interface Props {
         startDrag: () => void;
@@ -56,10 +56,13 @@
                     v{library?.headers.version}
                 </span>
             {/if}
+            <VerifiedCheck script={library} />
         </h2>
     {/snippet}
     {#snippet author()}
-        <AuthorDisplay author={library?.headers.author} />
+        {#if !library?.headers.signature}
+            <AuthorDisplay author={library?.headers.author} />
+        {/if}
     {/snippet}
     {#snippet description()}
         {library?.headers.description}

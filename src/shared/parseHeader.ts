@@ -14,6 +14,7 @@ export function parseScriptHeaders(code: string): ScriptHeaders {
         hasSettings: "false",
         webpage: null,
         deprecated: null,
+        signature: null,
         gamemode: [],
         changelog: [],
         needsPlugin: []

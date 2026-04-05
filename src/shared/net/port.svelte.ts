@@ -1,6 +1,6 @@
 import type { State } from "$types/net/state";
 import EventEmitter2 from "eventemitter2";
-import { algorithm, isFirefox } from "../consts";
+import { isFirefox, portCryptoAlgorithm } from "../consts";
 import type { Messages, OnceMessages, OnceResponses, StateMessages } from "$types/net/messages";
 import { log } from "$shared/utils";
 
@@ -91,7 +91,7 @@ export default new class Port extends EventEmitter2 {
         // generate a signature for the json
         const arr = new TextEncoder().encode(str);
         const key = await this.signKey;
-        const signed = await crypto.subtle.sign(algorithm, key, arr);
+        const signed = await crypto.subtle.sign(portCryptoAlgorithm, key, arr);
         const signature = Array.from(new Uint8Array(signed));
 
         window.postMessage({ json: str, signature, source: "gimloader-out" });
@@ -101,7 +101,7 @@ export default new class Port extends EventEmitter2 {
         this.disconnected = false;
 
         if(data?.type === "key") {
-            crypto.subtle.importKey("jwk", data.key, algorithm, true, ["sign", "verify"])
+            crypto.subtle.importKey("jwk", data.key, portCryptoAlgorithm, true, ["sign", "verify"])
                 .then((key) => this.signKeyRes(key));
             return;
         }

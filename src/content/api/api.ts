@@ -19,10 +19,10 @@ import Patcher from "$core/patcher";
 import Storage from "$core/storage.svelte";
 import Rewriter from "$core/rewriter";
 import createSettingsApi from "./settings";
-import Commands from "$content/core/commands.svelte";
+import Commands from "$core/commands.svelte";
 import { nop } from "$shared/utils";
-import Modals from "$content/core/modals.svelte";
 import Svelte from "./svelte";
+import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 
 class Api {
     /** Functions to edit Gimkit's code */
@@ -259,7 +259,7 @@ class Api {
     openSettingsMenu: (callback: () => void) => void;
 
     /** Display a modal to the user indicating that the script requires a reload */
-    requestReload = () => Modals.addReloadNeeded(this.#id);
+    requestReload = () => addReloadNeeded(this.#id);
 }
 
 Object.freeze(Api);

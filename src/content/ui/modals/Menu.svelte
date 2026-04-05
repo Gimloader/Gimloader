@@ -1,11 +1,22 @@
+<script lang="ts" module>
+    let openState = $state(false);
+    let currentTab = $state("plugins");
+    let officialPluginsOpen = $state(false);
+
+    export function showMenu(tab = "plugins", officialOpen = false) {
+        openState = true;
+        currentTab = tab;
+        officialPluginsOpen = officialOpen;
+    }
+</script>
+
 <script lang="ts">
-    import LibraryCardsList from "./libraries/LibraryCardsList.svelte";
-    import PluginCardsList from "./plugins/PluginCardsList.svelte";
-    import { officialPluginsOpen } from "../stores";
-    import Updates from "./Updates.svelte";
-    import Settings from "./Settings.svelte";
-    import Hotkeys from "./Hotkeys.svelte";
-    import OfficialPlugins from "./plugins/OfficialPlugins.svelte";
+    import LibraryCardsList from "../libraries/LibraryCardsList.svelte";
+    import PluginCardsList from "../plugins/PluginCardsList.svelte";
+    import Updates from "../Updates.svelte";
+    import Settings from "../Settings.svelte";
+    import Hotkeys from "../Hotkeys.svelte";
+    import OfficialPlugins from "../plugins/OfficialPlugins.svelte";
     import Port from "$shared/net/port.svelte";
     import { toast } from "svelte-sonner";
     import PluginManager from "$core/scripts/pluginManager.svelte";
@@ -19,22 +30,6 @@
     import Update from "svelte-material-icons/Update.svelte";
     import Cog from "svelte-material-icons/Cog.svelte";
     import FileUploadOutline from "svelte-material-icons/FileUploadOutline.svelte";
-
-    interface Props {
-        onClose: () => void;
-        tab: string;
-        officialOpen: boolean;
-    }
-
-    let { onClose, tab, officialOpen }: Props = $props();
-
-    let currentTab = $state(tab);
-    officialPluginsOpen.set(officialOpen);
-
-    export const setTab = (tab: string, officialOpen: boolean) => {
-        currentTab = tab;
-        officialPluginsOpen.set(officialOpen);
-    };
 
     let modalDragCounter = $state(0);
     let canDrop = $derived(currentTab === "plugins" || currentTab === "libraries");
@@ -57,9 +52,13 @@
         if(currentTab === "plugins") PluginManager.create(text);
         else LibManager.create(text);
     }
+
+    function blurFocused() {
+        (document.activeElement as HTMLElement)?.blur();
+    }
 </script>
 
-<Dialog.Root open={true} onOpenChangeComplete={onClose}>
+<Dialog.Root bind:open={openState} onOpenChangeComplete={blurFocused}>
     <Dialog.Content
         class="text-gray-600 min-h-[65vh]"
         trapFocus={false}
@@ -115,10 +114,10 @@
                 </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="plugins">
-                {#if $officialPluginsOpen}
-                    <OfficialPlugins />
+                {#if officialPluginsOpen}
+                    <OfficialPlugins bind:officialPluginsOpen />
                 {:else}
-                    <PluginCardsList />
+                    <PluginCardsList bind:officialPluginsOpen />
                 {/if}
             </Tabs.Content>
             <Tabs.Content value="libraries">

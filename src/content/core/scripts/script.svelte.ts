@@ -8,6 +8,8 @@ import { gameState } from "$content/stores";
 import Modals from "../modals.svelte";
 import { scripts } from "./map";
 import Port from "$shared/net/port.svelte";
+import { signaturePublicKey } from "$shared/consts";
+import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
 
@@ -130,7 +132,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     checkReloadNeeded() {
         if(this.reloadNeeded) {
-            Modals.addReloadNeeded(this.headers.name);
+            addReloadNeeded(this.headers.name);
         }
     }
 
@@ -242,5 +244,22 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     delete() {
         this.stop();
+    }
+
+    signatureRegex = /\n\s*\*\s*@signature \S+\n/g;
+    async verifySignature() {
+        if(!this.headers.signature) return false;
+
+        try {
+            const code = this.code.replaceAll("\n\r", "\n").replace(this.signatureRegex, "\n");
+            const bytes = new TextEncoder().encode(code);
+            const signatureBytes = Uint8Array.fromBase64(this.headers.signature);
+
+            const key = await signaturePublicKey;
+            return crypto.subtle.verify({ name: "Ed25519" }, key, signatureBytes, bytes);
+        } catch (e) {
+            error(`Error verifying signature for ${this.headers.name}:`, e);
+            return false;
+        }
     }
 }

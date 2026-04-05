@@ -5,7 +5,7 @@ import GimkitInternals from "$core/internals";
 import { log } from "$shared/utils";
 import Port from "$shared/net/port.svelte";
 import { version } from "../../package.json";
-import { disableConsoleWarning, fixRDT } from "$content/core/qol";
+import { disableConsoleWarning, fixRDT } from "$core/qol";
 import StateManager from "$core/state";
 import setupModals from "./core/ui/setupModals";
 import { toast } from "svelte-sonner";

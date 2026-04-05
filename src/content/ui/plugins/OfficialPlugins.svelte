@@ -3,14 +3,17 @@
     import { onMount } from "svelte";
     import Card from "../components/Card.svelte";
     import { Button } from "$shared/ui/button";
-    import { officialPluginsOpen } from "../../stores";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import Download from "svelte-material-icons/Download.svelte";
     import Search from "../components/Search.svelte";
-    import { downloadScript } from "$content/core/net/download";
+    import { downloadScript } from "$core/net/download";
     import { error } from "$shared/utils";
-    import AuthorDisplay from "../components/AuthorDisplay.svelte";
+    import * as Tooltip from "$shared/ui/tooltip";
+    import BadgeCheck from "@lucide/svelte/icons/badge-check";
+    import { officialUrlBase } from "$shared/consts";
+
+    let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
     let officialPlugins: OfficialScriptInfo[] = $state([]);
     let searchValue = $state("");
@@ -51,7 +54,7 @@
 
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px] mt-1">
-        <Button class="h-7" onclick={() => officialPluginsOpen.set(false)}>
+        <Button class="h-7" onclick={() => officialPluginsOpen = false}>
             &lt; Installed Plugins
         </Button>
         <Search bind:value={searchValue} />
@@ -63,15 +66,26 @@
                     {#snippet header()}
                         <h2 class="overflow-ellipsis overflow-hidden whitespace-nowrap grow text-xl font-bold! mb-0!">
                             {plugin.title}
+                            <Tooltip.Provider>
+                                <Tooltip.Root>
+                                    <Tooltip.Trigger>
+                                        {@const href =
+                                        `${officialUrlBase}/plugins/${plugin.title}`}
+                                        <a target="_blank" {href}>
+                                            <BadgeCheck class="text-primary" size={16} />
+                                        </a>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content side="bottom">
+                                        This plugin has been verified as an official Gimloader script.
+                                    </Tooltip.Content>
+                                </Tooltip.Root>
+                            </Tooltip.Provider>
                         </h2>
                     {/snippet}
                     {#snippet toggle()}
                         <Button class="px-2 py-2" onclick={() => downloadScript(plugin.downloadUrl, "plugin")}>
                             <Download size={20} />
                         </Button>
-                    {/snippet}
-                    {#snippet author()}
-                        <AuthorDisplay author={plugin.author} />
                     {/snippet}
                     {#snippet description()}
                         {plugin.description}

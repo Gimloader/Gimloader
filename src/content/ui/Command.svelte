@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Commands from "$content/core/commands.svelte";
+    import Commands from "$core/commands.svelte";
     import * as Dialog from "$shared/ui/dialog";
     import type { CommandCallback } from "$types/api/commands";
     import Search from "@lucide/svelte/icons/search";

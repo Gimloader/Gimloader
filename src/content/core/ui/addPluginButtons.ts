@@ -2,7 +2,7 @@ import whiteWrenchSvg from "$assets/wrench-light.svg";
 import UI from "$core/ui/ui";
 import Hotkeys from "$core/hotkeys/hotkeys.svelte";
 import Rewriter from "../rewriter";
-import { showMenu } from "$content/ui/mount";
+import { showMenu } from "$content/ui/modals/Menu.svelte";
 import Commands from "../commands.svelte";
 
 function addTabCommand(text: string, tab: string, keywords?: string[], officialOpen?: boolean) {

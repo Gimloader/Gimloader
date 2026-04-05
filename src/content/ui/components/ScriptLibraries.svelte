@@ -7,7 +7,7 @@
     import OpenInNew from "svelte-material-icons/OpenInNew.svelte";
     import Update from "svelte-material-icons/Update.svelte";
     import Download from "svelte-material-icons/Download.svelte";
-    import { downloadScript } from "$content/core/net/download";
+    import { downloadScript } from "$core/net/download";
     import { parseDep } from "$shared/parseHeader";
 
     interface Props {

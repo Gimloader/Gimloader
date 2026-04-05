@@ -8,7 +8,7 @@
     import { toast } from "svelte-sonner";
     import Port from "$shared/net/port.svelte";
     import { englishList } from "$shared/utils";
-    import Modals from "$content/core/modals.svelte";
+    import Modals from "$core/modals.svelte";
     import { changelog } from "$content/utils";
 
     async function checkAll() {
