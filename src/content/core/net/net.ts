@@ -62,6 +62,9 @@ export default new class Net extends EventEmitter2 {
     }
 
     init() {
+        // Gimkit recently pushed and reverted an update that bumps the Colyseus version and breaks how we intercept it
+        // However, it was reverted, and presumably will be pushed again later
+        // Therefore both patches are left in, and once the update is pushed again the old patch will be removed
         // Patch the Colyseus callbacks
         const onColyseusCallbacks = Rewriter.createShared(null, "colyseusCallbacks", (Callbacks: any) => {
             this.Callbacks = Callbacks;
@@ -103,15 +106,26 @@ export default new class Net extends EventEmitter2 {
         // Patch the Blueboat client
         Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
             const proto = mod.Client.prototype;
-            if(!proto.createRoom || !proto.joinRoom) return;
 
-            Patcher.after(null, proto, "createRoom", (_, __, room) => {
-                this.onBlueboatRoom(room);
-            });
+            if(proto.joinById) {
+                // Colyseus
+                Patcher.after(null, proto, "create", (_, __, roomPromise) => {
+                    roomPromise.then((room: any) => this.onColyseusRoom(room));
+                });
 
-            Patcher.after(null, proto, "joinRoom", (_, __, room) => {
-                this.onBlueboatRoom(room);
-            });
+                Patcher.after(null, proto, "joinById", (_, __, roomPromise) => {
+                    roomPromise.then((room: any) => this.onColyseusRoom(room));
+                });
+            } else if(proto.createRoom && proto.joinRoom) {
+                // Blueboat
+                Patcher.after(null, proto, "createRoom", (_, __, room) => {
+                    this.onBlueboatRoom(room);
+                });
+
+                Patcher.after(null, proto, "joinRoom", (_, __, room) => {
+                    this.onBlueboatRoom(room);
+                });
+            }
         });
 
         // Patch the requester
