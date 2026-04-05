@@ -1,2 +1,1 @@
-Added signing confirming scripts are official
-Hotfixed Colyseus stuff for new Gimkit update, plugins will be updated soon
+Hotfix for a crash when joining 2d modes

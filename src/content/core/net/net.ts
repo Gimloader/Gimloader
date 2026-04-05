@@ -103,6 +103,7 @@ export default new class Net extends EventEmitter2 {
         // Patch the Blueboat client
         Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
             const proto = mod.Client.prototype;
+            if(!proto.createRoom || !proto.joinRoom) return;
 
             Patcher.after(null, proto, "createRoom", (_, __, room) => {
                 this.onBlueboatRoom(room);
