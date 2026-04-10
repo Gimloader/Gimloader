@@ -4634,6 +4634,7 @@ class CCDSolver {
 	free(): void;
 	constructor(raw?: RawCCDSolver);
 }
+type Untyped = any;
 interface Shapes {
 	circles: number[][];
 	lines: number[][];
@@ -4656,8 +4657,8 @@ interface WorldCustomAssets {
 }
 interface CodeGridSchema {
 	allowChannelGrids: boolean;
-	customBlocks: any[];
-	triggers: any[];
+	customBlocks: Untyped[];
+	triggers: Untyped[];
 }
 interface WireConnection {
 	id: string;
@@ -4674,7 +4675,7 @@ interface DeviceOption {
 	minimumRoleLevel?: number;
 	name?: string;
 	optionSchema: {
-		options: any[];
+		options: Untyped[];
 	};
 	seasonTicketRequired?: boolean;
 	subsequentMemoryCost?: number;
@@ -4692,13 +4693,13 @@ interface DeviceData {
 	depth: number;
 	deviceOption: DeviceOption;
 	existsBeforeReconnect: boolean;
-	hooks: any;
+	hooks: Untyped;
 	id: string;
 	isPreview: boolean;
 	layerId: string;
-	name: any;
+	name: Untyped;
 	options: Record<string, any>;
-	props: any;
+	props: Record<string, any>;
 	x: number;
 	y: number;
 }
@@ -4750,7 +4751,7 @@ interface GimkitWorld {
 	mapOptionsJSON: string;
 	terrain: Terrain;
 	wires: {
-		wires: Map<any, any>;
+		wires: Map<string, Untyped>;
 	};
 }
 interface ExistingDevice {
@@ -5244,11 +5245,11 @@ interface CircleShort {
 interface CodeGrids {
 	blockCategories: string;
 	customBlocks: string;
-	customBlocksParsed: any[];
+	customBlocksParsed: Untyped[];
 }
 interface OptionSchema {
-	options: any[];
-	categories?: any[];
+	options: Untyped[];
+	categories?: Untyped[];
 }
 interface DeviceInfo {
 	id: string;
@@ -5257,7 +5258,7 @@ interface DeviceInfo {
 	optionSchema: OptionSchema;
 	defaultState: any;
 	codeGridSchema: CodeGridSchema;
-	wireConfig?: any;
+	wireConfig?: Untyped;
 	minimumRoleLevel?: number;
 	maxOnMap?: number;
 	initialMemoryCost?: number;
@@ -5331,7 +5332,7 @@ interface CustomAssetOption {
 	maxOnMap: number;
 	memoryCost: number;
 	minimumRoleLevel?: number;
-	validate: any;
+	validate: Untyped;
 }
 interface WorldOptions {
 	codeGrids: CodeGrids;
@@ -5411,8 +5412,8 @@ interface Cull {
 interface DeviceUI {
 	device: Device;
 	close(): void;
-	open(options: Record<string, any>): void;
-	update(options: Record<string, any>): void;
+	open(options: Record<string, Untyped>): void;
+	update(options: Record<string, Untyped>): void;
 }
 interface DeviceInput {
 	device: Device;
@@ -5442,14 +5443,14 @@ interface InteractiveZones {
 	contains(x: number, y: number): boolean;
 	destroy(): void;
 	getCanInteractThroughColliders(): boolean;
-	getInfo(): any;
+	getInfo(): Untyped;
 	getMaxDistance(x: number, y: number): number;
 	isInteractive(): boolean;
 	onPlayerCanInteract(): void;
 	onPlayerCantInteractAnyMore(): void;
 	setCanInteractThroughColliders(canInteract: boolean): void;
 	setForceDisabled(forceDisabled: boolean): void;
-	setInfo(info: any): void;
+	setInfo(info: Untyped): void;
 	remove(zone: CircleShort | Rect): void;
 	onInteraction?(): void;
 }
@@ -5504,7 +5505,7 @@ interface Layers {
 	depth: number;
 	device: Device;
 	layer: string;
-	options: any;
+	options: Untyped;
 }
 interface WirePoints {
 	device: Device;
@@ -5544,7 +5545,7 @@ interface BaseDevice {
 	visualEditing: DeviceVisualEditing;
 	shadows: Shadows;
 	input: DeviceInput;
-	parts: any;
+	parts: Untyped;
 	cull: Cull;
 	boundingBox: BoundingBox;
 	appearanceVariation: AppearanceVariation;
@@ -5555,7 +5556,7 @@ interface BaseDevice {
 	wirePoints: WirePoints;
 	tweens: DeviceTweens;
 	projectiles: DeviceProjectiles;
-	sensors: any;
+	sensors: Untyped;
 	onHide: (() => void) | null;
 	onShow: (() => void) | null;
 	onUpdate: (() => void) | null;
@@ -5598,7 +5599,7 @@ interface MovementState {
 	xVelocity: number;
 }
 interface PhysicsState {
-	forces: any[];
+	forces: Untyped[];
 	gravity: number;
 	grounded: boolean;
 	groundedTicks: number;
@@ -5609,14 +5610,14 @@ interface PhysicsState {
 }
 interface PhysicsInput extends TickInput {
 	activeClassDeviceId: string;
-	ignoredStaticBodies: Set<any>;
-	ignoredTileBodies: Set<any>;
-	projectileHitForcesQueue: Set<any>;
+	ignoredStaticBodies: Set<Untyped>;
+	ignoredTileBodies: Set<Untyped>;
+	projectileHitForcesQueue: Set<Untyped>;
 }
 interface CharacterBody {
 	id: string;
-	ignoredStaticBodies: Set<any>;
-	ignoredTileBodies: Set<any>;
+	ignoredStaticBodies: Set<Untyped>;
+	ignoredTileBodies: Set<Untyped>;
 	controller: KinematicCharacterController;
 	aroundSensor: Collider;
 	feetSensor: Collider;
@@ -5645,18 +5646,18 @@ interface Physics {
 	character: Character;
 	currentPacketId: number;
 	frameInputsHistory: Map<number, PhysicsInput>;
-	justAppliedProjectileHitForces: Set<any>;
+	justAppliedProjectileHitForces: Set<Untyped>;
 	lastClassDeviceActivationId: number;
 	lastPacketSent: number[];
 	lastSentClassDeviceActivationId: number;
 	lastSentTerrainUpdateId: number;
 	lastTerrainUpdateId: number;
-	newlyAddedTileBodies: Set<any>;
+	newlyAddedTileBodies: Set<Untyped>;
 	phase: boolean;
 	physicsBodyId: string;
 	prevState: PhysicsState;
-	projectileHitForcesHistory: Map<any, any>;
-	projectileHitForcesQueue: Set<any>;
+	projectileHitForcesHistory: Map<string, Untyped>;
+	projectileHitForcesQueue: Set<Untyped>;
 	scene: Scene;
 	state: PhysicsState;
 	tickInput: TickInput;
@@ -5752,10 +5753,10 @@ interface InputManager {
 interface Cameras {
 	allCameras: Device[];
 	allCamerasNeedsUpdate: boolean;
-	camerasPlayerIsInside: any[];
+	camerasPlayerIsInside: Untyped[];
 	scene: Scene;
 	wasInPrePhase: boolean;
-	findNewCameras(allCameras: Device[], x: number, y: number): any;
+	findNewCameras(allCameras: Device[], x: number, y: number): Untyped;
 	setCurrentCameraSizeDevice(device: Device): void;
 	switchToDefaultCameraSize(reset: boolean): void;
 	update(devices: Device[]): void;
@@ -5763,7 +5764,7 @@ interface Cameras {
 interface DevicesAction {
 	inputManager: InputManager;
 	scene: Scene;
-	onClick(arg: any): void;
+	onClick(arg: Untyped): void;
 	update(): void;
 }
 interface DevicesPreview {
@@ -5792,7 +5793,7 @@ interface Devices {
 	devicesToUpdate: Set<Device>;
 	interactives: WorldInteractives;
 	scene: Scene;
-	visualEditingManager: any;
+	visualEditingManager: Untyped;
 	addDevice(device: Device): void;
 	cullDevices(): void;
 	findDeviceUnderMouse(): Device | undefined;
@@ -5904,9 +5905,9 @@ interface Projectile {
 	hitTime?: number;
 }
 interface Projectiles {
-	damageMarkers: any;
+	damageMarkers: Untyped;
 	dynamicDevices: Set<Device>;
-	fireSlashes: any;
+	fireSlashes: Untyped;
 	projectileJSON: Map<string, Projectile>;
 	runClientSidePrediction: boolean;
 	scene: Scene;
@@ -5920,8 +5921,8 @@ interface WorldManager {
 	physics: PhysicsManager;
 	projectiles: Projectiles;
 	scene: Scene;
-	terrain: any;
-	wires: any;
+	terrain: Untyped;
+	wires: Untyped;
 	update(dt: number): void;
 }
 interface BackgroundLayersManager {
@@ -5941,7 +5942,7 @@ interface BackgroundLayersManager {
 interface LayerManager {
 	backgroundLayersManager: BackgroundLayersManager;
 	colliders: Map<string, Map<string, string>>;
-	layers: Map<string, any>;
+	layers: Map<string, Untyped>;
 	scene: Scene;
 	createInitialLayers(): void;
 	createLayer(id: string): void;
@@ -6074,15 +6075,15 @@ interface CharacterManager {
 }
 interface Scene extends BaseScene {
 	actionManager: ActionManager;
-	cameraHelper: any;
+	cameraHelper: Untyped;
 	characterManager: CharacterManager;
 	dt: number;
 	inputManager: InputManager;
-	resizeManager: any;
-	shadowsManager: any;
-	spine: any;
+	resizeManager: Untyped;
+	shadowsManager: Untyped;
+	spine: Untyped;
 	tileManager: TileManager;
-	uiManager: any;
+	uiManager: Untyped;
 	worldManager: WorldManager;
 	create(): void;
 }
@@ -6162,7 +6163,7 @@ interface CharacterAnimation {
 	prevNonMainCharacterState: NonMainCharacterState;
 	skinChanged: boolean;
 	destroy(): void;
-	onAnimationComplete(options: any): void;
+	onAnimationComplete(options: Untyped): void;
 	onSkinChanged(): void;
 	playAnimationOrClearTrack(animations: string[], track: number): void;
 	playBodyAnimation(animation: string): void;
@@ -6296,10 +6297,10 @@ interface Culling {
 	scene: Scene;
 	shouldForceUpdate: boolean;
 	forceUpdate(): void;
-	hideObject(object: any): void;
+	hideObject(object: Untyped): void;
 	onInCamera(): void;
 	onOutCamera(): void;
-	showObject(object: any): void;
+	showObject(object: Untyped): void;
 	updateNeedsUpdate(): void;
 }
 interface Depth {
@@ -6530,7 +6531,7 @@ interface Character {
 	scene: Scene;
 	shadow: Shadow;
 	skin: Skin;
-	spine: any;
+	spine: Untyped;
 	teamId: string;
 	tint: Tint;
 	type: CharacterType;
@@ -6574,9 +6575,9 @@ interface NetworkStore {
 	attemptingToConnect: boolean;
 	attemptingToReconnect: boolean;
 	authId: string;
-	client: any;
+	client: Untyped;
 	clientConnectionString: string;
-	error: any;
+	error: Untyped;
 	errorFindingServerForGame: boolean;
 	errorJoiningRoom: boolean;
 	failedToReconnect: boolean;
@@ -6587,7 +6588,7 @@ interface NetworkStore {
 	joinedRoom: boolean;
 	phaseBeforeReconnect: string | null;
 	ping: number;
-	room: any;
+	room: Untyped;
 	roomIntentErrorMessage: string;
 	syncingAfterReconnection: boolean;
 }
@@ -6633,6 +6634,8 @@ interface Stores {
 }
 }
 
+type Untyped = any;
+type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 interface BaseSetting<K extends string, T> {
 	id: K;
 	default?: T;
@@ -6710,7 +6713,6 @@ type DescriptionToReturnType<T extends PluginSetting> = T extends DropdownSettin
 type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? {
 	[K in Id]: DescriptionToReturnType<T>;
 } : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> : never;
-type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 type SettingsObject<T> = T & {
 	listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;
 };
@@ -7046,8 +7048,8 @@ type SessionPhase = "preGame" | "game";
 type SessionVersion = "published" | "saved";
 namespace Schema {
 	interface ColyseusMethods {
-		$callbacks: Record<string, any>;
-		$changes: any;
+		$callbacks: Record<string, Untyped>;
+		$changes: Untyped;
 		toJson(): any;
 	}
 	type ObjectSchema<T extends object> = T & ColyseusMethods & {
@@ -7254,6 +7256,8 @@ class BaseNetApi extends EventEmitter2 {
 	get room(): any;
 	/** Gimkit's internal Colyseus state */
 	get state(): Schema.GimkitSchema;
+	/** Colyseus's Callbacks function for listening to state changes */
+	get Callbacks(): any;
 	/** Whether the user is the one hosting the current game */
 	get isHost(): boolean;
 	/** Sends a message to the server on a specific channel */
@@ -7687,6 +7691,19 @@ interface ModalBaseMethods {
 type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
 type AntdMessage = MessageMethods & MessageBaseMethods;
 type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
+interface Internals {
+	stores: Stores.Stores;
+	notification: AntdNotification;
+	message: AntdMessage;
+	modal: AntdModal;
+	platformerPhysics: any;
+}
+const gimkitComponents: readonly [
+	"notification",
+	"message",
+	"modal"
+];
+type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
 class BaseUIApi {
 	/**
 	 * Shows a customizable modal to the user
@@ -7748,6 +7765,21 @@ class UIApi extends BaseUIApi {
 	addStyles(id: string, style: string): () => void;
 	/** Remove all styles with a given id */
 	removeStyles(id: string): void;
+	/**
+	 * Waits for a component to load, and calls the callback with the component as an argument.
+	 * If the component has already loaded the callback will be fired immediately.
+	 * The available components are "notification", "message", and "modal".
+	 * @returns A function that cancels waiting
+	 * @example
+	 * ```js
+	 * GL.UI.onComponentLoad("MyPlugin", "message", (message) => {
+	 *     message.success({ content: "This is a message!" });
+	 * });
+	 * ```
+	 */
+	onComponentLoad<K extends keyof GimkitComponents>(id: string, type: K, callback: (component: GimkitComponents[K]) => void): () => void;
+	/** Cancels any calls made to {@link onComponentLoad} with the same id */
+	offComponentLoad(id: string): void;
 }
 class ScopedUIApi extends BaseUIApi {
 	
@@ -7761,10 +7793,23 @@ class ScopedUIApi extends BaseUIApi {
 	 *     color: red;
 	 * }`;
 	 *
-	 * GL.UI.addStyles("MyPlugin", styles);
+	 * api.UI.addStyles(styles);
 	 * ```
 	 */
 	addStyles(style: string): () => void;
+	/**
+	 * Waits for a component to load, and calls the callback with the component as an argument.
+	 * If the component has already loaded the callback will be fired immediately.
+	 * The available components are "notification", "message", and "modal".
+	 * @returns A function that cancels waiting
+	 * @example
+	 * ```js
+	 * api.UI.onComponentLoad("message", (message) => {
+	 *     message.success({ content: "This is a message!" });
+	 * });
+	 * ```
+	 */
+	onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void): () => void;
 }
 
 type ValueChangeCallback = (value: any, remote: boolean) => void;
@@ -8212,7 +8257,7 @@ class ScopedCommandsApi {
 interface ScriptHeaders {
 	name: string;
 	description: string;
-	author: string;
+	author: string[];
 	version: string | null;
 	reloadRequired: string;
 	isLibrary: string;
@@ -8223,6 +8268,7 @@ interface ScriptHeaders {
 	deprecated: string | null;
 	gamemode: string[];
 	changelog: string[];
+	signature: string | null;
 	/** Only available for plugins */
 	needsPlugin: string[];
 	hasSettings: string;
@@ -8425,7 +8471,7 @@ class Api {
 	 */
 	openSettingsMenu: (callback: () => void) => void;
 	/** Display a modal to the user indicating that the script requires a reload */
-	requestReload: () => void;
+	requestReload: () => any;
 }
 
 interface Plugins {

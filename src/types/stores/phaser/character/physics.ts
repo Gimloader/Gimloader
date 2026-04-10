@@ -1,6 +1,7 @@
 import type Scene from "../scene";
 import type Character from "../character";
 import type { Collider, ColliderDesc, KinematicCharacterController, RigidBody, RigidBodyDesc, Vector } from "@dimforge/rapier2d-compat";
+import type { Untyped } from "$types/util";
 
 interface Jump {
     /** Optional in top-down, required in platformer */
@@ -19,7 +20,7 @@ interface MovementState {
 }
 
 interface PhysicsState {
-    forces: any[];
+    forces: Untyped[];
     gravity: number;
     grounded: boolean;
     groundedTicks: number;
@@ -31,15 +32,15 @@ interface PhysicsState {
 
 interface PhysicsInput extends TickInput {
     activeClassDeviceId: string;
-    ignoredStaticBodies: Set<any>;
-    ignoredTileBodies: Set<any>;
-    projectileHitForcesQueue: Set<any>;
+    ignoredStaticBodies: Set<Untyped>;
+    ignoredTileBodies: Set<Untyped>;
+    projectileHitForcesQueue: Set<Untyped>;
 }
 
 interface CharacterBody {
     id: string;
-    ignoredStaticBodies: Set<any>;
-    ignoredTileBodies: Set<any>;
+    ignoredStaticBodies: Set<Untyped>;
+    ignoredTileBodies: Set<Untyped>;
     controller: KinematicCharacterController;
     aroundSensor: Collider;
     feetSensor: Collider;
@@ -73,18 +74,18 @@ export default interface Physics {
     character: Character;
     currentPacketId: number;
     frameInputsHistory: Map<number, PhysicsInput>;
-    justAppliedProjectileHitForces: Set<any>;
+    justAppliedProjectileHitForces: Set<Untyped>;
     lastClassDeviceActivationId: number;
     lastPacketSent: number[];
     lastSentClassDeviceActivationId: number;
     lastSentTerrainUpdateId: number;
     lastTerrainUpdateId: number;
-    newlyAddedTileBodies: Set<any>;
+    newlyAddedTileBodies: Set<Untyped>;
     phase: boolean;
     physicsBodyId: string;
     prevState: PhysicsState;
-    projectileHitForcesHistory: Map<any, any>;
-    projectileHitForcesQueue: Set<any>;
+    projectileHitForcesHistory: Map<string, Untyped>;
+    projectileHitForcesQueue: Set<Untyped>;
     scene: Scene;
     state: PhysicsState;
     tickInput: TickInput;

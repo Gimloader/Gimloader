@@ -1,3 +1,4 @@
+import type { Untyped } from "$types/util";
 import type Character from "../character";
 
 interface NonMainCharacterState {
@@ -17,7 +18,7 @@ export default interface CharacterAnimation {
     prevNonMainCharacterState: NonMainCharacterState;
     skinChanged: boolean;
     destroy(): void;
-    onAnimationComplete(options: any): void;
+    onAnimationComplete(options: Untyped): void;
     onSkinChanged(): void;
     playAnimationOrClearTrack(animations: string[], track: number): void;
     playBodyAnimation(animation: string): void;

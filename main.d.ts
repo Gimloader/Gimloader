@@ -24,6 +24,9 @@ declare module '*.svelte' {
     export const ButtonProps;
     export const ButtonVariant;
     export const ButtonSize;
+    export const addReloadNeeded;
+    export const addUpdated;
+    export const showMenu;
 }
 
 declare const GL: typeof import('./src/content/api/api').default;

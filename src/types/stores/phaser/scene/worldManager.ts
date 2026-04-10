@@ -6,14 +6,15 @@ import type { Device } from "./device";
 import type InputManager from "./inputManager";
 import type { Rect } from "../../shapes";
 import type { Input } from "phaser";
+import type { Untyped } from "$types/util";
 
 interface Cameras {
     allCameras: Device[];
     allCamerasNeedsUpdate: boolean;
-    camerasPlayerIsInside: any[];
+    camerasPlayerIsInside: Untyped[];
     scene: Scene;
     wasInPrePhase: boolean;
-    findNewCameras(allCameras: Device[], x: number, y: number): any;
+    findNewCameras(allCameras: Device[], x: number, y: number): Untyped;
     setCurrentCameraSizeDevice(device: Device): void;
     switchToDefaultCameraSize(reset: boolean): void;
     update(devices: Device[]): void;
@@ -22,7 +23,7 @@ interface Cameras {
 interface DevicesAction {
     inputManager: InputManager;
     scene: Scene;
-    onClick(arg: any): void;
+    onClick(arg: Untyped): void;
     update(): void;
 }
 
@@ -54,7 +55,7 @@ interface Devices {
     devicesToUpdate: Set<Device>;
     interactives: WorldInteractives;
     scene: Scene;
-    visualEditingManager: any;
+    visualEditingManager: Untyped;
     addDevice(device: Device): void;
     cullDevices(): void;
     findDeviceUnderMouse(): Device | undefined;
@@ -165,9 +166,9 @@ interface Projectile {
 }
 
 interface Projectiles {
-    damageMarkers: any;
+    damageMarkers: Untyped;
     dynamicDevices: Set<Device>;
-    fireSlashes: any;
+    fireSlashes: Untyped;
     projectileJSON: Map<string, Projectile>;
     runClientSidePrediction: boolean;
     scene: Scene;
@@ -182,7 +183,7 @@ export default interface WorldManager {
     physics: PhysicsManager;
     projectiles: Projectiles;
     scene: Scene;
-    terrain: any;
-    wires: any;
+    terrain: Untyped;
+    wires: Untyped;
     update(dt: number): void;
 }

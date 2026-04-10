@@ -6,6 +6,7 @@ import type Physics from "./character/physics";
 import type { Vector } from "@dimforge/rapier2d-compat";
 import type { GameObjects, Tweens } from "phaser";
 import type { CharacterType } from "../characters";
+import type { Untyped } from "$types/util";
 
 interface Updates {
     update(update: { delta: number }): void;
@@ -96,10 +97,10 @@ interface Culling {
     scene: Scene;
     shouldForceUpdate: boolean;
     forceUpdate(): void;
-    hideObject(object: any): void;
+    hideObject(object: Untyped): void;
     onInCamera(): void;
     onOutCamera(): void;
-    showObject(object: any): void;
+    showObject(object: Untyped): void;
     updateNeedsUpdate(): void;
 }
 
@@ -349,7 +350,7 @@ export default interface Character {
     scene: Scene;
     shadow: Shadow;
     skin: Skin;
-    spine: any; // SpineGameObject from @esotericsoftware/spine-phaser-v3
+    spine: Untyped; // SpineGameObject from @esotericsoftware/spine-phaser-v3
     teamId: string;
     tint: Tint;
     type: CharacterType;

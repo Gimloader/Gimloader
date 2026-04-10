@@ -7,6 +7,7 @@ import type WorldManager from "./scene/worldManager";
 import type InputManager from "./scene/inputManager";
 import type TileManager from "./scene/tileManager";
 import type { CharacterType } from "../characters";
+import type { Untyped } from "$types/util";
 
 interface ShowOverlayOptions {
     x: number;
@@ -121,15 +122,15 @@ interface CharacterManager {
 
 export default interface Scene extends BaseScene {
     actionManager: ActionManager;
-    cameraHelper: any;
+    cameraHelper: Untyped;
     characterManager: CharacterManager;
     dt: number;
     inputManager: InputManager;
-    resizeManager: any;
-    shadowsManager: any;
-    spine: any;
+    resizeManager: Untyped;
+    shadowsManager: Untyped;
+    spine: Untyped;
     tileManager: TileManager;
-    uiManager: any;
+    uiManager: Untyped;
     worldManager: WorldManager;
     create(): void;
 }

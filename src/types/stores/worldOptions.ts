@@ -1,15 +1,16 @@
+import type { Untyped } from "$types/util";
 import type { CircleShort, Ellipse, RotatedEllipse, RotatedRectShort } from "./shapes";
 import type { CodeGridSchema } from "./world";
 
 interface CodeGrids {
     blockCategories: string;
     customBlocks: string;
-    customBlocksParsed: any[];
+    customBlocksParsed: Untyped[];
 }
 
 interface OptionSchema {
-    options: any[];
-    categories?: any[];
+    options: Untyped[];
+    categories?: Untyped[];
 }
 
 interface DeviceInfo {
@@ -19,7 +20,7 @@ interface DeviceInfo {
     optionSchema: OptionSchema;
     defaultState: any;
     codeGridSchema: CodeGridSchema;
-    wireConfig?: any;
+    wireConfig?: Untyped;
     minimumRoleLevel?: number;
     maxOnMap?: number;
     initialMemoryCost?: number;
@@ -98,7 +99,7 @@ interface CustomAssetOption {
     maxOnMap: number;
     memoryCost: number;
     minimumRoleLevel?: number;
-    validate: any;
+    validate: Untyped;
 }
 
 export default interface WorldOptions {

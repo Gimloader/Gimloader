@@ -1,3 +1,5 @@
+import type { UnionToIntersection } from "$types/util";
+
 export interface BaseSetting<K extends string, T> {
     id: K;
     default?: T;
@@ -103,8 +105,6 @@ export type DescriptionToReturnType<T extends PluginSetting> = T extends Dropdow
 type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
     : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
     : never;
-
-type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 
 type SettingsObject<T> = T & {
     listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;

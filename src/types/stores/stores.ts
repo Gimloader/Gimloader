@@ -8,6 +8,7 @@ import type WorldOptions from "./worldOptions";
 import type Character from "./phaser/character";
 import type Scene from "./phaser/scene";
 import type { Vector } from "@dimforge/rapier2d-compat";
+import type { Untyped } from "$types/util";
 
 // Single-interface stores properties are in this file, everything else is in its own file
 
@@ -49,9 +50,9 @@ interface NetworkStore {
     attemptingToConnect: boolean;
     attemptingToReconnect: boolean;
     authId: string;
-    client: any; // colyseus.js Client type
+    client: Untyped; // colyseus.js Client type
     clientConnectionString: string;
-    error: any;
+    error: Untyped;
     errorFindingServerForGame: boolean;
     errorJoiningRoom: boolean;
     failedToReconnect: boolean;
@@ -62,7 +63,7 @@ interface NetworkStore {
     joinedRoom: boolean;
     phaseBeforeReconnect: string | null;
     ping: number;
-    room: any; // colyseus.js Room type
+    room: Untyped; // colyseus.js Room type
     roomIntentErrorMessage: string;
     syncingAfterReconnection: boolean;
 }

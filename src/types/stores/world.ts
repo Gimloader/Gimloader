@@ -1,3 +1,5 @@
+import type { Untyped } from "$types/util";
+
 export interface Shapes {
     circles: number[][];
     lines: number[][];
@@ -21,8 +23,8 @@ interface WorldCustomAssets {
 
 export interface CodeGridSchema {
     allowChannelGrids: boolean;
-    customBlocks: any[];
-    triggers: any[];
+    customBlocks: Untyped[];
+    triggers: Untyped[];
 }
 
 interface WireConnection {
@@ -40,7 +42,7 @@ export interface DeviceOption {
     maximumRoleLevel?: number;
     minimumRoleLevel?: number;
     name?: string;
-    optionSchema: { options: any[] };
+    optionSchema: { options: Untyped[] };
     seasonTicketRequired?: boolean;
     subsequentMemoryCost?: number;
     supportedMapStyles?: string[];
@@ -54,13 +56,13 @@ interface DeviceData {
     depth: number;
     deviceOption: DeviceOption;
     existsBeforeReconnect: boolean;
-    hooks: any;
+    hooks: Untyped;
     id: string;
     isPreview: boolean;
     layerId: string;
-    name: any;
+    name: Untyped;
     options: Record<string, any>;
-    props: any;
+    props: Record<string, any>;
     x: number;
     y: number;
 }
@@ -119,5 +121,5 @@ export default interface GimkitWorld {
     width: number;
     mapOptionsJSON: string;
     terrain: Terrain;
-    wires: { wires: Map<any, any> };
+    wires: { wires: Map<string, Untyped> };
 }

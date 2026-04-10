@@ -4,6 +4,7 @@ import type Character from "../character";
 import type Scene from "../scene";
 import type { Tweens, Types } from "phaser";
 import type { Circle, CircleShort, Ellipse, Rect, RectShort, RotatedCircle, RotatedRect } from "../../shapes";
+import type { Untyped } from "$types/util";
 
 interface AppearanceVariation {
     device: Device;
@@ -81,8 +82,8 @@ interface Cull {
 interface DeviceUI {
     device: Device;
     close(): void;
-    open(options: Record<string, any>): void;
-    update(options: Record<string, any>): void;
+    open(options: Record<string, Untyped>): void;
+    update(options: Record<string, Untyped>): void;
 }
 
 interface DeviceInput {
@@ -114,14 +115,14 @@ interface InteractiveZones {
     contains(x: number, y: number): boolean;
     destroy(): void;
     getCanInteractThroughColliders(): boolean;
-    getInfo(): any;
+    getInfo(): Untyped;
     getMaxDistance(x: number, y: number): number;
     isInteractive(): boolean;
     onPlayerCanInteract(): void;
     onPlayerCantInteractAnyMore(): void;
     setCanInteractThroughColliders(canInteract: boolean): void;
     setForceDisabled(forceDisabled: boolean): void;
-    setInfo(info: any): void;
+    setInfo(info: Untyped): void;
     remove(zone: CircleShort | Rect): void;
     onInteraction?(): void;
 }
@@ -182,7 +183,7 @@ interface Layers {
     depth: number;
     device: Device;
     layer: string;
-    options: any;
+    options: Untyped;
 }
 
 interface WirePoints {
@@ -226,7 +227,7 @@ interface BaseDevice {
     visualEditing: DeviceVisualEditing;
     shadows: Shadows;
     input: DeviceInput;
-    parts: any;
+    parts: Untyped;
     cull: Cull;
     boundingBox: BoundingBox;
     appearanceVariation: AppearanceVariation;
@@ -237,7 +238,7 @@ interface BaseDevice {
     wirePoints: WirePoints;
     tweens: DeviceTweens;
     projectiles: DeviceProjectiles;
-    sensors: any;
+    sensors: Untyped;
     onHide: (() => void) | null;
     onShow: (() => void) | null;
     onUpdate: (() => void) | null;

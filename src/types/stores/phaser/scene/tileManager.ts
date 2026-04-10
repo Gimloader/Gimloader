@@ -1,5 +1,6 @@
 import type Scene from "../scene";
 import type { TerrainOption } from "../../worldOptions";
+import type { Untyped } from "$types/util";
 
 interface BackgroundLayersManager {
     layerManager: LayerManager;
@@ -14,7 +15,7 @@ interface BackgroundLayersManager {
 interface LayerManager {
     backgroundLayersManager: BackgroundLayersManager;
     colliders: Map<string, Map<string, string>>;
-    layers: Map<string, any>;
+    layers: Map<string, Untyped>;
     scene: Scene;
     createInitialLayers(): void;
     createLayer(id: string): void;

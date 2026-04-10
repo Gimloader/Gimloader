@@ -1,9 +1,10 @@
 import type { GameSessionPhase, SessionMapStyle, SessionModeType, SessionPhase, SessionVersion } from "./stores/session";
+import type { Untyped } from "./util";
 
 export namespace Schema {
     export interface ColyseusMethods {
-        $callbacks: Record<string, any>;
-        $changes: any;
+        $callbacks: Record<string, Untyped>;
+        $changes: Untyped;
         toJson(): any;
     }
 

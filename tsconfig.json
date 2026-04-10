@@ -8,7 +8,7 @@
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "strict": false,
-        "baseUrl": ".",
+        "types": ["bun", "chrome", "react", "react-dom"],
         "paths": {
             "$assets/*": ["./assets/*"],
             "$core/*": ["./src/content/core/*"],
@@ -20,5 +20,5 @@
         "verbatimModuleSyntax": true,
         "noEmit": true
     },
-    "include": ["./src/**/*.*", "main.d.ts"]
+    "include": ["./src/**/*.*", "main.d.ts", "./extension/scripts/*.ts"]
 }
