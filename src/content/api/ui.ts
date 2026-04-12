@@ -102,7 +102,7 @@ class UIApi extends BaseUIApi {
      * ```
      */
     addStyles(id: string, style: string) {
-        validate("UI.removeStyles", arguments, ["id", "string"], ["style", "string"]);
+        validate("UI.addStyles", arguments, ["id", "string"], ["style", "string"]);
 
         return UI.addStyles(id, style);
     }
@@ -162,7 +162,7 @@ class ScopedUIApi extends BaseUIApi {
      * ```
      */
     addStyles(style: string) {
-        validate("UI.removeStyles", arguments, ["style", "string"]);
+        validate("UI.addStyles", arguments, ["style", "string"]);
 
         return UI.addStyles(this.#id, style);
     }

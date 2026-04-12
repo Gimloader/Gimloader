@@ -1,1 +1,1 @@
-Hotfix for a crash when joining 2d modes
+Fixed name of UI.addStyles in errors
