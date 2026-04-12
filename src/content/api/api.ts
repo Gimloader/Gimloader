@@ -113,6 +113,16 @@ class Api {
         return GimkitInternals.stores;
     }
 
+    /** A variety of gimkit internal objects available in 1d gamemodes */
+    static get liveGameStores() {
+        return GimkitInternals.liveGameStores;
+    }
+
+    /** A variety of gimkit internal objects available in 1d gamemodes */
+    get liveGameStores() {
+        return GimkitInternals.liveGameStores;
+    }
+
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.

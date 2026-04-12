@@ -1,6 +1,7 @@
 import Rewriter from "./rewriter";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
 import { clearId, splicer } from "$content/utils";
+import type { LiveGameStores } from "$types/live-game-stores";
 
 export interface Internals {
     stores: Stores.Stores;
@@ -21,17 +22,23 @@ export default class GimkitInternals {
     static notification: AntdNotification;
     static message: AntdMessage;
     static modal: AntdModal;
+    static liveGameStores: LiveGameStores;
     static platformerPhysics: any;
 
     static loadCallbacks: LoadCallback<keyof Internals>[] = [];
 
     static init() {
-        // window.stores
+        // GL.stores
         Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores: Stores.Stores) => {
             this.stores = stores;
             window.stores = stores;
 
             this.onLoaded("stores", stores);
+        });
+
+        // GL.liveGameStores
+        Rewriter.exposeObject("index", "liveGameStores", "gameValues:new", (liveGameStores: LiveGameStores) => {
+            this.liveGameStores = liveGameStores;
         });
 
         // ant-design notifications
@@ -55,7 +62,7 @@ export default class GimkitInternals {
             this.onLoaded("modal", modal);
         });
 
-        // window.platformerPhysics
+        // GL.platformerPhysics
         Rewriter.exposeObject("App", "platformerPhysics", "topDownBaseSpeed:", (phys) => {
             this.platformerPhysics = phys;
             window.platformerPhysics = phys;
