@@ -5,8 +5,6 @@ interface Goal {
 
 type Currency = "$" | "€" | "¥" | "£" | "X̶" | "₩";
 
-// Gimkit uses google translate language codes
-
 interface GameOptions {
     allowGoogleTranslate: boolean;
     clapping: boolean;
