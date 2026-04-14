@@ -1,1 +1,2 @@
 Fixed name of UI.addStyles in errors
+Fixed the Gimloader menu being placed behind certain Gimkit popups
