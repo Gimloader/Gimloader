@@ -1,7 +1,7 @@
 import Rewriter from "./rewriter";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
 import { clearId, splicer } from "$content/utils";
-import type { LiveGameStores } from "$types/live-game-stores";
+import type { ClassicStores } from "$types/classic-stores";
 
 export interface Internals {
     stores: Stores.Stores;
@@ -22,7 +22,7 @@ export default class GimkitInternals {
     static notification: AntdNotification;
     static message: AntdMessage;
     static modal: AntdModal;
-    static liveGameStores: LiveGameStores;
+    static classicStores: ClassicStores;
     static platformerPhysics: any;
 
     static loadCallbacks: LoadCallback<keyof Internals>[] = [];
@@ -36,9 +36,9 @@ export default class GimkitInternals {
             this.onLoaded("stores", stores);
         });
 
-        // GL.liveGameStores
-        Rewriter.exposeObject("index", "liveGameStores", "gameValues:new", (liveGameStores: LiveGameStores) => {
-            this.liveGameStores = liveGameStores;
+        // GL.classicStores
+        Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores) => {
+            this.classicStores = classicStores;
         });
 
         // ant-design notifications

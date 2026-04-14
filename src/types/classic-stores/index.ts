@@ -38,12 +38,12 @@ interface Stats {
     playerStats: Untyped[];
 }
 
-interface BaseLiveGameStores {
+interface BaseClassicStores {
     events: Record<string, Untyped>;
     engine: Untyped;
 }
 
-interface HostLiveGameStores extends BaseLiveGameStores {
+interface HostClassicStores extends BaseClassicStores {
     draw: HostDraw;
     entities: HostEntities;
     gameOptions: HostGameOptions;
@@ -60,7 +60,7 @@ interface HostLiveGameStores extends BaseLiveGameStores {
     ui: HostUI;
 }
 
-interface GuestLiveGameStores extends BaseLiveGameStores {
+interface GuestClassicStores extends BaseClassicStores {
     balance: Balance;
     draw: GuestDraw;
     entities: GuestEntities;
@@ -78,4 +78,4 @@ interface GuestLiveGameStores extends BaseLiveGameStores {
     user: User;
 }
 
-export type LiveGameStores = HostLiveGameStores | GuestLiveGameStores;
+export type ClassicStores = HostClassicStores | GuestClassicStores;

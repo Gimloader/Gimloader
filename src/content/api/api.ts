@@ -114,13 +114,13 @@ class Api {
     }
 
     /** A variety of gimkit internal objects available in 1d gamemodes */
-    static get liveGameStores() {
-        return GimkitInternals.liveGameStores;
+    static get classicStores() {
+        return GimkitInternals.classicStores;
     }
 
     /** A variety of gimkit internal objects available in 1d gamemodes */
-    get liveGameStores() {
-        return GimkitInternals.liveGameStores;
+    get classicStores() {
+        return GimkitInternals.classicStores;
     }
 
     /**
