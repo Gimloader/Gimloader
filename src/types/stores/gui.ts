@@ -1,8 +1,8 @@
 interface Achievement {
     id: string;
     key: string;
-    reset: () => void;
-    update: () => void;
+    reset(): void;
+    update(): void;
 }
 
 interface BottomInGamePrimaryContent {
@@ -33,7 +33,7 @@ interface KnockoutAlert {
 }
 
 interface Modals {
-    closeAllModals: () => void;
+    closeAllModals(): void;
     cosmosModalOpen: boolean;
     switchToRegisterScreenWhenCosmosModalOpens: boolean;
 }

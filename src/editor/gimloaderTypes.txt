@@ -5083,8 +5083,8 @@ interface Session {
 interface Achievement {
 	id: string;
 	key: string;
-	reset: () => void;
-	update: () => void;
+	reset(): void;
+	update(): void;
 }
 interface BottomInGamePrimaryContent {
 	interactionWantsToBeVisible: boolean;
@@ -5110,7 +5110,7 @@ interface KnockoutAlert {
 	name: string;
 }
 interface Modals {
-	closeAllModals: () => void;
+	closeAllModals(): void;
 	cosmosModalOpen: boolean;
 	switchToRegisterScreenWhenCosmosModalOpens: boolean;
 }
@@ -6639,7 +6639,7 @@ type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 interface BaseSetting<K extends string, T> {
 	id: K;
 	default?: T;
-	onChange?: (value: T, remote: boolean) => void;
+	onChange?(value: T, remote: boolean): void;
 }
 interface NamedSetting<K extends string, T> extends BaseSetting<K, T> {
 	title: string;
@@ -6680,7 +6680,7 @@ interface SliderSetting<K extends string> extends NamedSetting<K, number> {
 	max: number;
 	step?: number;
 	ticks?: ReadonlyArray<number>;
-	formatter?: (value: number) => string;
+	formatter?(value: number): string;
 }
 interface RadioSetting<K extends string> extends NamedSetting<K, string> {
 	type: "radio";
@@ -6695,11 +6695,11 @@ interface ColorSetting<K extends string> extends NamedSetting<K, string> {
 }
 interface CustomSetting<K extends string, T = any> extends NamedSetting<K, T> {
 	type: "custom";
-	render: (container: HTMLElement, currentValue: T, update: (newValue: T) => void) => (() => void) | void;
+	render(container: HTMLElement, currentValue: T, update: (newValue: T) => void): (() => void) | void;
 }
 interface CustomSection<K extends string, T = any> extends BaseSetting<K, T> {
 	type: "customsection";
-	render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
+	render(container: HTMLElement, currentValue: T, onChange: (newValue: T) => void): (() => void) | void;
 }
 type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
 interface SettingGroup {
@@ -7393,7 +7393,7 @@ interface MessageConfigOptions {
 	top?: string | number;
 	duration?: number;
 	prefixCls?: string;
-	getContainer?: () => HTMLElement;
+	getContainer?(): HTMLElement;
 	transitionName?: string;
 	maxCount?: number;
 	rtl?: boolean;
@@ -7405,14 +7405,14 @@ interface MessageArgsProps {
 	content: React$1.ReactNode;
 	duration?: number;
 	type?: NoticeType;
-	onClose?: () => void;
+	onClose?(): void;
 	icon?: React$1.ReactNode;
 	key?: string | number;
 	style?: React$1.CSSProperties;
 	className?: string;
 	classNames?: ArgsClassNamesType;
 	styles?: ArgsStylesType;
-	onClick?: (e: React$1.MouseEvent<HTMLDivElement>) => void;
+	onClick?(e: React$1.MouseEvent<HTMLDivElement>): void;
 	pauseOnHover?: boolean;
 }
 type MessageJointContent = React$1.ReactNode | MessageArgsProps;
@@ -7426,14 +7426,14 @@ interface MessageInstance {
 	error: MessageTypeOpen;
 	warning: MessageTypeOpen;
 	loading: MessageTypeOpen;
-	open: (args: MessageArgsProps) => MessageType;
-	destroy: (key?: React$1.Key) => void;
+	open(args: MessageArgsProps): MessageType;
+	destroy(key?: React$1.Key): void;
 }
 interface MessageBaseMethods {
-	open: (config: MessageArgsProps) => MessageType;
-	destroy: (key?: React$1.Key) => void;
-	config: (config: MessageConfigOptions) => void;
-	useMessage: () => MessageInstance;
+	open(config: MessageArgsProps): MessageType;
+	destroy(key?: React$1.Key): void;
+	config(config: MessageConfigOptions): void;
+	useMessage(): MessageInstance;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
 interface MessageMethods {
@@ -7479,7 +7479,7 @@ interface NotificationArgsProps {
 	btn?: React$1.ReactNode;
 	actions?: React$1.ReactNode;
 	key?: React$1.Key;
-	onClose?: () => void;
+	onClose?(): void;
 	duration?: number | false;
 	showProgress?: boolean;
 	pauseOnHover?: boolean;
@@ -7490,10 +7490,10 @@ interface NotificationArgsProps {
 	classNames?: NotificationClassNamesType;
 	styles?: NotificationStylesType;
 	readonly type?: NotificationIconType;
-	onClick?: () => void;
+	onClick?(): void;
 	closeIcon?: React$1.ReactNode;
 	closable?: boolean | {
-		onClose?: () => void;
+		onClose?(): void;
 	};
 	props?: NotificationDivProps;
 	role?: "alert" | "status";
@@ -7505,7 +7505,7 @@ interface NotificationInstance {
 	info: NotificationStaticFn;
 	warning: NotificationStaticFn;
 	open: NotificationStaticFn;
-	destroy: (key?: React$1.Key) => void;
+	destroy(key?: React$1.Key): void;
 }
 interface NotificationGlobalConfigProps {
 	top?: number;
@@ -7514,21 +7514,21 @@ interface NotificationGlobalConfigProps {
 	showProgress?: boolean;
 	pauseOnHover?: boolean;
 	prefixCls?: string;
-	getContainer?: () => HTMLElement | ShadowRoot;
+	getContainer?(): HTMLElement | ShadowRoot;
 	placement?: NotificationPlacement;
 	closeIcon?: React$1.ReactNode;
 	closable?: boolean | {
-		onClose?: () => void;
+		onClose?(): void;
 	};
 	rtl?: boolean;
 	maxCount?: number;
 	props?: NotificationDivProps;
 }
 interface NotificationBaseMethods {
-	open: (config: NotificationArgsProps) => void;
-	destroy: (key?: React$1.Key) => void;
-	config: (config: NotificationGlobalConfigProps) => void;
-	useNotification: () => NotificationInstance;
+	open(config: NotificationArgsProps): void;
+	destroy(key?: React$1.Key): void;
+	config(config: NotificationGlobalConfigProps): void;
+	useNotification(): NotificationInstance;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
 interface NotificationNoticeMethods {
@@ -7571,8 +7571,8 @@ interface ModalCommonProps {
 		CancelBtn: React$1.FC;
 	}) => React$1.ReactNode);
 	closable?: boolean | {
-		onClose?: () => void;
-		afterClose?: () => void;
+		onClose?(): void;
+		afterClose?(): void;
 	};
 	classNames?: ModalClassNamesType;
 	styles?: ModalStylesType;
@@ -7581,10 +7581,10 @@ interface ModalProps extends ModalCommonProps {
 	open?: boolean;
 	confirmLoading?: boolean;
 	title?: React$1.ReactNode;
-	onOk?: (e: React$1.MouseEvent<HTMLButtonElement>) => void;
-	onCancel?: (e: React$1.MouseEvent<HTMLButtonElement>) => void;
-	afterClose?: () => void;
-	afterOpenChange?: (open: boolean) => void;
+	onOk?(e: React$1.MouseEvent<HTMLButtonElement>): void;
+	onCancel?(e: React$1.MouseEvent<HTMLButtonElement>): void;
+	afterClose?(): void;
+	afterOpenChange?(open: boolean): void;
 	centered?: boolean;
 	width?: string | number;
 	okText?: React$1.ReactNode;
@@ -7612,7 +7612,7 @@ interface ModalProps extends ModalCommonProps {
 	wrapProps?: any;
 	prefixCls?: string;
 	closeIcon?: React$1.ReactNode;
-	modalRender?: (node: React$1.ReactNode) => React$1.ReactNode;
+	modalRender?(node: React$1.ReactNode): React$1.ReactNode;
 	children?: React$1.ReactNode;
 	mousePosition?: ModalMousePosition;
 	loading?: boolean;
@@ -7628,9 +7628,9 @@ interface ModalFuncProps extends ModalCommonProps {
 	open?: boolean;
 	title?: React$1.ReactNode;
 	content?: React$1.ReactNode;
-	onOk?: (...args: any[]) => any;
-	onCancel?: (...args: any[]) => any;
-	afterClose?: () => void;
+	onOk?(...args: any[]): any;
+	onCancel?(...args: any[]): any;
+	afterClose?(): void;
 	okButtonProps?: Record<string, any>;
 	cancelButtonProps?: Record<string, any>;
 	centered?: boolean;
@@ -7655,7 +7655,7 @@ interface ModalFuncProps extends ModalCommonProps {
 	bodyStyle?: React$1.CSSProperties;
 	closeIcon?: React$1.ReactNode;
 	footer?: ModalProps["footer"];
-	modalRender?: (node: React$1.ReactNode) => React$1.ReactNode;
+	modalRender?(node: React$1.ReactNode): React$1.ReactNode;
 	focusTriggerAfterClose?: boolean;
 	autoFocusButton?: null | "ok" | "cancel";
 	focusable?: {
@@ -7665,8 +7665,8 @@ interface ModalFuncProps extends ModalCommonProps {
 }
 type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
 interface ModalFuncReturn {
-	destroy: () => void;
-	update: (configUpdate: ModalConfigUpdate) => void;
+	destroy(): void;
+	update(configUpdate: ModalConfigUpdate): void;
 }
 type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
 interface ModalStaticFunctions {
@@ -7678,14 +7678,14 @@ interface ModalStaticFunctions {
 	warn: ModalFunc;
 }
 interface ModalBaseMethods {
-	useModal: () => [
+	useModal(): [
 		api: any,
 		contextHolder: React$1.ReactNode
 	];
-	destroyAll: () => void;
-	config: (config: {
+	destroyAll(): void;
+	config(config: {
 		rootPrefixCls: string;
-	}) => void;
+	}): void;
 	_InternalPanelDoNotUseOrYouWillBeFired: React$1.FC<any>;
 }
 type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
@@ -8153,7 +8153,7 @@ class ScopedRewriterApi {
 interface CommandOptions {
 	text: string | (() => string);
 	keywords?: ReadonlyArray<string>;
-	hidden?: () => boolean;
+	hidden?(): boolean;
 }
 interface BaseCommandOptions {
 	title: string;
