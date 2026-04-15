@@ -1,1 +1,2 @@
-Hotfix for a crash when joining 2d modes
+Fixed name of UI.addStyles in errors
+Fixed the Gimloader menu being placed behind certain Gimkit popups

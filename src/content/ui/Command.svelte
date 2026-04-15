@@ -144,9 +144,9 @@
 {/snippet}
 
 <Dialog.Root bind:open={Commands.open} onOpenChangeComplete={onOpenChange}>
-    <Dialog.Overlay class="z-100" />
+    <Dialog.Overlay class="z-overlay-bg" />
     <Dialog.Content
-        class="flex flex-col p-0 gap-0 overflow-hidden z-100"
+        class="flex flex-col p-0 gap-0 overflow-hidden z-overlay"
         style="width: min(600px, 90vw)"
         showCloseButton={false}>
         {#if !Commands.action}
