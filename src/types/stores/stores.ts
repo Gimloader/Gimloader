@@ -81,7 +81,7 @@ interface SceneStore {
 }
 
 interface Team {
-    characters: Map<number, string>;
+    characters: string[];
     id: string;
     name: string;
     score: number;
