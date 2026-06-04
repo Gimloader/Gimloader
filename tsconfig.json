@@ -15,10 +15,16 @@
             "$content/*": ["./src/content/*"],
             "$bg/*": ["./src/background/*"],
             "$types/*": ["./src/types/*"],
+            "$shared*": ["./src/shared"],
             "$shared/*": ["./src/shared/*"]
         },
         "verbatimModuleSyntax": true,
         "noEmit": true
     },
-    "include": ["./src/**/*.*", "main.d.ts", "./extension/scripts/*.ts"]
+    "include": [
+        "./scripts/**/*.*",
+        "./src/**/*.*",
+        "main.d.ts",
+        "./extension/scripts/*.ts"
+    ]
 }

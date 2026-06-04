@@ -4680,11 +4680,11 @@ interface DeviceOption {
 	seasonTicketRequired?: boolean;
 	subsequentMemoryCost?: number;
 	supportedMapStyles?: string[];
-	wireConfig: {
-		in: {
+	wireConfig?: {
+		in?: {
 			connections: WireConnection[];
 		};
-		out: {
+		out?: {
 			connections: WireConnection[];
 		};
 	};
@@ -6603,7 +6603,7 @@ interface SceneStore {
 	isCursorOverCanvas: boolean;
 }
 interface Team {
-	characters: Map<number, string>;
+	characters: string[];
 	id: string;
 	name: string;
 	score: number;
@@ -7691,6 +7691,604 @@ interface ModalBaseMethods {
 type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
 type AntdMessage = MessageMethods & MessageBaseMethods;
 type AntdModal = React$1.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
+type HexColor = `#${string}`;
+interface Theme {
+	background: HexColor;
+	text?: string;
+}
+interface ShopTheme {
+	cost: number;
+	description: string;
+	name: string;
+	palette: Theme[];
+	question: Theme;
+}
+interface ActiveThemeResponse {
+	continue: Theme;
+	correctAnswer: Theme;
+	incorrectAnswer: Theme;
+	shop: Theme;
+}
+interface ActiveTheme {
+	defaultBackground: HexColor;
+	desktopBreakpoint: number;
+	palette: Theme[];
+	question: Theme;
+	response: ActiveThemeResponse;
+}
+interface ThemeStore {
+	availableThemes: ShopTheme[];
+	disabledThemes: string[];
+	ownedThemes: string[];
+	theme: ActiveTheme;
+	themeName: string;
+}
+interface Round {
+	amount: number;
+	metadata: number;
+	type: "correct" | "speed" | "firstGuess" | "goodDrawer";
+}
+interface Me {
+	answeredCorrectly: boolean;
+	lastRound: null | Round[];
+	role: "Guesser" | "Drawer";
+}
+interface Drawer {
+	id: string;
+	name: string;
+}
+interface TermOption {
+	id: string;
+	term: string;
+}
+interface Round {
+	drawer: Drawer;
+	drawingBase64: string;
+	revealText: string;
+	secondsLeft: number;
+	term: string;
+	termOptions: TermOption[];
+}
+interface FeedItem {
+	action: string;
+	actionColor: HexColor;
+	important: boolean;
+}
+interface Line {
+	color: string;
+	width: number;
+	xEnd: number;
+	xStart: number;
+	yEnd: number;
+	yStart: number;
+}
+interface PersonCount {
+	correct: number;
+	total: number;
+}
+interface Drawing {
+	image: string;
+	index: number;
+	name: string;
+	term: string;
+}
+interface PointAddition {
+	amount: number;
+	id: string;
+	name: string;
+}
+interface BaseDraw {
+	latestFeedItem: FeedItem | null;
+	latestLine: Line | null;
+	round: Round;
+	status: "pickDrawer" | "results" | "termSelection" | "drawing";
+}
+interface HostDraw extends BaseDraw {
+	drawingHistory: Drawing[];
+	drawingsModalOpen: boolean;
+	everybodyGotLastRoundCorrect: boolean;
+	personCount: PersonCount | null;
+	pointAdditions: PointAddition[];
+	showingFeed: boolean;
+}
+interface GuestDraw extends BaseDraw {
+	me: Me;
+	shouldClearCanvas: boolean;
+}
+interface Lava {
+	buildHeight: number;
+	buildPieces: number;
+	buildsInProgress: number;
+	lavaHeight: number;
+	lavaIncreasePaused: boolean;
+	lavaIncreaseSpeed: number;
+	secondsLasted: number;
+}
+interface DefendingHomebase {
+	backgroundColor: HexColor;
+	health: number;
+	healthDecreasePerTick: number;
+	healthRegenPerTick: number;
+	icon: string;
+	id: string;
+	linkedWith: string;
+	maxHealth: number;
+	name: string;
+}
+interface BaseEntities {
+	lava: Lava | null;
+}
+interface HostEntities extends BaseEntities {
+	defendingHomebase: DefendingHomebase[] | null;
+}
+interface GuestEntities extends BaseEntities {
+	defendingHomebase: DefendingHomebase | null;
+}
+interface Goal {
+	type: string;
+	value: number;
+}
+type Currency = "$" | "\u20AC" | "\u00A5" | "\u00A3" | "X\u0336" | "\u20A9";
+interface GameOptions {
+	allowGoogleTranslate: boolean;
+	clapping: boolean;
+	cleanPowerupsOnly: boolean;
+	currency: Currency;
+	enablePowerupRNGAnimation: boolean;
+	goal: Goal;
+	group: string;
+	handicap: number;
+	language: string;
+	modeOptions: any;
+	music: boolean;
+	powerups: boolean;
+	specialGameType: string[];
+	startingCash: number;
+	themes: boolean;
+	type: string;
+}
+interface BaseGameOptionsStore extends GameOptions {
+	formattedGameOptions: GameOptions;
+}
+interface HostGameOptions extends BaseGameOptionsStore {
+	setGameOptionsFromStorage: (gameOptions: GameOptions, defaultValues: boolean) => void;
+}
+interface GuestGameOptions extends BaseGameOptionsStore {
+	setGameOptions: (gameOptions: GameOptions) => void;
+}
+interface Player {
+	activePowerups: string[];
+	balance: number;
+	id: string;
+	name: string;
+	theme: string;
+	/** Only in the "What Is..." gamemode */
+	power?: string;
+}
+interface Team {
+	activePowerups: string[];
+	balance: number;
+	color: Theme;
+	icon: string | undefined;
+	id: string;
+	players: string[];
+}
+interface Players {
+	finalResults: Player[];
+	players: Player[];
+	teams: Team[];
+	filteredPlayers: Player[];
+	totalBalance: number;
+	totalStones: number;
+}
+interface NonDismissMessage {
+	buttonText: string;
+	link: string;
+	message: string;
+	title: string;
+}
+interface NewsItem {
+	tag: string;
+	header: string;
+	image: string;
+	description: string;
+}
+interface SimplePlayer {
+	id: string;
+	name: string;
+}
+interface ThanosValues {
+	saved: SimplePlayer[];
+	showAt: number;
+	snapped: SimplePlayer[];
+	winner: SimplePlayer;
+}
+interface ActivityItem {
+	action: string;
+	customTextColor: HexColor;
+	key: string;
+	name: string;
+}
+interface LinkedPlayer extends SimplePlayer {
+	linked: string;
+}
+interface DefendingHomebaseResults {
+	loser: LinkedPlayer;
+	winner: LinkedPlayer;
+	winnerPlayerNames: string[];
+}
+type GameStatus = "results" | "teams" | "gameplay";
+interface BaseGameValues {
+	gameCode: string | null;
+	thanosValues: ThanosValues | null;
+}
+interface HostGameValues extends BaseGameValues {
+	activityItems: ActivityItem[];
+	availableThemes: ShopTheme[];
+	bossId: string | null;
+	clapCount: number;
+	currentRoute: string;
+	defendingHomebaseResults: null | DefendingHomebaseResults;
+	gameEndDate: number;
+	reportId: string;
+	roomIntentErrorMessage: string;
+	showBossBattleModal: boolean;
+}
+interface GuestGameValues extends BaseGameValues {
+	connected: boolean;
+	connectionError: boolean;
+	gameStatus: GameStatus;
+	news: NewsItem[];
+	nonDismissMessage: NonDismissMessage;
+	players: Player[];
+	teams: Theme[];
+}
+interface ShopItem {
+	background: HexColor;
+	cost: number;
+	description: string;
+	icon: string;
+	id: string;
+	name: string;
+}
+type Role = "imposter" | "detective";
+interface ImposterMe {
+	blendingIn: boolean;
+	canNeverBeClear: boolean;
+	currentVote: string;
+	id: string;
+	markedAsClear: boolean;
+	name: string;
+	notes: string;
+	role: Role;
+	votedOff: boolean;
+}
+interface MeetingResult {
+	name: string;
+	wasImposter: boolean;
+}
+interface Person {
+	canNeverBeClear: boolean;
+	id: string;
+	markedAsClear: boolean;
+	name: string;
+	role: Role;
+	votedOff: boolean;
+}
+type Status = "intro" | "questions" | "discussion" | "voting" | "votingResult";
+interface BaseImposter {
+	impostersLeft: number;
+	investigationsLeft: number;
+	meetingsLeft: number;
+	status: Status;
+}
+interface HostImposter extends BaseImposter {
+	meetingResults: MeetingResult | null;
+	people: Person[];
+	votes: number;
+}
+interface GuestImposter extends BaseImposter {
+	currentShopItem: string | null;
+	currentShopItemModalVisible: boolean;
+	epl: string | null;
+	me: ImposterMe | null;
+	noteDrawerOpen: boolean;
+	roleModalOpen: boolean;
+	shopItems: ShopItem[];
+}
+interface AttackModal {
+	open: boolean;
+	powerup: string;
+}
+type CurrentShopTab = "defendingHomebase" | "upgrades" | "powerups" | "themes" | "powerupsNonMusic" | "powerupsMusic" | "lava";
+interface NavigationStore {
+	attackModal: AttackModal;
+	canChangeRoute: boolean;
+	currentRoute: string;
+	currentShopTab: CurrentShopTab;
+	drawerOpen: boolean;
+	leaderboardDrawerOpen: boolean;
+	powerupRNGAnimationDone: boolean;
+	settingsOpen: boolean;
+	visitedPowerupSection: boolean;
+	changeRoute(route: string): void;
+}
+interface Answer {
+	correct: boolean;
+	text: string;
+	_id: string;
+}
+interface Question {
+	answers: Answer[];
+	game: string;
+	image: string;
+	isActive: boolean;
+	position: number;
+	source: string;
+	text: string;
+	type: string;
+	__v: number;
+	_id: string;
+}
+interface Questions {
+	canAnswerQuestion: boolean;
+	ceq: string;
+	currentQuestionIndex: number;
+	currentQuestionLoaded: boolean;
+	eqt: string;
+	lastQuestion: string;
+	lastQuestionAnsweredTimestamp: number;
+	lockedViewingCorrectAnswer: boolean;
+	/** A list of the IDs of all the questions. */
+	questionList: string[];
+	questionsAnsweredCorrectly: number;
+	questionsAnsweredIncorrectly: number;
+	transitioningToNextQuestion: boolean;
+	nextQuestion: () => void;
+	questionAnswered: (lastQuestionCorrect: string, lastQuestion: string) => void;
+	setCurrentQuestion: (index: number) => void;
+	setQuestions: (questions: Question[]) => void;
+}
+interface Power {
+	background: HexColor;
+	description: string;
+	id: string;
+	image: string;
+	name: string;
+}
+interface Item {
+	amount: number;
+	id: string;
+	questionId: string;
+}
+interface Category {
+	name: string;
+	items: Item[];
+}
+interface Board {
+	categories: Category[];
+}
+interface RoundValue {
+	category: string;
+	id: string;
+}
+interface NormalRound {
+	type: "Normal";
+	value: RoundValue;
+}
+interface FinaleRound {
+	type: "Finale";
+	value: undefined;
+}
+type Round$1 = NormalRound | FinaleRound;
+type QuestionScreen = "preview" | "finale" | "question";
+type QuestionStatus = "preview" | "ask" | "timesUp";
+type Screen$1 = "home" | "question" | "question" | "answer";
+interface BasePardy {
+	powers: Power[];
+	questionScreen: QuestionScreen;
+	questionStatus: QuestionStatus;
+	screen: Screen$1;
+}
+interface HostPardy extends BasePardy {
+	betsPlaced: number;
+	board: Board | null;
+	currentRound: Round$1 | null;
+	disabledSections: string[];
+	finaleQuestionId: string;
+	nameOfFirstPlayerToAnswerCorrectly: string;
+	playerCount: number;
+	playersAnswered: number;
+	playersAnsweredCorrectly: number;
+}
+interface GuestPardy extends BasePardy {
+	animatingBetScreenOut: boolean;
+	animatingQuestionScreenOut: boolean;
+	answerLockedInWittyMessages: string[];
+	answerResponseItems: string[];
+	answered: boolean;
+	answeredCorrectly: boolean;
+	correctWittyMessages: string[];
+	currentBet: number;
+	currentQuestion: Question | null;
+	incorrectWittyMessages: string[];
+	maxBet: number;
+	power: string;
+	powerOptions: string[];
+	tips: string[];
+}
+interface Powerup {
+	baseCost: number;
+	color: HexColor;
+	description: string;
+	disabled: string[];
+	displayName: string;
+	icon: string;
+	name: string;
+	percentageCost: number;
+}
+interface ScreenAttack {
+	attackerName: string;
+	fullScreen: boolean;
+	powerupName: string;
+}
+interface HostPowerups {
+	specialSongIsPlaying: boolean;
+}
+interface GuestPowerups {
+	availablePowerups: Powerup[];
+	disabledPowerups: Powerup[];
+	hasShownHelperModal: boolean;
+	linkPartnerName: string;
+	personalActivePowerups: Powerup[];
+	purchasedPowerups: Powerup[];
+	screenAttack: ScreenAttack;
+	teamActivePowerups: Powerup[];
+	teamAppliedPowerups: Powerup[];
+	usedPowerups: Powerup[];
+	activePowerups: Powerup[];
+	appliedPowerups: Powerup[];
+}
+interface SuccessModalInfo {
+	background: string;
+	color: string;
+	description: string;
+	icon: string;
+	sound?: string;
+	textOptions?: Untyped;
+	title: string;
+}
+interface GuestUI {
+	blurredScreen: boolean;
+	fullBlackScreen: boolean;
+	showingSuccessModal: boolean;
+	snowing: boolean;
+	successModalInfo: SuccessModalInfo[];
+}
+interface HostUI {
+	backgroundColor: HexColor;
+	showingBossPreScreen: boolean;
+	showingClassTip: boolean;
+	showingHumansVsZombiesPreScreen: boolean;
+	showingLavaPreScreen: boolean;
+	snowing: boolean;
+}
+interface Level {
+	price: number;
+	value: number;
+}
+interface Upgrade {
+	description: string;
+	icon: string;
+	levels: Level[];
+	name: string;
+}
+interface LavaUpgrade {
+	background: HexColor;
+	description: string;
+	icon: string;
+	id: string;
+	name: string;
+	price: number;
+}
+interface HomebaseUpgrade {
+	background: HexColor;
+	baseCost: number;
+	description: string;
+	icon: string;
+	id: string;
+	name: string;
+}
+interface UpgradeLevels {
+	insurance: number;
+	moneyPerQuestion: number;
+	multiplier: number;
+	streakBonus: number;
+}
+interface Upgrades {
+	currentlySelectedUpgrade: string;
+	homebaseUpgades: HomebaseUpgrade[];
+	lavaUpgrades: LavaUpgrade[];
+	upgradeLevelTabs: UpgradeLevels;
+	upgradeLevels: UpgradeLevels;
+	upgradePricingDiscount: number;
+	upgrades: Upgrade[];
+}
+interface TeamMeta {
+	isBoss?: boolean;
+}
+interface Team$1 {
+	color: Theme;
+	icon?: string;
+	id: string;
+	meta: TeamMeta;
+}
+interface User {
+	groupId: string;
+	groupMemberId: string;
+	name: string;
+	place: number;
+	readToMeEnabled: boolean;
+	team: Team$1 | null;
+	theme: string;
+}
+interface Balance {
+	balance: number;
+	balanceChangeIfCorrect: number;
+	balanceChangeIfIncorrect: number;
+	customColor: string;
+	incomeMultiplier: number;
+	maxBalance: number;
+	streakAmount: number;
+}
+interface Kit {
+	questions: Question[];
+}
+interface Metadata$1 {
+	currentGameIsUsingGroups: boolean;
+	hasReceivedHostStaticState: boolean;
+}
+interface Stats {
+	playerStats: Untyped[];
+}
+interface BaseClassicStores {
+	events: Record<string, Untyped>;
+	engine: Untyped;
+}
+interface HostClassicStores extends BaseClassicStores {
+	draw: HostDraw;
+	entities: HostEntities;
+	gameOptions: HostGameOptions;
+	gameValues: HostGameValues;
+	imposter: HostImposter;
+	kit: Kit;
+	metadata: Metadata$1;
+	pardy: HostPardy;
+	players: Players;
+	powerups: HostPowerups;
+	/** Appears to be unused by Gimkit */
+	stats: Stats;
+	translations: Untyped;
+	ui: HostUI;
+}
+interface GuestClassicStores extends BaseClassicStores {
+	balance: Balance;
+	draw: GuestDraw;
+	entities: GuestEntities;
+	gameOptions: GuestGameOptions;
+	gameValues: GuestGameValues;
+	imposter: GuestImposter;
+	navigation: NavigationStore;
+	pardy: GuestPardy;
+	powerups: GuestPowerups;
+	questions: Questions;
+	theme: ThemeStore;
+	translations: Untyped;
+	ui: GuestUI;
+	upgrades: Upgrades;
+	user: User;
+}
+type ClassicStores = HostClassicStores | GuestClassicStores;
 interface Internals {
 	stores: Stores.Stores;
 	notification: AntdNotification;
@@ -8337,6 +8935,22 @@ interface SvelteExport {
 	Store: any;
 	Transition: any;
 }
+interface SvelteComponents {
+	Accordion: any;
+	Dialog: any;
+	AlertDialog: any;
+	DropdownMenu: any;
+	Popover: any;
+	RadioGroup: any;
+	Separator: any;
+	Tabs: any;
+	Tooltip: any;
+	Button: any;
+	Progress: any;
+	Slider: any;
+	Spinner: any;
+	Switch: any;
+}
 class Api {
 	
 	/** Functions to edit Gimkit's code */
@@ -8401,6 +9015,10 @@ class Api {
 	static get stores(): Stores.Stores;
 	/** A variety of gimkit internal objects available in 2d gamemodes */
 	get stores(): Stores.Stores;
+	/** A variety of gimkit internal objects available in 1d gamemodes */
+	static get classicStores(): ClassicStores;
+	/** A variety of gimkit internal objects available in 1d gamemodes */
+	get classicStores(): ClassicStores;
 	/**
 	 * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
 	 * Should never be used by hand.
@@ -8411,6 +9029,10 @@ class Api {
 	 * Should never be used by hand.
 	 */
 	svelte_5_43_0: SvelteExport;
+	/** Useful svelte components which can be used by scripts */
+	static Components: SvelteComponents;
+	/** Useful svelte components which can be used by scripts */
+	Components: SvelteComponents;
 	/**
 	 * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
 	 * @hidden
