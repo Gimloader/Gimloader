@@ -22,6 +22,7 @@ import createSettingsApi from "./settings";
 import Commands from "$core/commands.svelte";
 import { nop } from "$shared/utils";
 import Svelte from "./svelte";
+import * as BitsUI from "bits-ui";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 
 class Api {
@@ -133,6 +134,17 @@ class Api {
      * Should never be used by hand.
      */
     svelte_5_43_0 = Svelte;
+
+    /**
+     * The exports of bits-ui v2.11.0, used internally by Gimloader and exposed to make scripts smaller.
+     * Should never be used by hand.
+     */
+    static bits_ui_2_11_0 = BitsUI;
+    /**
+     * The exports of bits-ui v2.11.0, used internally by Gimloader and exposed to make scripts smaller.
+     * Should never be used by hand.
+     */
+    bits_ui_2_11_0 = BitsUI;
 
     /**
      * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
