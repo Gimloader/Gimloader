@@ -45,6 +45,6 @@ const Components: SvelteComponents = {
     Slider,
     Spinner,
     Switch
-}
+};
 
 export default Components;
