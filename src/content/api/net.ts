@@ -3,8 +3,25 @@ import { validate } from "$content/utils";
 import EventEmitter2 from "eventemitter2";
 import * as z from "zod";
 import type { Schema } from "$types/schema";
+import type { ReceivedMessages, SentMessages } from "$types/net";
 
 const GamemodeSchema = z.union([z.string(), z.array(z.string())]);
+
+type TaggedSentMessages = {
+    [K in keyof SentMessages as `send:${K}`]: SentMessages[K];
+};
+
+type EventData<C extends string> = C extends keyof ReceivedMessages ? ReceivedMessages[C]
+    : C extends keyof TaggedSentMessages ? TaggedSentMessages[C]
+    : any;
+
+type AllEvents = TaggedSentMessages & ReceivedMessages;
+
+type EditFN<T> = (newValue: T | null) => void;
+
+type EventTuple = {
+    [K in keyof AllEvents]: [channel: K, data: AllEvents[K], editFn: EditFN<AllEvents[K]>];
+}[keyof AllEvents];
 
 class BaseNetApi extends EventEmitter2 {
     constructor() {
@@ -49,10 +66,18 @@ class BaseNetApi extends EventEmitter2 {
     }
 
     /** Sends a message to the server on a specific channel */
-    send(channel: string, message?: any) {
+    send<C extends keyof SentMessages>(channel: C, ...args: SentMessages[C] extends undefined ? [] : [data: SentMessages[C]]) {
         validate("net.send", arguments, ["channel", "string"]);
 
-        Net.send(channel, message);
+        Net.send(channel, args[0]);
+    }
+
+    on<C extends string>(channel: C, listener: (data: EventData<C>, editFn: EditFN<EventData<C>>) => void) {
+        return super.on(channel, listener);
+    }
+
+    onAny(listener: (...args: EventTuple) => void) {
+        return super.onAny(listener);
     }
 }
 
