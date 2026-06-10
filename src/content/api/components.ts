@@ -14,20 +14,20 @@ import { Spinner } from "$shared/ui/spinner";
 import { Switch } from "$shared/ui/switch";
 
 export interface SvelteComponents {
-    Accordion: any;
-    Dialog: any;
-    AlertDialog: any;
-    DropdownMenu: any;
-    Popover: any;
-    RadioGroup: any;
-    Separator: any;
-    Tabs: any;
-    Tooltip: any;
-    Button: any;
-    Progress: any;
-    Slider: any;
-    Spinner: any;
-    Switch: any;
+    Accordion: typeof Accordion;
+    Dialog: typeof Dialog;
+    AlertDialog: typeof AlertDialog;
+    DropdownMenu: typeof DropdownMenu;
+    Popover: typeof Popover;
+    RadioGroup: typeof RadioGroup;
+    Separator: typeof Separator;
+    Tabs: typeof Tabs;
+    Tooltip: typeof Tooltip;
+    Button: typeof Button;
+    Progress: typeof Progress;
+    Slider: typeof Slider;
+    Spinner: typeof Spinner;
+    Switch: typeof Switch;
 }
 
 const Components: SvelteComponents = {

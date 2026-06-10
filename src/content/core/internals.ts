@@ -1,7 +1,8 @@
 import Rewriter from "./rewriter";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
 import { clearId, splicer } from "$content/utils";
-import type { ClassicStores } from "$types/classic-stores";
+import type { ClassicStores } from "$types/classicStores";
+import type { Stores } from "$types/stores";
 
 export interface Internals {
     stores: Stores.Stores;
@@ -22,7 +23,7 @@ export default class GimkitInternals {
     static notification: AntdNotification;
     static message: AntdMessage;
     static modal: AntdModal;
-    static classicStores: ClassicStores;
+    static classicStores: ClassicStores.ClassicStores;
     static platformerPhysics: any;
 
     static loadCallbacks: LoadCallback<keyof Internals>[] = [];
@@ -37,7 +38,7 @@ export default class GimkitInternals {
         });
 
         // GL.classicStores
-        Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores) => {
+        Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
             this.classicStores = classicStores;
         });
 

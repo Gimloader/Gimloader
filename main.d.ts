@@ -52,10 +52,3 @@ declare namespace Gimloader {
         [name: string]: any;
     }
 }
-
-// Evil hack to avoid dts-bundle-generator including the stores types in the main bundle
-declare namespace Stores {
-    type Stores = {
-        [I in keyof import("./src/types/stores/stores").Stores]: import("./src/types/stores/stores").Stores[I];
-    }
-};

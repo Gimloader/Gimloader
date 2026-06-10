@@ -1,4 +1,4 @@
-import type { GameSessionPhase, SessionMapStyle, SessionModeType, SessionPhase, SessionVersion } from "./stores/session";
+import type { Stores } from "./stores";
 import type { Untyped } from "./util";
 
 export namespace Schema {
@@ -163,7 +163,7 @@ export namespace Schema {
          *
          * `results` after the game ends until the game has been started again
          */
-        phase: GameSessionPhase;
+        phase: Stores.GameSessionPhase;
         resultsEnd: number;
     }
 
@@ -176,10 +176,10 @@ export namespace Schema {
         globalPermissions: ObjectSchema<PermissionsState>;
         loadingPhase: boolean;
         mapCreatorRoleLevel: number;
-        mapStyle: SessionMapStyle;
-        modeType: SessionModeType;
-        phase: SessionPhase;
-        version: SessionVersion;
+        mapStyle: Stores.SessionMapStyle;
+        modeType: Stores.SessionModeType;
+        phase: Stores.SessionPhase;
+        version: Stores.SessionVersion;
     }
 
     export interface DevicesState {

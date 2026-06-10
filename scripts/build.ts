@@ -1,4 +1,4 @@
-import { build, BuildOptions, context, Plugin } from 'esbuild';
+import { build, type BuildOptions, context, type Plugin } from 'esbuild';
 import sveltePlugin from 'esbuild-svelte';
 import postcss from 'postcss';
 import postcssLoadConfig from 'postcss-load-config';

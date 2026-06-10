@@ -15,8 +15,8 @@
             "$content/*": ["./src/content/*"],
             "$bg/*": ["./src/background/*"],
             "$types/*": ["./src/types/*"],
-            "$shared*": ["./src/shared"],
-            "$shared/*": ["./src/shared/*"]
+            "$shared/*": ["./src/shared/*"],
+            "rapier/*": ["./node_modules/@dimforge/rapier2d-compat/*"]
         },
         "verbatimModuleSyntax": true,
         "noEmit": true

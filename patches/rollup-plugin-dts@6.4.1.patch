@@ -1,0 +1,42 @@
+diff --git a/node_modules/rollup-plugin-dts/.bun-tag-89546bbefc3e5ba3 b/.bun-tag-89546bbefc3e5ba3
+new file mode 100755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/COPYING b/COPYING
+old mode 100644
+new mode 100755
+diff --git a/COPYING.LESSER b/COPYING.LESSER
+old mode 100644
+new mode 100755
+diff --git a/README.md b/README.md
+old mode 100644
+new mode 100755
+diff --git a/dist/rollup-plugin-dts.cjs b/dist/rollup-plugin-dts.cjs
+old mode 100644
+new mode 100755
+diff --git a/dist/rollup-plugin-dts.d.cts b/dist/rollup-plugin-dts.d.cts
+old mode 100644
+new mode 100755
+diff --git a/dist/rollup-plugin-dts.d.mts b/dist/rollup-plugin-dts.d.mts
+old mode 100644
+new mode 100755
+diff --git a/dist/rollup-plugin-dts.mjs b/dist/rollup-plugin-dts.mjs
+old mode 100644
+new mode 100755
+index 07248cc53e1c2b181a4d633a2d72a5818da6f2d9..c0f17e4e4e87cff07217c0c32c8540ac6304358c
+--- a/dist/rollup-plugin-dts.mjs
++++ b/dist/rollup-plugin-dts.mjs
+@@ -2815,7 +2815,10 @@ const plugin = (options = {}) => {
+             if (!resolvedModule) {
+                 return;
+             }
+-            if (resolvedModule.isExternalLibraryImport && resolvedModule.packageId && ctx.resolvedOptions.includeExternal.includes(resolvedModule.packageId.name)) {
++            if (
++                (resolvedModule.isExternalLibraryImport && resolvedModule.packageId && ctx.resolvedOptions.includeExternal.includes(resolvedModule.packageId.name)) ||
++                (ctx.resolvedOptions.includeExternal.includes("@dimforge/rapier2d-compat") && resolvedModule.resolvedFileName.includes("@dimforge/rapier2d-compat"))
++            ) {
+                 // include types from specified external modules
+                 return { id: path.resolve(resolvedModule.resolvedFileName) };
+             }
+diff --git a/package.json b/package.json
+old mode 100644
+new mode 100755

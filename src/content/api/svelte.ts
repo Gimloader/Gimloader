@@ -12,17 +12,17 @@ import * as Store from "svelte/store";
 import * as Transition from "svelte/transition";
 
 export interface SvelteExport {
-    Index: any;
+    Index: typeof Index;
     Client: any;
-    Animate: any;
-    Attachments: any;
-    Easing: any;
-    Events: any;
-    Motion: any;
-    WindowReactivity: any;
-    Reactivity: any;
-    Store: any;
-    Transition: any;
+    Animate: typeof Animate;
+    Attachments: typeof Attachments;
+    Easing: typeof Easing;
+    Events: typeof Events;
+    Motion: typeof Motion;
+    WindowReactivity: typeof WindowReactivity;
+    Reactivity: typeof Reactivity;
+    Store: typeof Store;
+    Transition: typeof Transition;
 }
 
 const Svelte: SvelteExport = {
