@@ -27,7 +27,7 @@ export interface SvelteExport {
 
 const Svelte: SvelteExport = {
     Index,
-    Client,
+    Client: {...Client},
     Animate,
     Attachments,
     Easing,

@@ -232,6 +232,15 @@ class Api {
             this.settings = createSettingsApi(scoped.script);
         }
 
+        // Patch append_styles to automatically clean up
+        const styleCleanups = new Map<string, () => void>();
+        this.svelte_5_43_0.Client.append_styles = (_: any, css: any) => {
+            const cleanup = styleCleanups.get(css.hash);
+            if(cleanup) cleanup();
+
+            styleCleanups.set(css.hash, this.UI.addStyles(css.code));
+        };
+
         const netOnAny = (channel: string, ...args: any[]) => {
             this.net.emit(channel, ...args);
         };

@@ -1,3 +1,5 @@
 Fixed name of UI.addStyles in errors
 Fixed the Gimloader menu being placed behind certain Gimkit popups
 Exposed some Svelte components for plugins to use
+Added automatic cleanup for styles created by Svelte in scripts
+Fixed modal backdrops sometimes being behind the wrong modal

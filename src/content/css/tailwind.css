@@ -7,12 +7,9 @@
 @source "../../shared";
 
 @theme {
-    --z-index-modal-bg: 100001;
-    --z-index-modal: 100002;
-    --z-index-alert-bg: 100011;
-    --z-index-alert: 100012;
-    --z-index-overlay-bg: 100021;
-    --z-index-overlay: 100022;
+    --z-index-modal: 100001;
+    --z-index-alert: 100002;
+    --z-index-overlay: 100003;
 }
 
 @layer theme {
