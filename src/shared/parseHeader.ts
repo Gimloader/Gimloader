@@ -23,7 +23,7 @@ export function parseScriptHeaders(code: string): ScriptHeaders {
     return parseHeader<ScriptHeaders>(code, baseHeaders);
 }
 
-export function parseHeader<T>(code: string, headers: T): T {
+export function parseHeader<T extends object>(code: string, headers: T): T {
     // parse the JSDoc header at the start (if it exists)
     const closingIndex = code.indexOf("*/");
     if(!(code.trimStart().startsWith("/**")) || closingIndex === -1) {
@@ -62,16 +62,18 @@ export function parseHeader<T>(code: string, headers: T): T {
         validAtIndexes.push(index);
     }
 
+    const returned = { ...headers } as Record<string, string | null | string[]>;
+
     for(let i = 0; i < validAtIndexes.length; i++) {
         const chunk = text.slice(validAtIndexes[i] + 1, validAtIndexes[i + 1] ?? text.length);
         const spaceIndex = chunk.indexOf(" ");
         const key = chunk.slice(0, spaceIndex !== -1 ? spaceIndex : chunk.length);
         const value = chunk.slice(key.length).trim();
 
-        if(Array.isArray(headers[key])) {
-            headers[key].push(value);
+        if(Array.isArray(returned[key])) {
+            returned[key].push(value);
         } else {
-            headers[key] = value;
+            returned[key] = value;
         }
     }
 

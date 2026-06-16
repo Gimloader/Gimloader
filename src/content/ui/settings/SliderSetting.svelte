@@ -49,7 +49,8 @@
         return val;
     }
 
-    const margin = $derived(4.4 * formatValue(ticks.at(-1)).toString().length + 8);
+    const lastTick = $derived(ticks[ticks.length - 1]);
+    const lastTickWidth = $derived(lastTick ? 4.4 * formatValue(lastTick).toString().length : 0);
 </script>
 
 <svelte:window onpointerup={stopDragging} onpointermove={onPointermove} />
@@ -59,7 +60,7 @@
     class="w-[250px] relative h-1 bg-gray-300 rounded-full mt-3 mr-1 mb-10 font-mono"
     class:dragging={dragging}
     bind:this={track}
-    style:margin-right="{margin}px;">
+    style:margin-right="{lastTickWidth + 8}px;">
     <div
         class="absolute top-1/2 -translate-1/2 size-5 rounded-full bg-primary-400 hover:bg-primary-500 z-20 cursor-ew-resize thumb"
         style:left="{thumbLeft}%"

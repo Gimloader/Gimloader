@@ -9,8 +9,8 @@
 
     let hotkeys = Hotkeys.configurableHotkeys;
 
-    let categories: Record<string, ConfigurableHotkey[]> = $derived.by(() => {
-        let categories = {};
+    let categories = $derived.by(() => {
+        let categories: Record<string, ConfigurableHotkey[]> = {};
         for(let hotkey of hotkeys.values()) {
             if(!categories[hotkey.category]) {
                 categories[hotkey.category] = [];
@@ -40,7 +40,7 @@
     }
 
     function onEscape() {
-        configuring.trigger = null;
+        if(configuring) configuring.trigger = null;
         stopConfigure();
     }
 
@@ -89,7 +89,7 @@
             if(trigger.key.startsWith("Key")) keys.push(trigger.key.slice(3));
             else if(trigger.key.startsWith("Digit")) keys.push(trigger.key.slice(5));
             else keys.push(trigger.key);
-        } else {
+        } else if(trigger.keys) {
             if(trigger.ctrl && !trigger.keys.some(key => key.startsWith("Control"))) keys.push("Ctrl");
             if(trigger.alt && !trigger.keys.some(key => key.startsWith("Alt"))) keys.push("Alt");
             if(trigger.shift && !trigger.keys.some(key => key.startsWith("Shift"))) keys.push("Shift");

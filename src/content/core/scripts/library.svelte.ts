@@ -16,7 +16,7 @@ export class Library extends Script<ScriptInfo> {
     }
 
     // Automatically stop the library when not needed
-    unrequire(by: Script, required: boolean) {
+    override unrequire(by: Script, required: boolean) {
         super.unrequire(by, required);
 
         if(this.requiredBy.length === 0 && this.optionalBy.length === 0) {

@@ -37,7 +37,7 @@ mount(Editor, {
                 automaticLayout: true
             });
 
-            editor.getModel().onDidChangeContent(options.onChange);
+            editor.getModel()?.onDidChangeContent(options.onChange);
 
             return {
                 getValue: () => editor.getValue()

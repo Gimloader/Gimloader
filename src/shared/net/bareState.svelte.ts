@@ -42,7 +42,8 @@ export default new class BareState {
         Port.on("pluginArrange", ({ order }) => {
             const newOrder: PluginInfo[] = [];
             for(const name in order) {
-                newOrder.push(this.plugins.find(p => p.name === name));
+                const plugin = this.plugins.find(p => p.name === name);
+                if(plugin) newOrder.push(plugin);
             }
             this.plugins = newOrder;
         });
@@ -52,7 +53,8 @@ export default new class BareState {
         });
 
         Port.on("pluginToggled", ({ name, enabled }) => {
-            this.plugins.find(p => p.name === name).enabled = enabled;
+            const plugin = this.plugins.find(p => p.name === name);
+            if(plugin) plugin.enabled = enabled;
         });
 
         // sync libraries
@@ -63,7 +65,8 @@ export default new class BareState {
         });
 
         Port.on("libraryEdit", ({ name, code }) => {
-            this.libraries.find(l => l.name === name).code = code;
+            const library = this.libraries.find(l => l.name === name);
+            if(library) library.code = code;
         });
 
         Port.on("libraryDeleteAll", () => this.libraries = []);
@@ -71,13 +74,15 @@ export default new class BareState {
         Port.on("libraryArrange", ({ order }) => {
             const newOrder: LibraryInfo[] = [];
             for(const name in order) {
-                newOrder.push(this.libraries.find(l => l.name === name));
+                const library = this.libraries.find(l => l.name === name);
+                if(library) newOrder.push(library);
             }
             this.libraries = newOrder;
         });
 
         // sync settings
         Port.on("settingUpdate", ({ key, value }) => {
+            // @ts-expect-error probably a better way to do this
             this.settings[key] = value;
         });
     }

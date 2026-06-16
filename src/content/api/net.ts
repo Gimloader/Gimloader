@@ -34,7 +34,8 @@ class BaseNetApi extends EventEmitter2 {
 
     /** Gimkit's internal Colyseus state */
     get state(): Schema.GimkitSchema {
-        if(Net.type !== "Colyseus") return undefined;
+        // We pretend that this is always defined for ease of use
+        if(Net.type !== "Colyseus") return undefined as any;
         return Net.room?.state;
     }
 
@@ -78,7 +79,7 @@ class NetApi extends BaseNetApi {
     constructor() {
         super();
 
-        Net.onAny((channel: string, ...args: any[]) => {
+        Net.onAny((channel: string | string[], ...args: any[]) => {
             this.emit(channel, ...args);
         });
     }

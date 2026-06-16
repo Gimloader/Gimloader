@@ -23,7 +23,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         Port.on("pluginToggled", ({ name, enabled }) => this.onToggled(name, enabled));
     }
 
-    async init(info: PluginInfo[]) {
+    override async init(info: PluginInfo[]) {
         super.init(info);
 
         const toRun = this.scripts.filter(p => p.enabled);
@@ -47,7 +47,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
 
         switch (response.status) {
             case "dependencyError": {
-                const scripts = response.scripts.map(s => this.getScript(s));
+                const scripts = response.scripts.map(s => this.getScript(s)).filter(s => s) as Plugin[];
                 const title = scripts.length > 1 ? "Could not enable some plugins" : `Could not enable ${scripts[0].headers.name}`;
 
                 Modals.open("dependency", {
@@ -64,7 +64,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
                 });
                 return false;
             case "confirm": {
-                const scripts = response.scripts.map(s => this.getScript(s));
+                const scripts = response.scripts.map(s => this.getScript(s)).filter(s => s) as Plugin[];
                 const title = "Dependencies need to be downloaded";
 
                 const confirmed = await Modals.open("dependency", {
@@ -116,7 +116,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         return created;
     }
 
-    onCreate(info: PluginInfo) {
+    override onCreate(info: PluginInfo) {
         const plugin = super.onCreate(info);
         if(info.enabled) plugin.start(false);
 
@@ -172,7 +172,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         return script.exported;
     }
 
-    addCommands() {
+    override addCommands() {
         super.addCommands();
 
         const hasSettings = (p: Plugin) => p.openSettingsMenu.length > 0;

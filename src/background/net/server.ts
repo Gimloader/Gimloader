@@ -18,7 +18,7 @@ interface Message {
     returnId?: string;
 }
 
-type UpdateCallback<Channel extends keyof Messages> = (state: State, message: Messages[Channel]) => true | void | Promise<true | void>;
+type UpdateCallback<Channel extends keyof Messages> = (state: State, message: Messages[Channel]) => boolean | void | Promise<boolean | void>;
 type MessageCallback<Channel extends keyof OnceMessages> = (state: State, message: OnceMessages[Channel], respond: (response?: OnceResponses[Channel]) => void) => void | Promise<void>;
 
 export default new class Server {

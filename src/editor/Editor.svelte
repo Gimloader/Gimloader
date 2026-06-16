@@ -13,7 +13,7 @@
 
     const params = new URLSearchParams(location.search);
     const type = params.get("type") as ScriptType;
-    let name: string | undefined = $state(params.get("name"));
+    let name: string | null = $state(params.get("name"));
 
     let existing = $derived.by(() => {
         if(type === "plugin") return State.plugins.find(p => p.name === name);
@@ -25,7 +25,7 @@
         document.title = `${title} | Gimloader`;
     });
 
-    let editorDiv: HTMLElement = $state();
+    let editorDiv: HTMLElement = $state()!;
     let saved = $state(true);
     let editor: Editor;
 
@@ -74,7 +74,10 @@
         if(!saved && !confirm("You have unsaved changes! Are you sure you want to exit?")) return;
         saved = true;
 
-        chrome.tabs.getCurrent().then((tab) => chrome.tabs.remove(tab.id));
+        chrome.tabs.getCurrent().then((tab) => {
+            if(!tab?.id) return;
+            chrome.tabs.remove(tab.id);
+        });
     }
 
     function onKeydown(e: KeyboardEvent) {

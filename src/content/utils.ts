@@ -39,7 +39,7 @@ export function splicer<T>(array: T[], obj: T) {
     };
 }
 
-export function clearId<T extends { id?: string }>(array: T[], id: string) {
+export function clearId<T extends { id?: string | null }>(array: T[], id: string) {
     for(let i = 0; i < array.length; i++) {
         if(array[i].id === id) {
             array.splice(i, 1);
@@ -82,13 +82,14 @@ export class Deferred<T = void> extends Promise<T> {
         let reject: (reason?: any) => void;
 
         super((res, rej) => {
+            // @ts-expect-error trust me bro
             resolve = res;
             reject = rej;
             callback(res, rej);
         });
 
-        this.resolve = resolve;
-        this.reject = reject;
+        this.resolve = resolve!;
+        this.reject = reject!;
     }
 
     static create<T = void>() {

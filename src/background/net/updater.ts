@@ -12,7 +12,7 @@ export default class Updater {
     static updates: Update[] = [];
 
     static async init() {
-        Server.onMessage("applyUpdates", this.applyUpdates.bind(this));
+        Server.onMessage("applyUpdates", this.onApplyUpdates.bind(this));
         Server.onMessage("updateAll", this.updateAll.bind(this));
         Server.onMessage("updateSingle", this.updateSingle.bind(this));
 
@@ -36,10 +36,10 @@ export default class Updater {
             const state = await statePromise;
             const updaters: (() => Promise<void>)[] = [];
 
-            const checkUpdate = (headers: ScriptHeaders) => {
+            const checkUpdate = (headers: ScriptHeaders, downloadUrl: string) => {
                 return async () => {
                     try {
-                        const response = await Downloader.fetchScript(headers.downloadUrl);
+                        const response = await Downloader.fetchScript(downloadUrl);
                         if(!this.shouldUpdate(headers, response.headers)) return;
 
                         this.updates.push({
@@ -48,7 +48,7 @@ export default class Updater {
                             dependencies: response.dependencies
                         });
                     } catch (e) {
-                        console.error("Error downloading", headers.downloadUrl, e);
+                        console.error("Error downloading", downloadUrl, e);
                     }
                 };
             };
@@ -56,13 +56,13 @@ export default class Updater {
             for(const plugin of state.plugins) {
                 const headers = parseScriptHeaders(plugin.code);
                 if(!headers.downloadUrl) continue;
-                updaters.push(checkUpdate(headers));
+                updaters.push(checkUpdate(headers, headers.downloadUrl));
             }
 
             for(const lib of state.libraries) {
                 const headers = parseScriptHeaders(lib.code);
                 if(!headers.downloadUrl) continue;
-                updaters.push(checkUpdate(headers));
+                updaters.push(checkUpdate(headers, headers.downloadUrl));
             }
 
             let finished = false;
@@ -141,6 +141,7 @@ export default class Updater {
 
     static async updateSingle(_: State, message: OnceMessages["updateSingle"], respond: (updated: OnceResponses["updateSingle"]) => void) {
         const script = Scripts.get(message.name);
+        if(!script) return respond({ updated: false, failed: true });
 
         const headers = parseScriptHeaders(script.info.code);
         if(!headers.downloadUrl) return respond({ updated: false });

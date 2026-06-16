@@ -5,12 +5,12 @@ import Scripts from "$bg/scripts";
 import Server from "$bg/net/server";
 import { englishList } from "$shared/utils";
 
-export default new class LibrariesHandler extends ScriptHandler {
+export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
     constructor() {
         super("library", "libraries");
     }
 
-    init() {
+    override init() {
         super.init();
 
         Server.on("libraryCreate", this.onLibraryCreate.bind(this));

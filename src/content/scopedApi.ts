@@ -14,9 +14,11 @@ interface ScopedInfo {
 export default function setupScoped(type?: string, name?: string): ScopedInfo {
     if(!type || !name) {
         const stack = new Error().stack;
+        if(!stack) throw new Error("new GL() could not get stack trace, please provide type and name explicitly");
 
         // get the uuid of the blob that called this function
-        let match: RegExpExecArray, exec: RegExpExecArray;
+        let match: RegExpExecArray | null = null;
+        let exec: RegExpExecArray | null = null;
         while(exec = scriptRegex.exec(stack)) match = exec;
         if(!match) throw new Error("new GL() needs to be called by a plugin or library");
 

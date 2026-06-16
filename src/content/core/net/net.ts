@@ -7,6 +7,8 @@ import Patcher from "../patcher";
 import Rewriter from "../rewriter";
 import wildcardMatch from "wildcard-match";
 import { gameState } from "$content/stores";
+import type { WithSymbols } from "$types/util";
+import type { Stores } from "$types/stores";
 
 export type ConnectionType = "None" | "Colyseus" | "Blueboat";
 
@@ -260,9 +262,9 @@ export default new class Net extends EventEmitter2 {
     }
 
     waitForColyseusLoad() {
-        const message = Internals.stores.me.nonDismissMessage;
-        const loading = Internals.stores.loading;
-        const me = Internals.stores.me;
+        const message = Internals.stores.me.nonDismissMessage as WithSymbols<Stores.NonDismissMessage>;
+        const loading = Internals.stores.loading as WithSymbols<Stores.Loading>;
+        const me = Internals.stores.me as WithSymbols<Stores.Me>;
 
         const mobxMsg = message[Object.getOwnPropertySymbols(message)[0]];
         const mobxLoading = loading[Object.getOwnPropertySymbols(loading)[0]];
@@ -368,7 +370,7 @@ export default new class Net extends EventEmitter2 {
     pluginOnLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode: string | ReadonlyArray<string> = []) {
         if(typeof gamemode === "string") gamemode = [gamemode];
 
-        if(this.loaded) {
+        if(this.loaded && this.gamemode) {
             callback(this.type, this.gamemode);
             return nop;
         }

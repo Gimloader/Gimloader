@@ -136,7 +136,7 @@
         onfinalize={handleDndFinalize}>
         {#key searchValue}
             {#each items as item (item.id)}
-                {@const plugin = PluginManager.getScript(item.id)}
+                {@const plugin = PluginManager.getScript(item.id)!}
                 <div animate:flip={{ duration: flipDurationMs }}>
                     <Plugin {plugin} {startDrag} {dragDisabled} dragAllowed={searchValue == ""} />
                 </div>

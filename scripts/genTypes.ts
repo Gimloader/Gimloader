@@ -25,7 +25,8 @@ if(!declarationsExist || forceRegenerate) {
 }
 
 const paths = tsconfig.compilerOptions.paths;
-for(const key in paths) {
+for(const keyName in paths) {
+    const key = keyName as keyof typeof paths;
     paths[key] = paths[key].map((path: string) => {
         if(path.startsWith("./node_modules/")) return path;
         return join("./dist/declarations", path)

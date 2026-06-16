@@ -3,12 +3,17 @@
     import * as Select from "$shared/ui/select";
     import Eraser from "svelte-material-icons/Eraser.svelte";
 
-    let { value = $bindable(), setting }: { value: string; setting: DropdownSetting<string> } = $props();
+    interface Props {
+        value: string | undefined;
+        setting: DropdownSetting<string>;
+    }
+
+    let { value = $bindable(), setting }: Props = $props();
 </script>
 
 <div class="flex items-center gap-2">
     {#if setting.allowNone}
-        <button onclick={() => value = null}>
+        <button onclick={() => value = undefined}>
             <Eraser size={24} />
         </button>
     {/if}

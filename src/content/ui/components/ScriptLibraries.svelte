@@ -19,13 +19,13 @@
 
     let { name, needsLib, optionalLib, onClose }: Props = $props();
 
-    interface ILibInfo {
+    interface LibInfo {
         name: string;
         url?: string;
         required: boolean;
     }
 
-    let libsInitial: ILibInfo[] = [];
+    let libsInitial: LibInfo[] = [];
 
     for(let lib of needsLib) {
         let [name, url] = parseDep(lib);
@@ -37,7 +37,7 @@
         libsInitial.push({ name, url, required: false });
     }
 
-    let libsInfo: ILibInfo[] = $state(libsInitial);
+    let libsInfo: LibInfo[] = $state(libsInitial);
 </script>
 
 <Dialog.Root open={true} onOpenChangeComplete={onClose}>
@@ -88,7 +88,7 @@
                                     <Update size={25} />
                                 </button>
                             {:else if libInfo.url}
-                                <button onclick={() => downloadScript(libInfo.url, "library")}>
+                                <button onclick={() => downloadScript(libInfo.url!, "library")}>
                                     <Download size={25} />
                                 </button>
                             {/if}

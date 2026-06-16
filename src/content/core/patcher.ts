@@ -10,7 +10,7 @@ export default class Patcher {
     static patches: Map<object, Map<PropertyKey, { original: any; patches: Patch[] }>> = new Map();
     static unpatchers: Map<string, (() => void)[]> = new Map();
 
-    static applyPatches(object: object, property: PropertyKey) {
+    static applyPatches(object: any, property: PropertyKey) {
         const properties = this.patches.get(object);
         if(!properties) return;
 
@@ -68,7 +68,7 @@ export default class Patcher {
         }
     }
 
-    static addPatch(object: object, property: PropertyKey, patch: Patch) {
+    static addPatch(object: any, property: PropertyKey, patch: Patch) {
         if(!this.patches.has(object)) {
             this.patches.set(object, new Map([[property, { original: object[property], patches: [] }]]));
         }

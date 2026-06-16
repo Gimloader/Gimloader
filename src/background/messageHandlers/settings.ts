@@ -15,6 +15,7 @@ export default new class SettingsHandler extends EventEmitter2 {
     }
 
     onSettingUpdate(state: State, message: StateMessages["settingUpdate"]) {
+        // @ts-expect-error there's probably a better way to do this
         state.settings[message.key] = message.value;
         this.save();
         this.emit(message.key, message.value);

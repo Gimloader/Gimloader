@@ -25,7 +25,7 @@ export default class Downloader {
             const result = await this.download(message.url, 0, message.type);
             this.fetchCache.clear();
 
-            if(result.errors.length > 0) {
+            if(result.errors.length > 0 || !result.name) {
                 const message = `Download failed: ${result.errors.join("\n")}`;
                 respond({ status: "downloadError", message });
                 return;
@@ -57,7 +57,7 @@ export default class Downloader {
         // Actually download it
         const result = await this.download(message.url, 0, message.type);
         this.fetchCache.clear();
-        if(result.errors.length > 0) {
+        if(result.errors.length > 0 || !result.name) {
             const message = `Download failed: ${result.errors.join("\n")}`;
             respond({ status: "downloadError", message });
             return;
@@ -142,7 +142,7 @@ export default class Downloader {
         const errors: string[] = [];
 
         for(const dep of dependencies) {
-            if(Scripts.has(dep.name)) continue;
+            if(Scripts.has(dep.name) || !dep.url) continue;
             const downloadRes = await this.download(dep.url, 0);
             errors.push(...downloadRes.errors);
         }

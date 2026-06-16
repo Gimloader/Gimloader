@@ -1,4 +1,5 @@
 import type { HotkeyTrigger } from "../api/hotkeys";
+import type { UpdateResponse } from "./downloads";
 import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, SavedState, State } from "./state";
 
 export type ScriptType = "plugin" | "library";
@@ -8,7 +9,7 @@ export type ScriptArrange = { order: string[] };
 
 // These go both ways
 export interface StateMessages {
-    hotkeyUpdate: { id: string; trigger: HotkeyTrigger };
+    hotkeyUpdate: { id: string; trigger: HotkeyTrigger | null };
     hotkeysUpdate: { hotkeys: ConfigurableHotkeysState };
 
     libraryDelete: ScriptDelete;
@@ -37,7 +38,7 @@ export interface StateMessages {
 export interface Messages extends StateMessages {
     pluginEdit: ScriptEdit;
     libraryEdit: ScriptEdit;
-    setState: SavedState;
+    setState: State;
     toast: { type: "success" | "error" | "warning" | "normal"; message: string };
     availableUpdates: string[];
 }
@@ -47,6 +48,7 @@ export interface ScriptTryDelete {
     confirmed?: boolean;
 }
 
+// These go from content to background and generally expect a response
 export interface OnceMessages {
     getState: void;
     setState: SavedState;
@@ -60,7 +62,7 @@ export interface OnceMessages {
     tryTogglePlugin: { name: string; enabled: boolean; confirmed?: boolean };
     trySetAllPlugins: { enabled: boolean; confirmed?: boolean };
     downloadScript: { url: string; confirmed?: boolean; type?: ScriptType };
-    editOrCreate: { code: string; name?: string; updated?: boolean };
+    editOrCreate: { code: string; name: string | null; updated?: boolean };
 }
 
 interface Success {
@@ -104,7 +106,7 @@ export interface OnceResponses {
     setState: void;
     applyUpdates: void;
     updateAll: string[];
-    updateSingle: { updated: boolean; failed?: boolean; version?: string };
+    updateSingle: UpdateResponse;
     showEditor: void;
     pluginTryDelete: DeleteResult;
     libraryTryDelete: DeleteResult;

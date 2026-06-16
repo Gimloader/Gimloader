@@ -79,6 +79,14 @@ export default class Rewriter {
         await domLoaded;
         const index = document.querySelector<HTMLScriptElement>('script[type="module"][src^="/assets/index"]');
 
+        if(!index) {
+            const text = `Critical error loading Gimkit.\n\n`
+                + "This error is likely caused by Gimloader itself. Please try reloading the page. "
+                + "If this issue persists open an issue at https://github.com/Gimloader/Gimloader.";
+            Modals.open("error", { text, title: "Error loading Gimkit" });
+            return;
+        }
+
         // Invalidate the database if the index script has changed
         const name = this.getName(index.src);
         if(name !== localStorage.getItem("gl-lastindex")) {
@@ -95,7 +103,7 @@ export default class Rewriter {
     }
 
     static getName(src: string) {
-        return src.split("/").pop();
+        return src.split("/").pop()!;
     }
 
     static invalidate(broadcast = false) {
@@ -112,7 +120,7 @@ export default class Rewriter {
         if(existing) return existing;
 
         const promise = new Promise<string>(async (res) => {
-            let parsed: ParsedJs;
+            let parsed: ParsedJs | undefined;
             if(!this.cleared && !skipPluginHooks) parsed = await get(name);
 
             if(!parsed) {
@@ -153,7 +161,7 @@ export default class Rewriter {
 
             // Create an error message that lists plugins that might be causing the issue
             let usedHooks = this.getParseHooks(name, root, false)
-                .map(hook => hook.id).filter(name => name);
+                .map(hook => hook.id).filter(name => name) as string[];
             usedHooks = [...new Set(usedHooks)];
 
             // If no hooks were used, just give up
@@ -270,7 +278,7 @@ export default class Rewriter {
         }
     }
 
-    static addParseHook(pluginName: string | null, prefix: Prefix, modifier: (code: string) => string) {
+    static addParseHook(pluginName: string | null, prefix: Prefix, modifier: (code: string) => string | undefined) {
         const object: ParseHook = { prefix, callback: modifier };
         if(pluginName) object.id = pluginName;
 
@@ -348,7 +356,7 @@ export default class Rewriter {
         });
 
         return () => {
-            this.removeSharedById(pluginName, id);
+            if(pluginName) this.removeSharedById(pluginName, id);
             cancel();
         };
     }

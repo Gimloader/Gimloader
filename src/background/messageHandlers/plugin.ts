@@ -7,12 +7,12 @@ import { englishList } from "$shared/utils";
 import Downloader from "$bg/net/downloader";
 import type { Dependency } from "$types/net/downloads";
 
-export default new class PluginsHandler extends ScriptHandler {
+export default new class PluginsHandler extends ScriptHandler<"plugins"> {
     constructor() {
         super("plugin", "plugins");
     }
 
-    init() {
+    override init() {
         super.init();
 
         Server.on("pluginCreate", this.onPluginCreate.bind(this));
@@ -40,6 +40,8 @@ export default new class PluginsHandler extends ScriptHandler {
 
     onPluginToggled(state: State, message: StateMessages["pluginToggled"]) {
         const toggle = state.plugins.find(p => p.name === message.name);
+        if(!toggle) return;
+
         toggle.enabled = message.enabled;
 
         Server.executeAndSend("cacheInvalid", { invalid: true });
@@ -55,7 +57,7 @@ export default new class PluginsHandler extends ScriptHandler {
         this.save();
     }
 
-    async onScriptEdit(state: State, message: ScriptEdit) {
+    override async onScriptEdit(state: State, message: ScriptEdit) {
         super.onScriptEdit(state, message);
 
         // Disable the plugin if it doesn't work anymore

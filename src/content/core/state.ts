@@ -50,10 +50,10 @@ export default class StateManager {
     }
 
     static async downloadState() {
-        const state = await Port.sendAndRecieve("getState");
-        delete state.availableUpdates;
+        const state = await Port.sendAndRecieve("getState", undefined);
+        const { availableUpdates, ...savedState } = state;
 
-        const blob = new Blob([JSON.stringify(state, null, 4)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(savedState, null, 4)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.download = "gimloader_config.json";

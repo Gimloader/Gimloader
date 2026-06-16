@@ -36,27 +36,7 @@ export default new class Commands {
     context: CommandContext;
     open = $state(false);
 
-    init() {
-        const chromeDefault = {
-            key: "KeyP",
-            ctrl: true,
-            shift: true,
-            alt: false
-        };
-        const firefoxDefault = {
-            key: "KeyP",
-            ctrl: false,
-            shift: true,
-            alt: true
-        };
-
-        Hotkeys.addConfigurableHotkey("openCommandPalette", {
-            category: "Gimloader",
-            title: "Open Command Palette",
-            preventDefault: true,
-            default: isFirefox ? firefoxDefault : chromeDefault
-        }, () => this.startOpen());
-
+    constructor() {
         const createAction = <T extends CommandAction, R>(type: T["type"], options: T["options"]) => {
             this.startOpen();
 
@@ -89,6 +69,28 @@ export default new class Commands {
                 return createAction("string", options);
             }
         };
+    }
+
+    init() {
+        const chromeDefault = {
+            key: "KeyP",
+            ctrl: true,
+            shift: true,
+            alt: false
+        };
+        const firefoxDefault = {
+            key: "KeyP",
+            ctrl: false,
+            shift: true,
+            alt: true
+        };
+
+        Hotkeys.addConfigurableHotkey("openCommandPalette", {
+            category: "Gimloader",
+            title: "Open Command Palette",
+            preventDefault: true,
+            default: isFirefox ? firefoxDefault : chromeDefault
+        }, () => this.startOpen());
     }
 
     closeTimeout?: ReturnType<typeof setTimeout>;

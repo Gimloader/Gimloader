@@ -54,7 +54,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         // check if any scripts were updated
         for(const info of scriptInfo) {
             const existing = this.getScript(info.name);
-            if(existing.code !== info.code) {
+            if(existing && existing.code !== info.code) {
                 this.onEdit(info.name, info.code);
             }
         }
@@ -108,7 +108,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
             scripts.set(headers.name, script);
         }
 
-        if(updated && headers.changelog.length > 0) {
+        if(updated && headers.version && headers.changelog.length > 0) {
             addUpdated(headers.name, headers.version, headers.changelog);
         }
 
@@ -133,7 +133,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         const deleted = this.scripts.length;
 
         this.onDeleteAll();
-        Port.send(`${this.type}DeleteAll`);
+        Port.send(`${this.type}DeleteAll`, undefined);
         if(shouldToast) toast.success(`Deleted ${deleted} ${deleted === 1 ? this.singular : this.plural}`);
     }
 
@@ -181,7 +181,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         toast.warning(`Overwrote ${this.singular} ${name}`);
     }
 
-    async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T> {
+    async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T | null> {
         const scripts = filter ? this.scripts.filter(filter) : this.scripts;
 
         const name = await context.select({
@@ -200,7 +200,7 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
             hidden: () => this.scripts.length === 0
         }, async (context) => {
             const script = await this.selectScript(context, `Select ${this.singular} to delete`);
-            script.deleteConfirm();
+            script?.deleteConfirm();
         });
     }
 }

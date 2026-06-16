@@ -20,7 +20,7 @@ interface ModalProps {
     };
     singleChangelog: {
         name: string;
-        version: string;
+        version: string | null;
         changes: string[];
     };
 }
@@ -28,14 +28,20 @@ interface ModalProps {
 export default new class Modals {
     components = new Map<keyof ModalProps, Component>();
 
-    register<T extends keyof ModalProps>(type: T, component: Component) {
+    register<T extends keyof ModalProps>(type: T, component: Component<any>) {
         this.components.set(type, component);
     }
 
     async open<T extends keyof ModalProps>(type: T, props: ModalProps[T]) {
         await domLoaded;
+
+        const component = this.components.get(type);
+        if(!component) {
+            console.error(`No modal component registered for type "${type}"`);
+            return;
+        }
+
         return new Promise<boolean>((res) => {
-            const component = this.components.get(type);
             const instance = mount(component, {
                 target: document.body,
                 props: {

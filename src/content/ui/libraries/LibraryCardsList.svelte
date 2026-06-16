@@ -101,7 +101,7 @@
         onfinalize={handleDndFinalize}>
         {#key searchValue}
             {#each items as item (item.id)}
-                {@const library = LibManager.getScript(item.id)}
+                {@const library = LibManager.getScript(item.id)!}
                 <div animate:flip={{ duration: flipDurationMs }}>
                     <Library {library} {startDrag} {dragDisabled} dragAllowed={searchValue == ""} />
                 </div>

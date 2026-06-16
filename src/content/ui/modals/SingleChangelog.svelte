@@ -3,7 +3,7 @@
 
     interface Props {
         name: string;
-        version: string;
+        version: string | null;
         changes: string[];
     }
     const { name, version, changes }: Props = $props();
@@ -12,7 +12,7 @@
 <Dialog.Root open={true}>
     <Dialog.Content class="flex flex-col gap-2 text-gray-600" style="max-width: min(760px, calc(100% - 32px))">
         <Dialog.Header class="text-2xl font-bold! border-b-2">
-            {name} v{version} Changes
+            {version ? `${name} v${version}` : name} Changes
         </Dialog.Header>
         <ul class="list-disc pl-6 mb-0!">
             {#each changes as change}

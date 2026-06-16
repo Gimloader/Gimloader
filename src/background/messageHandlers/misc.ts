@@ -48,7 +48,7 @@ export default class MiscHandler {
         const type: ScriptType = headers.isLibrary !== "false" ? "library" : "plugin";
 
         if(message.name && Scripts.has(message.name)) {
-            const old = Scripts.get(message.name);
+            const old = Scripts.get(message.name)!;
 
             // Delete and recreate the script if it changed types
             if(type !== old.type) {

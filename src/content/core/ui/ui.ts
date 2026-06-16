@@ -95,8 +95,11 @@ export default class UI {
         const root = document.getElementById("root");
         if(!root) return;
 
-        const child = root.firstChild;
+        const child = root.firstChild as any;
+        if(!child) return;
+
         const key = Object.keys(child).find(k => k.startsWith("__reactFiber$"));
+        if(!key) return;
 
         let current = child[key];
         while(current?.return) {

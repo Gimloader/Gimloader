@@ -40,7 +40,7 @@
         e.preventDefault();
         modalDragCounter = 0;
 
-        let file = e.dataTransfer.files[0];
+        let file = e.dataTransfer?.files[0];
         if(!file) return;
 
         if(file.type !== "text/javascript") {

@@ -15,5 +15,5 @@ export interface Update {
 export interface UpdateResponse {
     updated: boolean;
     failed?: boolean;
-    version?: string;
+    version?: string | null;
 }

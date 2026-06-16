@@ -13,14 +13,14 @@
 
     async function checkAll() {
         if(!confirm("Do you want to try to update all plugins and all libraries?")) return;
-        let names: string[] = await Port.sendAndRecieve("updateAll");
+        let names: string[] = await Port.sendAndRecieve("updateAll", undefined);
 
         if(names.length === 0) return toast.success("All scripts are up to date!");
         toast.success(`Updated ${englishList(names)}`);
     }
 </script>
 
-{#snippet update(name: string, changes: string[], version?: string)}
+{#snippet update(name: string, changes: string[], version: string | null)}
     <div class="flex gap-1">
         {name}{version && ` v${version}`}
         {#if changes.length > 0}

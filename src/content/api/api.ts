@@ -215,8 +215,9 @@ class Api {
         const scoped = setupScoped(type, name);
         this.#id = scoped.id;
 
+        // For type convenience we pretend this always exists
+        this.openSettingsMenu = scoped.openSettingsMenu!;
         this.onStop = scoped.onStop;
-        this.openSettingsMenu = scoped.openSettingsMenu;
 
         this.rewriter = Object.freeze(new ScopedRewriterApi(scoped.id));
         this.parcel = Object.freeze(new ScopedParcelApi());
@@ -241,7 +242,7 @@ class Api {
             styleCleanups.set(css.hash, this.UI.addStyles(css.code));
         };
 
-        const netOnAny = (channel: string, ...args: any[]) => {
+        const netOnAny = (channel: string | string[], ...args: any[]) => {
             this.net.emit(channel, ...args);
         };
 
@@ -271,7 +272,7 @@ class Api {
     }
 
     /** A utility for creating persistent settings menus, only available to plugins */
-    settings: PluginSettings;
+    settings!: PluginSettings;
 
     /** Run a callback when the script is disabled */
     onStop: (callback: () => void) => void;

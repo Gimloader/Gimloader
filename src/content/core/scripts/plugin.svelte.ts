@@ -9,7 +9,7 @@ import Modals from "../modals.svelte";
 export class Plugin extends Script<PluginInfo> {
     type: ScriptType = "plugin";
     warnAbout = true;
-    enabled: boolean = $state();
+    enabled: boolean = $state(false);
     openSettingsMenu: (() => void)[] = $state([]);
     settingsDescription?: PluginSettingsDescription;
 
@@ -36,7 +36,7 @@ export class Plugin extends Script<PluginInfo> {
         Port.send("pluginToggled", { name: this.headers.name, enabled });
     }
 
-    edit(code: string, headers?: ScriptHeaders) {
+    override edit(code: string, headers?: ScriptHeaders) {
         super.edit(code, headers);
         if(this.started) this.stop();
         if(this.enabled) {
@@ -49,12 +49,12 @@ export class Plugin extends Script<PluginInfo> {
         }
     }
 
-    stop() {
+    override stop() {
         super.stop();
         this.openSettingsMenu = [];
     }
 
-    onImport(exports: any) {
+    override onImport(exports: any) {
         if(exports.openSettingsMenu && typeof exports.openSettingsMenu === "function") {
             this.openSettingsMenu.push(exports.openSettingsMenu);
         }
@@ -85,7 +85,7 @@ export class Plugin extends Script<PluginInfo> {
         }
     }
 
-    async enableConfirm(downloadConfirmed = false) {
+    async enableConfirm(downloadConfirmed = false): Promise<boolean> {
         const response = await Port.sendAndRecieve("tryTogglePlugin", {
             name: this.headers.name,
             enabled: true,

@@ -5,11 +5,13 @@ import { saveDebounced } from "$bg/state";
 import Scripts from "$bg/scripts";
 import { englishList } from "$shared/utils";
 
-export default abstract class ScriptHandler {
-    type: ScriptType;
-    key: "plugins" | "libraries";
+type ScriptKey = "plugins" | "libraries";
 
-    constructor(type: ScriptType, key: "plugins" | "libraries") {
+export default abstract class ScriptHandler<K extends ScriptKey> {
+    type: ScriptType;
+    key: K;
+
+    constructor(type: ScriptType, key: K) {
         this.type = type;
         this.key = key;
     }
@@ -69,9 +71,9 @@ export default abstract class ScriptHandler {
         const newScripts = [];
         for(const name of message.order) {
             const script = state[this.key].find((s) => s.name === name);
-            newScripts.push(script);
+            if(script) newScripts.push(script);
         }
-        state[this.key] = newScripts;
+        state[this.key] = newScripts as State[K];
         this.save();
     }
 

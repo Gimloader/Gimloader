@@ -17,7 +17,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     abstract type: ScriptType;
     abstract warnAbout: boolean;
     code: string;
-    headers: ScriptHeaders = $state();
+    headers: ScriptHeaders = $state({} as ScriptHeaders);
     requires: Script[] = [];
     optionalRequires: Script[] = [];
     requiredBy: Script[] = [];
@@ -162,8 +162,8 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
         for(const type in strings) {
             const deps = strings[type as ScriptType];
-            const requiredDeps = deps.required?.map(getDepName) ?? [];
-            const optionalDeps = deps.optional?.map(getDepName) ?? [];
+            const requiredDeps = deps?.required?.map(getDepName) ?? [];
+            const optionalDeps = deps?.optional?.map(getDepName) ?? [];
             const allDeps = requiredDeps.concat(optionalDeps);
 
             // Confirm the dependencies are all the correct type

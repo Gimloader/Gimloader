@@ -3,7 +3,7 @@ import Patcher from "$core/patcher";
 import { validate } from "$content/utils";
 
 function checkMethod(fnName: string, object: object, method: PropertyKey) {
-    const type = typeof object?.[method];
+    const type = typeof object?.[method as keyof typeof object];
     if(type === "function") return;
 
     throw new Error(`${fnName} expected object.${String(method)} to be a function, but got ${type}`);

@@ -11,7 +11,7 @@ export default new class Hotkeys {
     configurableHotkeys: ConfigurableHotkey[] = $state([]);
     pressedKeys = new Set<string>();
     pressed = new Set<string>();
-    savedHotkeys: ConfigurableHotkeysState;
+    savedHotkeys: ConfigurableHotkeysState = {};
 
     init(saved: ConfigurableHotkeysState) {
         this.savedHotkeys = saved;
@@ -100,7 +100,7 @@ export default new class Hotkeys {
         if(trigger.key) {
             if(trigger.key !== e.code) return false;
         } else {
-            if(!trigger.keys.includes(e.code)) return false;
+            if(!trigger.keys?.includes(e.code)) return false;
 
             for(const key of trigger.keys) {
                 if(!this.pressed.has(key)) return false;

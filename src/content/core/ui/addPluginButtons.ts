@@ -114,9 +114,9 @@ export function addPluginButtons() {
     });
 
     // Add the wrench button to the join screen
-    const wrapJoin = Rewriter.createShared(null, "wrapJoinButton", (joinButton: () => any) => {
-        return function() {
-            const element = joinButton.apply(this, arguments);
+    const wrapJoin = Rewriter.createShared(null, "wrapJoinButton", (joinButton: (...args: any[]) => any) => {
+        return function(this: any, ...args: any[]) {
+            const element = joinButton.apply(this, args);
             const newButton = UI.React.createElement("button", {
                 className: "openPlugins",
                 dangerouslySetInnerHTML: { __html: whiteWrenchSvg },

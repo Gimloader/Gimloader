@@ -1,4 +1,5 @@
 import * as Index from "svelte";
+// @ts-expect-error this is internal and undocumented
 import * as Client from "svelte/internal/client";
 
 import * as Animate from "svelte/animate";
@@ -27,7 +28,7 @@ export interface SvelteExport {
 
 const Svelte: SvelteExport = {
     Index,
-    Client: {...Client},
+    Client: { ...Client },
     Animate,
     Attachments,
     Easing,

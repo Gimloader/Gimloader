@@ -7,7 +7,7 @@
     }
 
     let { value = $bindable("") }: Props = $props();
-    let searchInput: HTMLInputElement = $state();
+    let searchInput: HTMLInputElement = $state()!;
     let searchOpen = $state(false);
 
     function openSearch() {

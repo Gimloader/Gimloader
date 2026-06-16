@@ -22,8 +22,8 @@ interface SettingsChangeListener {
 
 export default new class Storage extends EventEmitter2 {
     settings: Settings = $state(defaultSettings);
-    values: PluginStorage;
-    pluginSettings: PluginStorage = $state();
+    values: PluginStorage = {};
+    pluginSettings: PluginStorage = $state({});
     valueListeners: ValueChangeListener[] = [];
     settingsListeners: SettingsChangeListener[] = [];
 
@@ -51,6 +51,7 @@ export default new class Storage extends EventEmitter2 {
     }
 
     updateSetting(key: string, value: any, emit = true) {
+        // @ts-expect-error there's probably a better way to do this
         this.settings[key] = value;
         if(emit) Port.send("settingUpdate", { key, value });
         else this.emit(key, value);
