@@ -2,7 +2,7 @@ import type { ScriptHeaders } from "$types/scripts";
 
 export function parseScriptHeaders(code: string): ScriptHeaders {
     const baseHeaders: ScriptHeaders = {
-        name: "Unnamed Plugin",
+        name: "Unnamed Script",
         description: "No description provided",
         author: [],
         version: null,
@@ -77,7 +77,7 @@ export function parseHeader<T extends object>(code: string, headers: T): T {
         }
     }
 
-    return headers;
+    return returned as T;
 }
 
 export function getDepName(dependency: string) {
