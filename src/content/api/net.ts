@@ -3,19 +3,15 @@ import { validate } from "$content/utils";
 import EventEmitter2 from "eventemitter2";
 import * as z from "zod";
 import type { Schema } from "$types/schema";
+import type { CancelablePromise, GeneralEventEmitter, ListenToOptions, WaitForFilter, WaitForOptions } from "eventemitter2";
 
 const GamemodeSchema = z.union([z.string(), z.array(z.string())]);
 
-class BaseNetApi extends EventEmitter2 {
-    constructor() {
-        super({
-            wildcard: true,
-            delimiter: ":"
-        });
-
-        // @ts-expect-error do this for eventemitter2 as it gets frozen
-        this._all = [];
-    }
+class BaseNetApi {
+    #events = new EventEmitter2({
+        wildcard: true,
+        delimiter: ":"
+    });
 
     /** Which type of server the client is currently connected to */
     get type() {
@@ -54,6 +50,112 @@ class BaseNetApi extends EventEmitter2 {
         validate("net.send", arguments, ["channel", "string"]);
 
         Net.send(channel, message);
+    }
+
+    emit(event: string | string[], ...args: any[]) {
+        this.#events.emit(event, ...args);
+    }
+
+    emitAsync(event: string | string[], ...args: any[]) {
+        return this.#events.emitAsync(event, ...args);
+    }
+
+    addListener(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.addListener(event, listener);
+    }
+
+    on(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.on(event, listener);
+    }
+
+    prependListener(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.prependListener(event, listener);
+    }
+
+    once(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.once(event, listener);
+    }
+
+    prependOnceListener(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.prependOnceListener(event, listener);
+    }
+
+    many(event: string | string[], timesToListen: number, listener: (...data: any[]) => void) {
+        this.#events.many(event, timesToListen, listener);
+    }
+
+    prependMany(event: string | string[], timesToListen: number, listener: (...data: any[]) => void) {
+        this.#events.many(event, timesToListen, listener);
+    }
+
+    onAny(listener: (event: string | string[], ...data: any[]) => void) {
+        this.#events.onAny(listener);
+    }
+
+    prependAny(listener: (event: string | string[], ...data: any[]) => void) {
+        this.#events.prependAny(listener);
+    }
+
+    offAny(listener: (event: string | string[], ...data: any[]) => void) {
+        this.#events.offAny(listener);
+    }
+
+    removeListener(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.removeListener(event, listener);
+    }
+
+    off(event: string | string[], listener: (...data: any[]) => void) {
+        this.#events.removeListener(event, listener);
+    }
+
+    removeAllListeners(event?: string | string[]) {
+        this.#events.removeAllListeners(event);
+    }
+
+    setMaxListeners(amount: number) {
+        this.#events.setMaxListeners(amount);
+    }
+
+    getMaxListeners() {
+        return this.#events.getMaxListeners();
+    }
+
+    eventNames(nsAsArray?: boolean) {
+        return this.#events.eventNames(nsAsArray);
+    }
+
+    listenerCount(event: string | string[]) {
+        return this.#events.listenerCount(event);
+    }
+
+    listeners(event: string | string[]) {
+        return this.#events.listeners(event);
+    }
+
+    listenersAny() {
+        return this.#events.listenersAny();
+    }
+
+    waitFor(event: string | string[], timeout?: number): CancelablePromise<any[]>;
+    waitFor(event: string | string[], filter?: WaitForFilter): CancelablePromise<any[]>;
+    waitFor(event: string | string[], options?: WaitForOptions): CancelablePromise<any[]>;
+    waitFor(event: string | string[], options: any) {
+        return this.#events.waitFor(event, options);
+    }
+
+    listenTo(target: GeneralEventEmitter, events: string | string[], options?: ListenToOptions): EventEmitter2;
+    listenTo(target: GeneralEventEmitter, events: Record<string, string>, options?: ListenToOptions): EventEmitter2;
+    listenTo(target: GeneralEventEmitter, events: any, options?: ListenToOptions) {
+        return this.#events.listenTo(target, events, options);
+    }
+
+    stopListeningTo(target: GeneralEventEmitter, event?: string | string[]) {
+        return this.#events.stopListeningTo(target, event);
+    }
+
+    hasListeners(event: string | string[]) {
+        // @ts-expect-error EventEmitter2's type is wrong
+        return this.#events.hasListeners(event);
     }
 }
 

@@ -33,14 +33,14 @@ for(const keyName in paths) {
     });
 }
 
-const includeExternal = ["bits-ui", "tailwind-variants", "svelte-toolbelt", "tailwind-merge"];
-
-if(!isDT) {
-    includeExternal.push(
-        "eventemitter2",
-        "@dimforge/rapier2d-compat"
-    )
-}
+const includeExternal = [
+    "bits-ui",
+    "tailwind-variants",
+    "svelte-toolbelt",
+    "tailwind-merge",
+    "eventemitter2"
+];
+if(!isDT) includeExternal.push("@dimforge/rapier2d-compat")
 
 console.log("Creating type bundle...");
 const bundle = await rollup({
