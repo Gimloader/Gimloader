@@ -82,7 +82,6 @@ typeContent = typeContent.replace("extends Scene", "extends BaseScene");
 if(isDT) {
     const startIndex = typeContent.lastIndexOf("\n", typeContent.indexOf("from 'rapier"));
     const endIndex = typeContent.indexOf("\n", typeContent.lastIndexOf("from 'rapier"));
-    console.log(startIndex, endIndex);
     typeContent = typeContent.slice(0, startIndex + 1) +
         "import { Collider, ColliderDesc, KinematicCharacterController, RigidBody, RigidBodyDesc, World, Vector } from '@dimforge/rapier2d-compat';\n" +
         typeContent.slice(endIndex + 1);
