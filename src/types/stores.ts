@@ -780,10 +780,149 @@ export namespace Stores {
         hitTime?: number;
     }
 
+    export interface TerrainTimeToWait {
+        initial: number;
+        subsequent: number;
+    }
+
+    export interface BasicDamage {
+        markerId: string;
+        damage: number;
+        x: number;
+        y: number;
+        timeToWait: TerrainTimeToWait;
+    }
+
+    export interface CharacterDamage {
+        characterId: string;
+        damage: number;
+        type: string;
+    }
+
+    export interface DamageMarker {
+        totalDamage: number;
+        yChange: number;
+        scale: number;
+        alpha: number;
+        timeoutTime: number;
+        isDisposing: boolean;
+        addDamage(damage: BasicDamage): void;
+        startDispose(): void;
+        update(): void;
+        scene: Scene;
+        onReadyToDispose(): void;
+        onDispose(): void;
+        x: number;
+        y: number;
+        timeToWait: TerrainTimeToWait;
+        text: Phaser.GameObjects.Text;
+        yChangeTween: Phaser.Tweens.Tween;
+        scaleTween: Phaser.Tweens.Tween;
+        alphaTween: Phaser.Tweens.Tween;
+        get depth(): number;
+    }
+
+    export type BasicDamageMarkerKey = `${string}_${number}_${number}`;
+
+    export interface BasicDamageMarkers {
+        markers: Map<BasicDamageMarkerKey, DamageMarker>;
+        markersDisposing: Map<BasicDamageMarkerKey, DamageMarker>;
+        applyDamage(damage: BasicDamage): void;
+        update(): void;
+        scene: Scene;
+    }
+
+    export interface CharactersDamageMarkers {
+        markers: Map<string, DamageMarker>;
+        markersDisposing: Map<string, DamageMarker>;
+        applyDamage(damage: CharacterDamage): void;
+        update(): void;
+        scene: Scene;
+    }
+
+    export interface DamageMarkers {
+        update(): void;
+        characters: CharactersDamageMarkers;
+        basic: BasicDamageMarkers;
+    }
+
+    export interface Explosion {
+        hit: boolean;
+        characterId?: string;
+        position?: Vector;
+    }
+
+    export interface CharacterOnScreen {
+        id: string;
+        teamId: string;
+        type: CharacterType;
+        x: number;
+        y: number;
+        scale: number;
+    }
+
+    export interface PhaserProjectileUpdateData {
+        charactersOnScreen: CharacterOnScreen[];
+    }
+
+    export interface FireSlash {
+        angle: number;
+        loadAndReplaceSprite(): void;
+        dispose(): void;
+        update(): void;
+        scene: Scene;
+        characterId: string;
+        onDispose(): void;
+        sprite: Phaser.GameObjects.Sprite;
+        get position(): Vector;
+        get depth(): number;
+    }
+
+    export interface FireSlashOptions {
+        characterId: string;
+        angle: number;
+    }
+
+    export interface FireSlashes {
+        slashes: Map<`${number}`, FireSlash>;
+        currentId: number;
+        addFireSlash(options: FireSlashOptions): void;
+        nextId: `${number}`;
+        update(): void;
+        scene: Scene;
+    }
+
+    export interface PhaserProjectile {
+        id: string;
+        simulationTimeShift: number;
+        ownerId: string;
+        ownerTeamId: string;
+        start: Vector;
+        end: Vector;
+        startTime: number;
+        endTime: number;
+        hitTime: number;
+        serverHitTime: number;
+        exploded: boolean;
+        hitDistanceRecord: number;
+        radius: number;
+        hitPos: Vector;
+        hasShownFireSlash: boolean;
+        hasPlayedFireSound: boolean;
+        isDisposed: boolean;
+        explode(explosion: Explosion): void;
+        dispose(): void;
+        update(data: PhaserProjectileUpdateData): void;
+        scene: Scene;
+        appearence: CurrentAppearance;
+        sprite: Phaser.GameObjects.Image;
+    }
+
     export interface Projectiles {
-        damageMarkers: Untyped;
+        damageMarkers: DamageMarkers;
         dynamicDevices: Set<Device>;
-        fireSlashes: Untyped;
+        fireSlashes: FireSlashes;
+        projectiles: Map<string, PhaserProjectile>;
         projectileJSON: Map<string, Projectile>;
         runClientSidePrediction: boolean;
         scene: Scene;
@@ -792,14 +931,172 @@ export namespace Stores {
         update(): void;
     }
 
+    export interface TerrainAddition {
+        update(): void;
+        inputManager: InputManager;
+    }
+
+    export interface PreviewTileOptions {
+        x: number;
+        y: number;
+        depth: number;
+        tileIndex: number;
+    }
+
+    export interface TerrainAdditionOverlay {
+        showing: boolean;
+        add(position: Vector): void;
+        show(rect: Rect): void;
+        hide(): void;
+        scene: Scene;
+    }
+
+    export interface TerrainAdditionPreview {
+        previewingTiles: Vector[];
+        createPreviewTile(options: PreviewTileOptions): void;
+        clearPreviewLayer(): void;
+        update(): void;
+        scene: Scene;
+        overlay: TerrainAdditionOverlay;
+    }
+
+    export interface TerrainLayerAppearance {
+        createLayerDepthListeners(): void;
+        updateLayerAppearance(): void;
+    }
+
+    export interface Terrain {
+        update(): void;
+        scene: Scene;
+        terrainAddition: TerrainAddition;
+        terrainAdditionPreview: TerrainAdditionPreview;
+        terrainLayerAppearance: TerrainLayerAppearance;
+    }
+
+    export interface Wire {
+        beamFollowers: Phaser.GameObjects.PathFollower[];
+        mouseIsOver: boolean;
+        isShowing: boolean;
+        isDestroyed: boolean;
+        isPreview: boolean;
+        boundingBox: Rect;
+        createBeam(): void;
+        destroyBeam(): void;
+        show(): void;
+        hide(): void;
+        onCullIsShowing(): void;
+        onCullIsNotShowing(): void;
+        onDeviceChange(): void;
+        addEndDevice(): void;
+        removeEndDevice(): void;
+        updateMousePosition(): void;
+        updateBoundingBox(): void;
+        updateInteractivity(): void;
+        setDirty(): void;
+        onMouseOver(pointer: Phaser.Input.Pointer): void;
+        onMouseOut(pointer: Phaser.Input.Pointer): void;
+        isSetup(): boolean;
+        destroy(): void;
+        id: string;
+        scene: Scene;
+        wireManager: WireManager;
+        startDeviceId: string;
+        endDeviceId: string;
+        startConnection?: string;
+        endConnection?: string;
+        start: Vector;
+        end: Vector;
+    }
+
+    export type WireKey = `${string}-${string}`;
+
+    export type PointKey = `${number}-${number}`;
+
+    export interface WireOptions {
+        startDeviceId: string;
+        endDeviceId: string;
+    }
+
+    export interface WireOverlay {
+        isShowing: boolean;
+        show(device: Device): void;
+        hide(): void;
+        scene: Scene;
+    }
+
+    export interface SnapPointManager {
+        points: Map<PointKey, Phaser.GameObjects.Arc>;
+        tweens: Map<PointKey, Phaser.Tweens.Tween>;
+        destroyAllPoints(): void;
+        createPoint(x: number, y: number, deviceId: string): void;
+        destroyPoint(point: PointKey): void;
+        update(): void;
+        scene: Scene;
+        additionManager: AdditionManager;
+    }
+
+    export interface AdditionManager {
+        addingWire: boolean;
+        update(): void;
+        handleClick(): void;
+        onAddSessionEnd(): void;
+        scene: Scene;
+        wireManager: WireManager;
+        snapPointManager: SnapPointManager;
+    }
+
+    export interface VisibleDependencies {
+        isAttemptingToCutDevice: boolean;
+        isVisualEditing: boolean;
+        inGameVisible: boolean;
+        isSavedVersion: boolean;
+    }
+
+    export interface VisibilityManager {
+        isVisible: boolean;
+        visibleDependencies: VisibleDependencies;
+        updateDependency(name: keyof VisibleDependencies, value: boolean): void;
+        onDependencyChange(): void;
+        hideAllWires(): void;
+        showAllWires(): void;
+        wireManager: WireManager;
+    }
+
+    export interface CullingManager {
+        update(): void;
+        scene: Scene;
+        wireManager: WireManager;
+    }
+
+    export interface WireActionManager {
+        createListeners(): void;
+        createListener(): void;
+        disposeListener(): void;
+        updateClickListener(): void;
+        scene: Scene;
+    }
+
+    export interface WireManager {
+        wires: Map<WireKey, Wire>;
+        addWire(options: WireOptions): void;
+        deleteWire(key: WireKey): void;
+        onDeviceChange(connectedDeviceId: string): void;
+        update(): void;
+        scene: Scene;
+        additionManager: AdditionManager;
+        visibilityManager: VisibilityManager;
+        cullingManager: CullingManager;
+        actionManager: WireActionManager;
+    }
+
     export interface WorldManager {
         devices: Devices;
         inGameTerrainBuilder: InGameTerrainBuilder;
         physics: PhysicsManager;
         projectiles: Projectiles;
         scene: Scene;
-        terrain: Untyped;
-        wires: Untyped;
+        terrain: Terrain;
+        wires: WireManager;
         update(dt: number): void;
     }
 
