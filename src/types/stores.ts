@@ -819,7 +819,7 @@ export namespace Stores {
         yChangeTween: Phaser.Tweens.Tween;
         scaleTween: Phaser.Tweens.Tween;
         alphaTween: Phaser.Tweens.Tween;
-        get depth(): number;
+        readonly depth: number;
     }
 
     export type BasicDamageMarkerKey = `${string}_${number}_${number}`;
@@ -874,8 +874,8 @@ export namespace Stores {
         characterId: string;
         onDispose(): void;
         sprite: Phaser.GameObjects.Sprite;
-        get position(): Vector;
-        get depth(): number;
+        readonly position: Vector;
+        readonly depth: number;
     }
 
     export interface FireSlashOptions {
