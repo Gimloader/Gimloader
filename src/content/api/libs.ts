@@ -44,7 +44,7 @@ class ScopedLibsApi extends LibsApi {
      * api.libs.require("Communication", "https://raw.githubusercontent.com/Gimloader/builds/main/libraries/Communication.js");
      * ```
      */
-    require<T extends keyof Gimloader.Libraries>(name: T, downloadUrl?: string): Gimloader.Libraries[T] {
+    require<T extends keyof Gimloader.Libraries>(name: T, downloadUrl?: string): Promise<Gimloader.Libraries[T]> {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 
         return LibManager.require(this.#id, name as string, downloadUrl);

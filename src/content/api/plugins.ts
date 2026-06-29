@@ -52,7 +52,7 @@ class ScopedPluginsApi extends PluginsApi {
      * api.libs.require("Desynchronize", "https://raw.githubusercontent.com/Gimloader/builds/main/plugins/Desynchronize.js");
      * ```
      */
-    require<T extends keyof Gimloader.Plugins>(name: T, downloadUrl?: string): Gimloader.Plugins[T] {
+    require<T extends keyof Gimloader.Plugins>(name: T, downloadUrl?: string): Promise<Gimloader.Plugins[T]> {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 
         return PluginManager.require(this.#id, name as string, downloadUrl);
