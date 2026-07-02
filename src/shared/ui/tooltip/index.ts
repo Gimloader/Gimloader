@@ -4,7 +4,7 @@ import Content from "./tooltip-content.svelte";
 import type { Component } from "svelte";
 
 // biome-ignore lint: typescript explodes when it tries to figure out the type of Root for some reason
-type RootType = Component<TooltipRootProps, {}, "open" | "triggerId">;
+type RootType = Component<TooltipRootProps, {}, "open">;
 
 const Root = TooltipPrimitive.Root as RootType;
 const Provider = TooltipPrimitive.Provider;

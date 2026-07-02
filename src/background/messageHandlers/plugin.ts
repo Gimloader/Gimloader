@@ -1,15 +1,15 @@
-import type { PluginInfo, State } from "$types/net/state";
-import Server from "$bg/net/server";
+import type { State } from "$types/net/state";
+import type { Dependency } from "$types/net/downloads";
 import type { Messages, OnceMessages, OnceResponses, ScriptEdit, StateMessages } from "$types/net/messages";
+import Server from "$bg/net/server";
 import ScriptHandler from "./script";
 import Scripts from "$bg/scripts";
 import { englishList } from "$shared/utils";
 import Downloader from "$bg/net/downloader";
-import type { Dependency } from "$types/net/downloads";
 
 export default new class PluginsHandler extends ScriptHandler<"plugins"> {
     constructor() {
-        super("plugin", "plugins");
+        super("plugin", "plugins", "pluginLayout");
     }
 
     override init() {
@@ -23,19 +23,18 @@ export default new class PluginsHandler extends ScriptHandler<"plugins"> {
     }
 
     async onPluginCreate(state: State, message: Messages["pluginCreate"]) {
-        await this.deleteConflicting(message.name);
+        await this.deleteConflicting(message.info.name);
 
-        const info: PluginInfo = {
-            name: message.name,
-            code: message.code,
-            enabled: message.enabled
-        };
-
-        state.plugins.push(info);
-        Scripts.createPlugin(info);
+        state.plugins.push(message.info);
+        state.pluginLayout[message.folder].contents.push({
+            type: "script",
+            id: message.info.name
+        });
+        Scripts.createPlugin(message.info);
 
         Server.executeAndSend("cacheInvalid", { invalid: true });
         this.save();
+        this.saveLayout();
     }
 
     onPluginToggled(state: State, message: StateMessages["pluginToggled"]) {

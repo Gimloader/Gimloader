@@ -1,10 +1,10 @@
 import type { Script } from "./script.svelte";
 import type { ScriptHeaders } from "$types/scripts";
-import type { ScriptInfo } from "$types/net/state";
+import type { LayoutItem, ScriptInfo, ScriptLayout } from "$types/net/state";
 import Port from "$shared/net/port.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
-import { scripts } from "./map";
+import { folderLocations, getItemFolder, scripts } from "./map";
 import Commands from "../commands.svelte";
 import type { CommandContext } from "$types/api/commands";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
@@ -13,6 +13,9 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
     abstract singular: string;
     abstract plural: string;
     scripts: T[] = $state([]);
+    layout: ScriptLayout = $state({ root: { contents: [] } });
+    openFolderId = $state("root");
+    currentFolder = $derived(this.layout[this.openFolderId]);
     type: T["type"];
     ScriptClass: new(info: I, headers?: ScriptHeaders) => T;
 
@@ -23,24 +26,45 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         Port.on(`${type}Edit`, ({ name, code, updated }) => this.onEdit(name, code, updated));
         Port.on(`${type}Delete`, ({ name }) => this.onDelete(name));
         Port.on(`${type}DeleteAll`, () => this.onDeleteAll());
-        Port.on(`${type}Arrange`, ({ order }) => this.onArrange(order));
+        Port.on(`${type}Arrange`, ({ folder, order }) => this.onArrange(folder, order));
+        Port.on(`${type}FolderCreate`, ({ parent, name, id }) => this.onCreateFolder(parent, name, id));
     }
 
-    init(info: I[]) {
+    init(info: I[], layout: ScriptLayout) {
         for(const item of info) {
             const script = new this.ScriptClass(item);
             this.scripts.push(script);
             scripts.set(script.headers.name, script);
         }
 
+        // Set the folders that items are in
+        for(const folderId in layout) {
+            for(const item of layout[folderId].contents) {
+                folderLocations.set(item.id, folderId);
+            }
+        }
+
+        this.layout = layout;
+
+        const savedFolder = localStorage.getItem(`gl-${this.type}Folder`);
+        if(savedFolder && this.layout[savedFolder]) this.openFolderId = savedFolder;
+
         this.addCommands();
     }
 
-    updateState(scriptInfo: I[]) {
+    updateState(scriptInfo: I[], layout: ScriptLayout) {
+        // Update the folders that things are in
+        folderLocations.clear();
+        for(const folderId in layout) {
+            for(const item of layout[folderId].contents) {
+                folderLocations.set(item.id, folderId);
+            }
+        }
+
         // check if any scripts were added
         for(const info of scriptInfo) {
             if(!this.getScript(info.name)) {
-                this.onCreate(info);
+                this.onCreate(info, getItemFolder(info.name));
             }
         }
 
@@ -59,14 +83,8 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
             }
         }
 
-        // move the scripts into the correct order
-        const newOrder = [];
-        for(const info of scriptInfo) {
-            const addScript = this.getScript(info.name);
-            if(addScript) newOrder.push(addScript);
-        }
-
-        this.scripts = newOrder;
+        if(!layout[this.openFolderId]) this.openFolderId = "root";
+        this.layout = layout;
     }
 
     getScriptNames(): string[] {
@@ -121,7 +139,13 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
 
         this.scripts[index].delete();
         this.scripts.splice(index, 1);
+
+        const folder = getItemFolder(name);
+        const itemIndex = this.layout[folder].contents.findIndex(i => i.id === name);
+        this.layout[folder].contents.splice(itemIndex, 1);
+
         scripts.delete(name);
+        folderLocations.delete(name);
     }
 
     deleteAll(shouldToast: boolean) {
@@ -144,31 +168,22 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         }
 
         this.scripts = [];
+        this.layout = { root: { contents: [] } };
     }
 
-    onCreate(info: I) {
+    onCreate(info: I, folder: string) {
         const headers = parseScriptHeaders(info.code);
         const script = new this.ScriptClass(info, headers);
+
         this.scripts.push(script);
+        this.layout[folder].contents.push({
+            type: "script",
+            id: info.name
+        });
+
         scripts.set(script.headers.name, script);
 
         return script;
-    }
-
-    arrange(order: string[]) {
-        this.onArrange(order);
-        Port.send(`${this.type}Arrange`, { order });
-    }
-
-    onArrange(order: string[]) {
-        const newOrder: T[] = [];
-
-        for(const name of order) {
-            const script = this.getScript(name);
-            if(script) newOrder.push(script);
-        }
-
-        this.scripts = newOrder;
     }
 
     deleteConflicting(name: string) {
@@ -201,6 +216,48 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         }, async (context) => {
             const script = await this.selectScript(context, `Select ${this.singular} to delete`);
             script?.deleteConfirm();
+        });
+    }
+
+    arrange(folder: string, order: string[]) {
+        this.onArrange(folder, order);
+        Port.send(`${this.type}Arrange`, { folder, order });
+    }
+
+    onArrange(folder: string, order: string[]) {
+        const folderValue = this.layout[folder];
+        if(!folderValue) return;
+
+        const newContents: LayoutItem[] = [];
+        for(const id of order) {
+            const script = folderValue.contents.find((i) => i.id === id);
+            if(script) newContents.push(script);
+        }
+
+        folderValue.contents = newContents;
+    }
+
+    viewFolder(id: string) {
+        this.openFolderId = id;
+        localStorage.setItem(`gl-${this.type}Folder`, id);
+    }
+
+    createFolder(parent: string, name: string) {
+        const id = crypto.randomUUID();
+        this.onCreateFolder(parent, name, id);
+        Port.send(`${this.type}FolderCreate`, { parent, name, id });
+    }
+
+    onCreateFolder(parent: string, name: string, id: string) {
+        this.layout[id] = {
+            parent,
+            name,
+            contents: []
+        };
+
+        this.layout[parent].contents.push({
+            type: "folder",
+            id
         });
     }
 }

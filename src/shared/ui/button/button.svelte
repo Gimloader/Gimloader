@@ -67,7 +67,8 @@
         aria-disabled={disabled}
         role={disabled ? "link" : undefined}
         tabindex={disabled ? -1 : undefined}
-        {...restProps}>
+        {...restProps}
+    >
         {@render children?.()}
     </a>
 {:else}
@@ -77,7 +78,8 @@
         class={cn(buttonVariants({ variant, size }), className)}
         {type}
         {disabled}
-        {...restProps}>
+        {...restProps}
+    >
         {@render children?.()}
     </button>
 {/if}

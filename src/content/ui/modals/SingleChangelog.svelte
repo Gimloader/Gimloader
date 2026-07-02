@@ -6,6 +6,7 @@
         version: string | null;
         changes: string[];
     }
+
     const { name, version, changes }: Props = $props();
 </script>
 

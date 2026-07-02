@@ -24,6 +24,7 @@ type ScriptEntry = PluginEntry | LibraryEntry;
 
 export default class Scripts {
     static map = new Map<string, ScriptEntry>();
+    static folderMap = new Map<string, string>();
 
     static get(name: string) {
         return this.map.get(name);
@@ -31,6 +32,14 @@ export default class Scripts {
 
     static has(name: string) {
         return this.map.has(name);
+    }
+
+    static setFolder(name: string, folder: string) {
+        this.folderMap.set(name, folder);
+    }
+
+    static getFolder(name: string) {
+        return this.folderMap.get(name) ?? "root";
     }
 
     static delete(name: string) {
@@ -46,6 +55,7 @@ export default class Scripts {
         }
 
         this.map.delete(name);
+        this.folderMap.delete(name);
     }
 
     static clearType(type: ScriptType) {
@@ -102,9 +112,9 @@ export default class Scripts {
         if(headers.isLibrary !== "false") return true;
 
         const dependencies = this.createDeps(headers, true);
-
         const dependents = this.findDependents(info.name);
         this.map.set(info.name, { type: "plugin", dependencies, info, dependents });
+
         return false;
     }
 
@@ -113,9 +123,9 @@ export default class Scripts {
         if(headers.isLibrary === "false") return true;
 
         const dependencies = this.createDeps(headers, false);
-
         const dependents = this.findDependents(info.name);
         this.map.set(info.name, { type: "library", dependencies, info, dependents });
+
         return false;
     }
 

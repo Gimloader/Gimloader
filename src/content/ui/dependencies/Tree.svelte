@@ -51,7 +51,7 @@
 
     async function download() {
         if(!url) return;
-        await downloadScript(url);
+        await downloadScript(url, "root");
 
         script = scripts.get(name);
         error = getError();

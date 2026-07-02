@@ -19,10 +19,12 @@
     class={cn("bg-muted h-1 rounded-full relative flex w-full items-center overflow-x-hidden", className)}
     {value}
     {max}
-    {...restProps}>
+    {...restProps}
+>
     <div
         data-slot="progress-indicator"
         class="bg-primary size-full flex-1 transition-all"
-        style="transform: translateX(-{translateX}%)">
+        style="transform: translateX(-{translateX}%)"
+    >
     </div>
 </ProgressPrimitive.Root>

@@ -27,8 +27,8 @@ export default new class BareState {
             plugin.name = newName;
         });
 
-        Port.on("pluginCreate", ({ name, code }) => {
-            this.plugins.push({ name, code, enabled: true });
+        Port.on("pluginCreate", ({ info }) => {
+            this.plugins.push(info);
         });
 
         Port.on("pluginDelete", ({ name }) => {
@@ -37,15 +37,6 @@ export default new class BareState {
 
         Port.on("pluginDeleteAll", () => {
             this.plugins = [];
-        });
-
-        Port.on("pluginArrange", ({ order }) => {
-            const newOrder: PluginInfo[] = [];
-            for(const name in order) {
-                const plugin = this.plugins.find(p => p.name === name);
-                if(plugin) newOrder.push(plugin);
-            }
-            this.plugins = newOrder;
         });
 
         Port.on("pluginSetAll", ({ enabled }) => {
@@ -58,7 +49,7 @@ export default new class BareState {
         });
 
         // sync libraries
-        Port.on("libraryCreate", (item) => this.libraries.push(item));
+        Port.on("libraryCreate", ({ info }) => this.libraries.push(info));
 
         Port.on("libraryDelete", ({ name }) => {
             this.libraries = this.libraries.filter(l => l.name !== name);

@@ -66,13 +66,15 @@
         ondragleave={() => modalDragCounter--}
         ondragover={(e) => e.preventDefault()}
         ondrop={onDrop}
-        style="max-width: min(1280px, calc(100% - 32px))">
+        style="max-width: min(1280px, calc(100% - 32px))"
+    >
         {#if Port.disconnected}
             <div
                 class="
                     z-50 absolute left-0 top-0 w-full h-full bg-gray-500
                     rounded-lg opacity-70 flex flex-col items-center justify-center
-                ">
+                "
+            >
                 <h2 class="text-3xl text-white">Connection lost with extension</h2>
                 <div class="xl text-white">
                     Attempting to reconnect... you can always refresh the page if this fails
@@ -86,7 +88,8 @@
                     rounded-lg opacity-70 flex items-center justify-center
                     bg-gray-500 border-white border-4 border-dashed
                 "
-                role="dialog">
+                role="dialog"
+            >
                 <FileUploadOutline size={128} color="white" />
             </div>
         {/if}

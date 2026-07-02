@@ -5,7 +5,8 @@ import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, SavedState, Sta
 export type ScriptType = "plugin" | "library";
 export type ScriptEdit = { name: string; newName: string; code: string; updated?: boolean };
 export type ScriptDelete = { name: string };
-export type ScriptArrange = { order: string[] };
+export type ScriptArrange = { folder: string; order: string[] };
+export type FolderCreate = { parent: string; name: string; id: string };
 
 // These go both ways
 export interface StateMessages {
@@ -14,15 +15,17 @@ export interface StateMessages {
 
     libraryDelete: ScriptDelete;
     libraryDeleteAll: void;
-    libraryCreate: LibraryInfo;
+    libraryCreate: { folder: string; info: LibraryInfo };
     libraryArrange: ScriptArrange;
+    libraryFolderCreate: FolderCreate;
 
     pluginDelete: ScriptDelete;
     pluginDeleteAll: void;
-    pluginCreate: PluginInfo;
+    pluginCreate: { folder: string; info: PluginInfo };
     pluginArrange: ScriptArrange;
     pluginToggled: { name: string; enabled: boolean };
     pluginSetAll: { enabled: boolean };
+    pluginFolderCreate: FolderCreate;
 
     settingUpdate: { key: string; value: any };
 
@@ -61,7 +64,7 @@ export interface OnceMessages {
     tryDeleteAllLibraries: { confirmed?: boolean };
     tryTogglePlugin: { name: string; enabled: boolean; confirmed?: boolean };
     trySetAllPlugins: { enabled: boolean; confirmed?: boolean };
-    downloadScript: { url: string; confirmed?: boolean; type?: ScriptType };
+    downloadScript: { url: string; folder: string; confirmed?: boolean; type?: ScriptType };
     editOrCreate: { code: string; name: string | null; updated?: boolean };
 }
 

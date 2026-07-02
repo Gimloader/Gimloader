@@ -20,7 +20,7 @@
         "scriptIndent": true,
         "styleIndent": true,
         "printWidth": 120,
-        "closingBracketSameLine": true,
+        "closingBracketSameLine": false,
         "preferAttrsSingleLine": true
     },
     "includes": [

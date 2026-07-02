@@ -1,22 +1,22 @@
 <script lang="ts">
+    import type ScriptManager from "$core/scripts/scriptManager.svelte";
     import * as Dialog from "$shared/ui/dialog";
     import { Button } from "$shared/ui/button";
     import { downloadScript } from "$core/net/download";
-    import type { ScriptType } from "$types/net/messages";
 
     interface Props {
         open: boolean;
         placeholder: string;
-        type: ScriptType;
+        manager: ScriptManager<any, any>;
     }
 
-    let { open = $bindable(), placeholder, type }: Props = $props();
+    let { open = $bindable(), placeholder, manager }: Props = $props();
 
     let url = $state("");
 
     function install() {
         if(!url) return;
-        downloadScript(url, type);
+        downloadScript(url, manager.openFolderId, manager.type);
         open = false;
     }
 </script>

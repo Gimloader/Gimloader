@@ -9,30 +9,36 @@ export interface Updated {
     changes: string[];
 }
 
-interface ModalProps {
-    error: { text: string; title: string };
-    confirm: { text: string; title: string };
-    pluginSettings: { plugin: Plugin };
-    dependency: {
-        script: Script | Script[];
-        type: string;
-        title: string;
-    };
-    singleChangelog: {
-        name: string;
-        version: string | null;
-        changes: string[];
-    };
+interface DependencyProps {
+    script: Script | Script[];
+    type: string;
+    title: string;
 }
 
-export default new class Modals {
-    components = new Map<keyof ModalProps, Component>();
+interface SingleChangelogProps {
+    name: string;
+    version: string | null;
+    changes: string[];
+}
 
-    register<T extends keyof ModalProps>(type: T, component: Component<any>) {
+type ModalInfo<Type extends string, Props, Result = void> = { type: Type; props: Props; result: Result };
+type ModalTypes =
+    | ModalInfo<"error", { text: string; title: string }>
+    | ModalInfo<"confirm", { text: string; title: string }, boolean>
+    | ModalInfo<"pluginSettings", { plugin: Plugin }>
+    | ModalInfo<"dependency", DependencyProps, boolean>
+    | ModalInfo<"singleChangelog", SingleChangelogProps>
+    | ModalInfo<"input", { title: string; placeholder?: string }, string | null>;
+type ExtractModal<Type extends ModalTypes["type"]> = Extract<ModalTypes, ModalInfo<Type, any, any>>;
+
+export default new class Modals {
+    components = new Map<ModalTypes["type"], Component>();
+
+    register<T extends ModalTypes["type"]>(type: T, component: Component<any>) {
         this.components.set(type, component);
     }
 
-    async open<T extends keyof ModalProps>(type: T, props: ModalProps[T]) {
+    async open<T extends ModalTypes["type"]>(type: T, props: ExtractModal<T>["props"]): Promise<ExtractModal<T>["result"]> {
         await domLoaded;
 
         const component = this.components.get(type);
@@ -41,13 +47,13 @@ export default new class Modals {
             return;
         }
 
-        return new Promise<boolean>((res) => {
+        return new Promise((res) => {
             const instance = mount(component, {
                 target: document.body,
                 props: {
                     ...props,
-                    onClose: (confirmed: boolean | undefined) => {
-                        res(Boolean(confirmed));
+                    onClose: (result: ExtractModal<T>["result"]) => {
+                        res(result);
                         unmount(instance);
                     }
                 }

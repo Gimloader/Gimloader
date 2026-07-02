@@ -32,8 +32,8 @@ export default class StateManager {
         }
 
         Storage.init(state.pluginStorage, state.settings, state.pluginSettings);
-        LibManager.init(state.libraries);
-        PluginManager.init(state.plugins);
+        LibManager.init(state.libraries, state.libraryLayout);
+        PluginManager.init(state.plugins, state.pluginLayout);
         Hotkeys.init(state.hotkeys);
         UpdateNotifier.init(state.availableUpdates);
         Rewriter.init(state.cacheInvalid || versionChanged);
@@ -42,8 +42,8 @@ export default class StateManager {
 
     static syncWithState(state: State) {
         Storage.updateState(state.pluginStorage, state.settings);
-        LibManager.updateState(state.libraries);
-        PluginManager.updateState(state.plugins);
+        LibManager.updateState(state.libraries, state.libraryLayout);
+        PluginManager.updateState(state.plugins, state.pluginLayout);
         Hotkeys.updateState(state.hotkeys);
         UpdateNotifier.onUpdate(state.availableUpdates);
         Rewriter.updateState(state.cacheInvalid);
@@ -70,10 +70,10 @@ export default class StateManager {
         readUserFile(".json", (text) => {
             try {
                 const state = JSON.parse(text);
-                const { plugins, libraries, pluginStorage, pluginSettings, settings, hotkeys, ...rest } = state;
+                const { plugins, libraries, pluginLayout, libraryLayout, pluginStorage, pluginSettings, settings, hotkeys, ...rest } = state;
 
                 // confirm that at least one of the keys is present
-                if(!plugins && !libraries && !pluginStorage && !pluginSettings && !settings && !hotkeys) {
+                if(!plugins && !libraries && !pluginLayout && !libraryLayout && !pluginStorage && !pluginSettings && !settings && !hotkeys) {
                     toast.error("That config appears to be invalid!");
                     return;
                 }
@@ -83,7 +83,7 @@ export default class StateManager {
                     toast("That config may be invalid, attempting to load anyways...");
                 }
 
-                Port.sendAndRecieve("setState", { plugins, libraries, pluginStorage, pluginSettings, settings, hotkeys, cacheInvalid: true });
+                Port.sendAndRecieve("setState", { plugins, libraries, pluginLayout, libraryLayout, pluginStorage, pluginSettings, settings, hotkeys, cacheInvalid: true });
             } catch {
                 toast.error("That config appears to be invalid!");
             }

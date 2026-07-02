@@ -2,7 +2,7 @@ import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
 import Port from "$shared/net/port.svelte";
 import { Deferred } from "$content/utils";
-import type { PluginInfo } from "$types/net/state";
+import type { PluginInfo, ScriptLayout } from "$types/net/state";
 import Modals from "../modals.svelte";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
@@ -18,13 +18,13 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
     constructor() {
         super(Plugin, "plugin");
 
-        Port.on("pluginCreate", (info) => this.onCreate(info));
+        Port.on("pluginCreate", ({ info, folder }) => this.onCreate(info, folder));
         Port.on("pluginSetAll", ({ enabled }) => this.onSetAll(enabled));
         Port.on("pluginToggled", ({ name, enabled }) => this.onToggled(name, enabled));
     }
 
-    override async init(info: PluginInfo[]) {
-        super.init(info);
+    override async init(info: PluginInfo[], layout: ScriptLayout) {
+        super.init(info, layout);
 
         const toRun = this.scripts.filter(p => p.enabled);
         await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
@@ -107,17 +107,18 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         const info = { name: headers.name, code, enabled: false };
         this.deleteConflicting(info.name);
 
-        const created = this.onCreate(info);
+        const folder = this.openFolderId;
+        const created = this.onCreate(info, folder);
 
         // Create it disabled and enable it
-        Port.send("pluginCreate", info);
+        Port.send("pluginCreate", { folder, info });
         created.toggleConfirm(true);
 
         return created;
     }
 
-    override onCreate(info: PluginInfo) {
-        const plugin = super.onCreate(info);
+    override onCreate(info: PluginInfo, folder: string) {
+        const plugin = super.onCreate(info, folder);
         if(info.enabled) plugin.start(false);
 
         return plugin;
@@ -161,7 +162,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         if(!confirmed) throw new Error("User declined downloading dependency");
 
         // Download the plugin
-        await downloadScript(downloadUrl, "plugin", true);
+        await downloadScript(downloadUrl, "root", "plugin", true);
         const script = this.getScript(name);
         if(!script) throw new Error(`Failed to download dependency ${name}`);
 

@@ -33,7 +33,8 @@
         class="w-auto h-auto flex flex-col {options.className}"
         style={options.style}
         preflight={false}
-        interactOutsideBehavior={options.closeOnBackgroundClick === false ? "ignore" : "close"}>
+        interactOutsideBehavior={options.closeOnBackgroundClick === false ? "ignore" : "close"}
+    >
         {#if options.title}
             <Dialog.Header class="text-2xl font-bold!">{options.title}</Dialog.Header>
         {/if}
@@ -46,7 +47,8 @@
                     : button.style === "danger"
                     ? "destructive"
                     : "default"}
-                    onclick={(e: MouseEvent) => onButtonClick(e, button)}>
+                    onclick={(e: MouseEvent) => onButtonClick(e, button)}
+                >
                     {button.text}
                 </Button>
             {/each}

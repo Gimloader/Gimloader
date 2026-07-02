@@ -1,4 +1,4 @@
-import type { LibraryInfo, State } from "$types/net/state";
+import type { State } from "$types/net/state";
 import type { Messages, OnceMessages, OnceResponses } from "$types/net/messages";
 import ScriptHandler from "./script";
 import Scripts from "$bg/scripts";
@@ -7,7 +7,7 @@ import { englishList } from "$shared/utils";
 
 export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
     constructor() {
-        super("library", "libraries");
+        super("library", "libraries", "libraryLayout");
     }
 
     override init() {
@@ -18,18 +18,18 @@ export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
     }
 
     async onLibraryCreate(state: State, message: Messages["libraryCreate"]) {
-        await this.deleteConflicting(message.name);
+        await this.deleteConflicting(message.info.name);
 
-        const info: LibraryInfo = {
-            name: message.name,
-            code: message.code
-        };
-
-        state.libraries.push(info);
-        Scripts.createLibrary(info);
+        state.libraries.push(message.info);
+        state.libraryLayout[message.folder].contents.push({
+            type: "script",
+            id: message.info.name
+        });
+        Scripts.createLibrary(message.info);
 
         Server.executeAndSend("cacheInvalid", { invalid: true });
         this.save();
+        this.saveLayout();
     }
 
     async tryDeleteAllLibraries(state: State, message: OnceMessages["tryDeleteAllLibraries"], respond: (response: OnceResponses["tryDeleteAllLibraries"]) => void) {

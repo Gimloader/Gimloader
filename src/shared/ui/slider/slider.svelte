@@ -24,14 +24,16 @@ get along, so we shut typescript up by casting `value` to `never`.
         "data-vertical:min-h-40 relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:w-auto data-vertical:flex-col",
         className
     )}
-    {...restProps}>
+    {...restProps}
+>
     {#snippet children({ thumbItems })}
         <span
             data-slot="slider-track"
             data-orientation={orientation}
             class={cn(
                 "bg-muted rounded-full data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1 bg-muted relative grow overflow-hidden data-horizontal:w-full data-vertical:h-full"
-            )}>
+            )}
+        >
             <SliderPrimitive.Range
                 data-slot="slider-range"
                 class={cn(

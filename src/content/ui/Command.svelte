@@ -138,7 +138,8 @@
         class="
             data-selected:bg-accent data-selected:text-accent-foreground w-full outline-hidden
             relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1! text-sm!
-        ">
+        "
+    >
         {text}
     </button>
 {/snippet}
@@ -148,7 +149,8 @@
     <Dialog.Content
         class="flex flex-col p-0 gap-0 overflow-hidden z-overlay"
         style="width: min(600px, 90vw)"
-        showCloseButton={false}>
+        showCloseButton={false}
+    >
         {#if !Commands.action}
             <div class="flex h-9 items-center gap-2 border-b pl-3 pr-8">
                 <Search class="size-4 shrink-0 opacity-50" />

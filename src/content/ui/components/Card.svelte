@@ -68,7 +68,8 @@
             style:cursor={dragAllowed ? dragDisabled ? "grab" : "grabbing" : "not-allowed"}
             title={dragAllowed ? "" : "Cannot rearrange while searching"}
             class:opacity-50={!dragAllowed}
-            onpointerdown={checkDrag}>
+            onpointerdown={checkDrag}
+        >
             <DotsGrid size={28} />
         </div>
     {/if}

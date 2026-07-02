@@ -1,4 +1,4 @@
-import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, PluginStorage, SavedState, Settings, State } from "$types/net/state";
+import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, PluginStorage, SavedState, ScriptLayout, Settings, State } from "$types/net/state";
 import { defaultSettings } from "$shared/consts";
 import debounce from "debounce";
 import type { ScriptType } from "$types/net/messages";
@@ -8,6 +8,8 @@ export const statePromise = new Promise<State>(async (res) => {
     const savedState = await chrome.storage.local.get<SavedState>({
         plugins: [],
         libraries: [],
+        pluginLayout: { root: { contents: [] } },
+        libraryLayout: { root: { contents: [] } },
         pluginStorage: {},
         pluginSettings: {},
         settings: defaultSettings,
@@ -15,9 +17,16 @@ export const statePromise = new Promise<State>(async (res) => {
         cacheInvalid: false
     });
 
+    const plugins = sanitizePlugins(savedState.plugins);
+    const libraries = sanitizeLibraries(savedState.libraries);
+    const pluginNames = new Set(plugins.map(p => p.name));
+    const libraryNames = new Set(libraries.map(p => p.name));
+
     res({
-        plugins: sanitizePlugins(savedState.plugins),
-        libraries: sanitizeLibraries(savedState.libraries),
+        plugins,
+        libraries,
+        pluginLayout: sanitizeLayout(savedState.pluginLayout, pluginNames),
+        libraryLayout: sanitizeLayout(savedState.libraryLayout, libraryNames),
         pluginStorage: sanitizePluginStorage(savedState.pluginStorage),
         pluginSettings: sanitizePluginStorage(savedState.pluginSettings),
         settings: sanitizeSettings(savedState.settings),
@@ -39,6 +48,9 @@ export function saveDebounced(key: keyof SavedState) {
 
     debounced[key]();
 }
+
+const isString = (value: any) => value && typeof value === "string";
+const isObject = (value: any) => typeof value === "object" && value !== null;
 
 export function sanitizeScriptInfo(info: PluginInfo[], type: "plugin"): PluginInfo[];
 export function sanitizeScriptInfo(info: LibraryInfo[], type: "library"): LibraryInfo[];
@@ -87,8 +99,61 @@ export function sanitizeLibraries(libraries: LibraryInfo[]) {
     return sanitizeScriptInfo(libraries, "library");
 }
 
+export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
+    if(!isObject(layout)) layout = {};
+
+    // Remove invalid folders
+    for(const folderId in layout) {
+        const folder = layout[folderId];
+
+        if(
+            !isObject(folder)
+            || !Array.isArray(folder.contents)
+            || (folderId !== "root" && !isString(folder.name))
+        ) {
+            delete layout[folderId];
+        }
+    }
+
+    // Make sure root exists
+    layout.root ??= { contents: [] };
+
+    // Confirm all the items are valid
+    for(const folderId in layout) {
+        const folder = layout[folderId];
+        const contents: LayoutItem[] = [];
+
+        for(const item of folder.contents) {
+            if(!isObject(item)) continue;
+
+            if(item.type === "script") {
+                if(!scripts.has(item.id)) continue;
+                scripts.delete(item.id);
+
+                contents.push({ type: "script", id: item.id });
+                Scripts.setFolder(item.id, folderId);
+            } else if(item.type === "folder") {
+                if(!layout[item.id]) continue;
+
+                layout[item.id].parent = folderId;
+                contents.push({ type: "folder", id: item.id });
+            }
+        }
+    }
+
+    // Add scripts that are not elsewhere to root
+    for(const script of scripts) {
+        layout.root.contents.push({
+            type: "script",
+            id: script
+        });
+    }
+
+    return layout;
+}
+
 export function sanitizePluginStorage(storage: PluginStorage) {
-    if(typeof storage !== "object" || storage === null) return {};
+    if(!isObject(storage)) return {};
 
     for(const key in storage) {
         if(typeof storage[key] !== "object" || storage[key] === null) {
@@ -100,7 +165,7 @@ export function sanitizePluginStorage(storage: PluginStorage) {
 }
 
 export function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
-    if(typeof hotkeys !== "object" || hotkeys === null) return {};
+    if(!isObject(hotkeys)) return {};
 
     for(const id in hotkeys) {
         const invalidate = () => delete hotkeys[id];
@@ -156,7 +221,7 @@ export function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
 
 export function copyOverDefault<T extends Record<string, any>>(obj: T, defaultVal: T): T {
     const newObj = Object.assign({}, defaultVal);
-    if(typeof obj !== "object" || obj === null) return newObj;
+    if(!isObject(obj)) return newObj;
 
     for(const key in defaultVal) {
         if(typeof obj[key] === typeof defaultVal[key]) {

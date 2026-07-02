@@ -34,6 +34,7 @@ Port.on("toast", (msg) => {
 });
 
 Port.init((state) => {
+    log("Recieved initial state", state);
     StateManager.initState(state);
 }, (state) => {
     log("Resynchronizing with state", state);

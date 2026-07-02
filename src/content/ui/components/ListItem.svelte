@@ -54,7 +54,8 @@
         <button
             class="transition-transform"
             style={expanded ? "transform: rotate(90deg)" : ""}
-            onclick={() => expanded = !expanded}>
+            onclick={() => expanded = !expanded}
+        >
             <ChevronRight width={28} height={28} />
         </button>
         {@render toggle?.()}
@@ -70,7 +71,8 @@
                 style:cursor={dragAllowed ? dragDisabled ? "grab" : "grabbing" : "not-allowed"}
                 title={dragAllowed ? "" : "Cannot rearrange while searching"}
                 class:opacity-50={!dragAllowed}
-                onpointerdown={checkDrag}>
+                onpointerdown={checkDrag}
+            >
                 <DotsGrid size={28} />
             </div>
         {/if}

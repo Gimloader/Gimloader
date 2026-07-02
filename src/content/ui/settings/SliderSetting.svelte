@@ -60,15 +60,18 @@
     class="w-[250px] relative h-1 bg-gray-300 rounded-full mt-3 mr-1 mb-10 font-mono"
     class:dragging={dragging}
     bind:this={track}
-    style:margin-right="{lastTickWidth + 8}px;">
+    style:margin-right="{lastTickWidth + 8}px;"
+>
     <div
         class="absolute top-1/2 -translate-1/2 size-5 rounded-full bg-primary-400 hover:bg-primary-500 z-20 cursor-ew-resize thumb"
         style:left="{thumbLeft}%"
-        onpointerdown={startDragging}>
+        onpointerdown={startDragging}
+    >
     </div>
     <div
         class="absolute -translate-x-1/2 left-0 bottom-4 bg-accent rounded-md px-2 py-1 select-none value hidden z-30"
-        style:left="{thumbLeft}%">
+        style:left="{thumbLeft}%"
+    >
         {formatValue(roundValue(value))}
     </div>
     {#each ticks as tick}

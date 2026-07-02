@@ -52,8 +52,9 @@ export default class MiscHandler {
 
             // Delete and recreate the script if it changed types
             if(type !== old.type) {
+                const folder = Scripts.getFolder(message.name);
                 await Server.executeAndSend(`${old.type}Delete`, { name: message.name });
-                await this.createScript(type, headers.name, message.code);
+                await this.createScript(type, headers.name, message.code, folder);
             } else {
                 await Server.executeAndSend(`${type}Edit`, {
                     name: message.name,
@@ -63,19 +64,22 @@ export default class MiscHandler {
                 });
             }
         } else {
-            await this.createScript(type, headers.name, message.code);
+            await this.createScript(type, headers.name, message.code, "root");
         }
 
         await Server.executeAndSend("cacheInvalid", { invalid: true });
         respond();
     }
 
-    static async createScript(type: ScriptType, name: string, code: string) {
+    static async createScript(type: ScriptType, name: string, code: string, folder: string) {
         if(type === "plugin") {
             await Server.executeAndSend("pluginCreate", {
-                name,
-                code,
-                enabled: false
+                folder,
+                info: {
+                    name,
+                    code,
+                    enabled: false
+                }
             });
 
             // Enable the plugin by default if there won't be any issues
@@ -85,8 +89,11 @@ export default class MiscHandler {
             }
         } else {
             await Server.executeAndSend("libraryCreate", {
-                name,
-                code
+                folder,
+                info: {
+                    name,
+                    code
+                }
             });
         }
     }

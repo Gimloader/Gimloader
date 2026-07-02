@@ -15,7 +15,7 @@ export default new class LibraryManager extends ScriptManager<Library, LibraryIn
     constructor() {
         super(Library, "library");
 
-        Port.on("libraryCreate", (info) => this.onCreate(info));
+        Port.on("libraryCreate", ({ info, folder }) => this.onCreate(info, folder));
     }
 
     async create(code: string) {
@@ -28,8 +28,9 @@ export default new class LibraryManager extends ScriptManager<Library, LibraryIn
         const info = { name: headers.name, code };
         this.deleteConflicting(info.name);
 
-        const created = this.onCreate(info);
-        Port.send("libraryCreate", info);
+        const folder = this.openFolderId;
+        const created = this.onCreate(info, folder);
+        Port.send("libraryCreate", { info, folder });
 
         return created;
     }
@@ -76,7 +77,7 @@ export default new class LibraryManager extends ScriptManager<Library, LibraryIn
         if(!confirmed) throw new Error("User declined downloading dependency");
 
         // Download the plugin
-        await downloadScript(downloadUrl, "library", true);
+        await downloadScript(downloadUrl, "root", "library", true);
         const script = this.getScript(name);
         if(!script) throw new Error(`Failed to download dependency ${name}`);
 
