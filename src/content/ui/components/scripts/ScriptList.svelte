@@ -11,7 +11,7 @@
     import ScriptFolder from "./ScriptFolder.svelte";
     import Modals from "$core/modals.svelte";
     import FolderPlus from "@lucide/svelte/icons/folder-plus";
-    import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+    import { capitalize } from "$shared/utils";
 
     interface Props {
         buttons: Snippet;
@@ -64,12 +64,18 @@
 
         manager.createFolder(manager.openFolderId, name);
     }
-
-    function backFolder() {
-        const parent = manager.currentFolder.parent;
-        if(parent) manager.viewFolder(parent);
-    }
 </script>
+
+{#snippet folderName(id: string)}
+    {@const folder = manager.layout[id]}
+    {#if folder.parent && folder.parent !== "root"}
+        {@render folderName(folder.parent)}
+    {/if}
+    <div>&gt;</div>
+    <button class="underline" onclick={() => manager.viewFolder(id)}>
+        {folder.name}
+    </button>
+{/snippet}
 
 <div class="flex flex-col max-h-full">
     <div class="flex items-center mb-[3px]">
@@ -84,10 +90,12 @@
         {@render noScripts()}
     {/if}
     {#if manager.currentFolder.parent}
-        <button class="flex items-center gap-2" onclick={backFolder}>
-            <ChevronLeft />
-            {manager.currentFolder.name}
-        </button>
+        <div class="flex items-center gap-2 pb-1">
+            <button class="underline" onclick={() => manager.viewFolder("root")}>
+                {capitalize(manager.plural)}
+            </button>
+            {@render folderName(manager.openFolderId)}
+        </div>
     {/if}
     <div
         class="overflow-y-auto outline-none grid gap-4 pb-1 grow view-{Storage.settings.menuView}"

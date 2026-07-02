@@ -13,4 +13,8 @@ export function englishList(items: string[], combiner = "and") {
     else return `${items.slice(0, -1).join(", ")}, ${combiner} ${items.at(-1)}`;
 }
 
+export function capitalize(string: string) {
+    return string[0].toUpperCase() + string.slice(1);
+}
+
 export const nop = () => {};
