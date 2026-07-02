@@ -4,9 +4,9 @@
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import { Button } from "$shared/ui/button";
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
-    import UrlInstall from "../components/UrlInstall.svelte";
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import ScriptItem from "../components/scripts/ScriptItem.svelte";
+    import Modals from "$core/modals.svelte";
 
     function importLib() {
         readUserFile(".js", (code) => {
@@ -20,10 +20,10 @@
         LibManager.deleteAllConfirm();
     }
 
-    let urlInstallOpen = $state(false);
+    function openUrlInstall() {
+        Modals.open("urlInstall", { manager: LibManager });
+    }
 </script>
-
-<UrlInstall bind:open={urlInstallOpen} placeholder="Library URL" manager={LibManager} />
 
 <ScriptList manager={LibManager} Script={ScriptItem}>
     {#snippet buttons()}
@@ -37,7 +37,7 @@
             <DropdownMenu.Content>
                 <DropdownMenu.Item onclick={() => showEditor("library")}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importLib}>Upload File</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={() => urlInstallOpen = true}>Install From URL</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>

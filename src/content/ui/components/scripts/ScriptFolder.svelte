@@ -7,7 +7,7 @@
 
     interface Props {
         id: string;
-        manager: ScriptManager<any, any>;
+        manager: ScriptManager;
         startDrag: () => void;
         dragDisabled: boolean;
         dragAllowed: boolean;

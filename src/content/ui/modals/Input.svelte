@@ -30,7 +30,7 @@
 </script>
 
 <Dialog.Root bind:open onOpenChangeComplete={onOpenChange}>
-    <Dialog.Content class="block" style="max-width: min(760px, calc(100% - 32px))">
+    <Dialog.Content class="block" style="max-width: min(600px, calc(100% - 32px))">
         <Dialog.Header class="font-bold text-lg w-full border-b">
             {title}
         </Dialog.Header>
@@ -38,8 +38,8 @@
             {placeholder}
             bind:value
             class="
-                text-2xl! not-focus:border-b-gray-400 border-b
-                w-full mt-10! mb-5! px-2 py-1 text-gray-600!
+                border-primary border-3 rounded-md
+                w-full mt-10! mb-5! px-3 py-2 text-gray-600!
             "
         />
         <Dialog.Footer>

@@ -5,8 +5,8 @@
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
-    import UrlInstall from "../components/UrlInstall.svelte";
     import ScriptList from "../components/scripts/ScriptList.svelte";
+    import Modals from "$core/modals.svelte";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -35,10 +35,10 @@
         PluginManager.deleteAll(false);
     }
 
-    let urlInstallOpen = $state(false);
+    function openUrlInstall() {
+        Modals.open("urlInstall", { manager: PluginManager });
+    }
 </script>
-
-<UrlInstall bind:open={urlInstallOpen} placeholder="Plugin URL" manager={PluginManager} />
 
 <ScriptList manager={PluginManager} Script={Plugin}>
     {#snippet buttons()}
@@ -55,7 +55,7 @@
             <DropdownMenu.Content>
                 <DropdownMenu.Item onclick={() => showEditor("plugin")}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importPlugin}>Upload File</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={() => urlInstallOpen = true}>Install From URL</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>

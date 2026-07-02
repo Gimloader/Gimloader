@@ -9,7 +9,7 @@ import Commands from "../commands.svelte";
 import type { CommandContext } from "$types/api/commands";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
 
-export default abstract class ScriptManager<T extends Script, I extends ScriptInfo> {
+export default abstract class ScriptManager<T extends Script = any, I extends ScriptInfo = any> {
     abstract singular: string;
     abstract plural: string;
     scripts: T[] = $state([]);

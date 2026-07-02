@@ -16,7 +16,7 @@
     interface Props {
         buttons: Snippet;
         noScripts: Snippet;
-        manager: ScriptManager<any, any>;
+        manager: ScriptManager;
         Script: Component<any>;
     }
 
