@@ -3,6 +3,7 @@
     import type ScriptManager from "$core/scripts/scriptManager.svelte";
     import Storage from "$core/storage.svelte";
     import { englishList } from "$shared/utils";
+    import type { Snippet } from "svelte";
     import Card from "../Card.svelte";
     import ListItem from "../ListItem.svelte";
     import FolderOpen from "@lucide/svelte/icons/folder-open";
@@ -15,6 +16,7 @@
         startDrag: () => void;
         dragDisabled: boolean;
         dragAllowed: boolean;
+        toggle?: Snippet;
     }
 
     let {
@@ -22,7 +24,8 @@
         manager,
         startDrag,
         dragDisabled,
-        dragAllowed
+        dragAllowed,
+        toggle
     }: Props = $props();
 
     let name = $derived(manager.layout[id]?.name);
@@ -62,7 +65,7 @@
     }
 </script>
 
-<Component {dragDisabled} {startDrag} {dragAllowed}>
+<Component {dragDisabled} {startDrag} {dragAllowed} {toggle}>
     {#snippet header()}
         <button class="flex items-center gap-2 border-b border-gray-400 w-full" onclick={openFolder}>
             <FolderOpen />

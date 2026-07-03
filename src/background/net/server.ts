@@ -1,4 +1,4 @@
-import type { Messages, OnceMessages, OnceResponses } from "$types/net/messages";
+import type { Messages, OnceMessages, ExtractOnceMessage, OnceMessageProps, OnceResponder } from "$types/net/messages";
 import type { State } from "$types/net/state";
 import HotkeysHandler from "$bg/messageHandlers/hotkeys";
 import JsCacheHandler from "$bg/messageHandlers/jsCache";
@@ -19,7 +19,11 @@ interface Message {
 }
 
 type UpdateCallback<Channel extends keyof Messages> = (state: State, message: Messages[Channel]) => boolean | void | Promise<boolean | void>;
-type MessageCallback<Channel extends keyof OnceMessages> = (state: State, message: OnceMessages[Channel], respond: (response?: OnceResponses[Channel]) => void) => void | Promise<void>;
+type MessageCallback<Channel extends OnceMessages["channel"]> = (
+    state: State,
+    message: OnceMessageProps<Channel>,
+    respond: OnceResponder<Channel>
+) => void | Promise<void>;
 
 export default new class Server {
     open = new Set<Port>();
@@ -65,7 +69,7 @@ export default new class Server {
             const callback = this.messageListeners.get(type);
             if(!callback) return;
 
-            callback(await statePromise, message, (response?: void) => {
+            callback(await statePromise, message, (response: any) => {
                 port.postMessage({ returnId, response });
             });
         } else {
@@ -88,7 +92,7 @@ export default new class Server {
         this.listeners.set(type, callback);
     }
 
-    onMessage<Channel extends keyof OnceMessages>(type: Channel, callback: MessageCallback<Channel>) {
+    onMessage<Channel extends OnceMessages["channel"]>(type: Channel, callback: MessageCallback<Channel>) {
         this.messageListeners.set(type, callback);
     }
 
@@ -110,7 +114,7 @@ export default new class Server {
         }
     }
 
-    async trigger<Channel extends keyof OnceMessages>(type: Channel, message: OnceMessages[Channel]) {
+    async trigger<Channel extends OnceMessages["channel"]>(type: Channel, message: OnceMessageProps<Channel>) {
         const listener = this.messageListeners.get(type);
         if(!listener) return;
 

@@ -1,5 +1,5 @@
 import type { State } from "$types/net/state";
-import type { Messages, OnceMessages, OnceResponses } from "$types/net/messages";
+import type { Messages, OnceMessageProps, OnceResponder } from "$types/net/messages";
 import ScriptHandler from "./script";
 import Scripts from "$bg/scripts";
 import Server from "$bg/net/server";
@@ -32,7 +32,7 @@ export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
         this.saveLayout();
     }
 
-    async onTryDeleteAllLibraries(state: State, message: OnceMessages["tryDeleteAllLibraries"], respond: (response: OnceResponses["tryDeleteAllLibraries"]) => void) {
+    async onTryDeleteAllLibraries(state: State, message: OnceMessageProps<"tryDeleteAllLibraries">, respond: OnceResponder<"tryDeleteAllLibraries">) {
         const allWillDisable = new Set<string>();
         const willDelete = new Set<string>();
 

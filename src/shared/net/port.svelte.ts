@@ -1,7 +1,7 @@
 import type { State } from "$types/net/state";
 import EventEmitter2 from "eventemitter2";
 import { isFirefox, portCryptoAlgorithm } from "../consts";
-import type { Messages, OnceMessages, OnceResponses, StateMessages } from "$types/net/messages";
+import type { ExtractOnceMessage, Messages, OnceMessageProps, OnceMessages, StateMessages } from "$types/net/messages";
 import { log } from "$shared/utils";
 import { Deferred } from "$content/utils";
 
@@ -135,8 +135,8 @@ export default new class Port extends EventEmitter2 {
         this.postMessage(type, message);
     }
 
-    sendAndRecieve<Channel extends keyof OnceMessages>(type: Channel, message: OnceMessages[Channel]) {
-        return new Promise<OnceResponses[Channel]>((res) => {
+    sendAndRecieve<Channel extends OnceMessages["channel"]>(type: Channel, message: OnceMessageProps<Channel>) {
+        return new Promise<ExtractOnceMessage<Channel>["response"]>((res) => {
             const returnId = crypto.randomUUID();
             this.pendingMessages.set(returnId, res);
             this.postMessage(type, message, returnId);

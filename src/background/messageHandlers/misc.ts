@@ -1,8 +1,8 @@
+import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
+import type { State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { sanitizeHotkeys, sanitizeLibraries, sanitizePlugins, sanitizePluginStorage, sanitizeSettings, saveDebounced } from "$bg/state";
 import Updater from "$bg/net/updater";
-import type { OnceMessages, OnceResponses, ScriptType } from "$types/net/messages";
-import type { State } from "$types/net/state";
 import Scripts from "$bg/scripts";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Poller from "$bg/net/poller";
@@ -14,11 +14,11 @@ export default class MiscHandler {
         Server.onMessage("editOrCreate", this.onEditOrCreate.bind(this));
     }
 
-    static onGetState(state: State, _: OnceMessages["getState"], respond: (response: OnceResponses["getState"]) => void) {
+    static onGetState(state: State, _: OnceMessageProps<"getState">, respond: OnceResponder<"getState">) {
         respond(state);
     }
 
-    static onSetState(state: State, newState: OnceMessages["setState"], respond: () => void) {
+    static onSetState(state: State, newState: OnceMessageProps<"setState">, respond: OnceResponder<"setState">) {
         const { plugins, libraries, pluginStorage, pluginSettings, settings, hotkeys } = newState;
 
         if(plugins) state.plugins = sanitizePlugins(plugins);
@@ -43,7 +43,7 @@ export default class MiscHandler {
         respond();
     }
 
-    static async onEditOrCreate(_: State, message: OnceMessages["editOrCreate"], respond: () => void) {
+    static async onEditOrCreate(_: State, message: OnceMessageProps<"editOrCreate">, respond: OnceResponder<"editOrCreate">) {
         const headers = parseScriptHeaders(message.code);
         const type: ScriptType = headers.isLibrary !== "false" ? "library" : "plugin";
 

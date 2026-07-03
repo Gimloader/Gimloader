@@ -19,7 +19,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         super(Plugin, "plugin");
 
         Port.on("pluginCreate", ({ info, folder }) => this.onCreate(info, folder));
-        Port.on("pluginSetAll", ({ enabled }) => this.onSetAll(enabled));
+        Port.on("pluginSetAll", ({ enabled, folder }) => this.onSetAll(enabled, folder));
         Port.on("pluginToggled", ({ name, enabled }) => this.onToggled(name, enabled));
     }
 
@@ -39,9 +39,10 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         return script.enabled;
     }
 
-    async setAllConfirm(enabled: boolean, confirmed = false) {
+    async setAllConfirm(enabled: boolean, folder?: string, confirmed = false) {
         const response = await Port.sendAndRecieve("trySetAllPlugins", {
             enabled,
+            folder,
             confirmed
         });
 
@@ -55,15 +56,15 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
                     type: "error",
                     title
                 });
-                return false;
+                return;
             }
             case "downloadError":
                 Modals.open("error", {
                     text: response.message,
                     title: "Download Error"
                 });
-                return false;
-            case "confirm": {
+                return;
+            case "dependencyConfirm": {
                 const scripts = response.scripts.map(s => this.getScript(s)).filter(s => s) as Plugin[];
                 const title = "Dependencies need to be downloaded";
 
@@ -74,20 +75,49 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
                 });
                 if(!confirmed) return;
 
-                this.setAllConfirm(enabled, true);
+                this.setAllConfirm(enabled, folder, true);
+                return;
+            }
+            case "confirm": {
+                const title = `Plugins depend on plugins in this folder`;
+                const confirmed = await Modals.open("confirm", {
+                    text: response.message,
+                    title
+                });
+                if(!confirmed) return;
+
+                this.setAllConfirm(enabled, folder, true);
                 return;
             }
         }
     }
 
-    setAll(enabled: boolean) {
-        this.onSetAll(enabled);
+    setAll(enabled: boolean, folder?: string) {
+        this.onSetAll(enabled, folder);
         Port.send("pluginSetAll", { enabled });
     }
 
-    onSetAll(enable: boolean) {
-        const toSet = this.scripts.filter(p => p.enabled !== enable);
-        for(const plugin of toSet) plugin.onToggled(enable);
+    onSetAll(enabled: boolean, folder?: string) {
+        if(folder) {
+            this.folderSetAll(enabled, folder);
+        } else {
+            const toSet = this.scripts.filter(p => p.enabled !== enabled);
+            for(const plugin of toSet) plugin.onToggled(enabled);
+        }
+    }
+
+    folderSetAll(enabled: boolean, id: string) {
+        const folder = this.layout[id];
+        if(!folder) return;
+
+        for(const item of folder.contents) {
+            if(item.type === "folder") {
+                this.folderSetAll(enabled, item.id);
+            } else {
+                const plugin = this.getScript(item.id);
+                if(plugin && plugin.enabled !== enabled) plugin.onToggled(enabled);
+            }
+        }
     }
 
     onToggled(name: string, enabled: boolean) {

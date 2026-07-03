@@ -47,7 +47,7 @@ export interface StateMessages {
     pluginCreate: { folder: string; info: PluginInfo };
     pluginArrange: ScriptArrange;
     pluginToggled: { name: string; enabled: boolean };
-    pluginSetAll: { enabled: boolean };
+    pluginSetAll: { enabled: boolean; folder?: string };
     pluginFolderCreate: FolderCreate;
     pluginFolderDelete: FolderDelete;
     pluginFolderEdit: FolderEdit;
@@ -80,25 +80,6 @@ export interface FolderTryDelete {
     confirmed?: boolean;
 }
 
-// These go from content to background and generally expect a response
-export interface OnceMessages {
-    getState: void;
-    setState: SavedState;
-    applyUpdates: { apply: boolean };
-    updateAll: void;
-    updateSingle: { name: string };
-    showEditor: { type: ScriptType; name?: string };
-    pluginTryDelete: ScriptTryDelete;
-    libraryTryDelete: ScriptTryDelete;
-    pluginFolderTryDelete: FolderTryDelete;
-    libraryFolderTryDelete: FolderTryDelete;
-    tryDeleteAllLibraries: { confirmed?: boolean };
-    tryTogglePlugin: { name: string; enabled: boolean; confirmed?: boolean };
-    trySetAllPlugins: { enabled: boolean; confirmed?: boolean };
-    downloadScript: { url: string; folder: string; confirmed?: boolean; type?: ScriptType };
-    editOrCreate: { code: string; name: string | null; updated?: boolean };
-}
-
 interface Success {
     status: "success";
 }
@@ -118,11 +99,12 @@ interface Confirm {
     message: string;
 }
 
-interface MultipleDependencyError extends DependencyError {
+interface DependencyConfirm {
+    status: "dependencyConfirm";
     scripts: string[];
 }
 
-interface MultipleConfirm extends Confirm {
+interface MultipleDependencyError extends DependencyError {
     scripts: string[];
 }
 
@@ -130,25 +112,29 @@ interface DownloadSuccess extends Success {
     name: string;
 }
 
-type ToggleResult = Success | DependencyError | DownloadError | Confirm;
+export type ToggleResult = Success | DependencyError | DownloadError | Confirm;
 export type DeleteResult = Success | Confirm;
-type SetAllResult = Success | MultipleDependencyError | DownloadError | MultipleConfirm;
-type DownloadResult = DownloadSuccess | Confirm | DownloadError;
+export type SetAllResult = Success | MultipleDependencyError | DownloadError | DependencyConfirm | Confirm;
+export type DownloadResult = DownloadSuccess | Confirm | DownloadError;
 
-export interface OnceResponses {
-    getState: State;
-    setState: void;
-    applyUpdates: void;
-    updateAll: string[];
-    updateSingle: UpdateResponse;
-    showEditor: void;
-    pluginTryDelete: DeleteResult;
-    libraryTryDelete: DeleteResult;
-    pluginFolderTryDelete: DeleteResult;
-    libraryFolderTryDelete: DeleteResult;
-    tryDeleteAllLibraries: DeleteResult;
-    tryTogglePlugin: ToggleResult;
-    trySetAllPlugins: SetAllResult;
-    downloadScript: DownloadResult;
-    editOrCreate: void;
-}
+export type OnceMessage<Channel extends string, Props, Response = void> = { channel: Channel; props: Props; response: Response };
+export type OnceMessages =
+    | OnceMessage<"getState", void, State>
+    | OnceMessage<"setState", SavedState>
+    | OnceMessage<"applyUpdates", { apply: boolean }>
+    | OnceMessage<"updateAll", void, string[]>
+    | OnceMessage<"updateSingle", { name: string }, UpdateResponse>
+    | OnceMessage<"showEditor", { type: ScriptType; name?: string }>
+    | OnceMessage<"pluginTryDelete", ScriptTryDelete, DeleteResult>
+    | OnceMessage<"libraryTryDelete", ScriptTryDelete, DeleteResult>
+    | OnceMessage<"pluginFolderTryDelete", FolderTryDelete, DeleteResult>
+    | OnceMessage<"libraryFolderTryDelete", FolderTryDelete, DeleteResult>
+    | OnceMessage<"tryDeleteAllLibraries", { confirmed?: boolean }, DeleteResult>
+    | OnceMessage<"tryTogglePlugin", { name: string; enabled: boolean; confirmed?: boolean }, ToggleResult>
+    | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string, confirmed?: boolean }, SetAllResult>
+    | OnceMessage<"downloadScript", { url: string; folder: string; confirmed?: boolean; type?: ScriptType }, DownloadResult>
+    | OnceMessage<"editOrCreate", { code: string; name: string | null; updated?: boolean }>
+
+export type ExtractOnceMessage<Channel extends OnceMessages["channel"]> = Extract<OnceMessages, OnceMessage<Channel, any, any>>;
+export type OnceMessageProps<Channel extends OnceMessages["channel"]> = ExtractOnceMessage<Channel>["props"];
+export type OnceResponder<Channel extends OnceMessages["channel"]> = (response: ExtractOnceMessage<Channel>["response"]) => void;

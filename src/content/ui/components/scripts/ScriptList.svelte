@@ -12,15 +12,23 @@
     import Modals from "$core/modals.svelte";
     import FolderPlus from "@lucide/svelte/icons/folder-plus";
     import { capitalize } from "$shared/utils";
+    import ScriptItem from "./ScriptItem.svelte";
 
     interface Props {
         buttons: Snippet;
         noScripts: Snippet;
         manager: ScriptManager;
-        Script: Component<any>;
+        Script?: Component<any>;
+        Folder?: Component<any>;
     }
 
-    let { buttons, noScripts, manager, Script }: Props = $props();
+    let {
+        buttons,
+        noScripts,
+        manager,
+        Script = ScriptItem,
+        Folder = ScriptFolder
+    }: Props = $props();
 
     let searchValue = $state("");
     let searchLower = $derived(searchValue.toLowerCase());
@@ -110,7 +118,7 @@
                         {@const script = manager.getScript(item.id)!}
                         <Script {script} {startDrag} {dragDisabled} {dragAllowed} />
                     {:else}
-                        <ScriptFolder id={item.id} {manager} {startDrag} {dragDisabled} {dragAllowed} />
+                        <Folder id={item.id} {manager} {startDrag} {dragDisabled} {dragAllowed} />
                     {/if}
                 </div>
             {/each}

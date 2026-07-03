@@ -8,6 +8,7 @@
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
+    import PluginFolder from "./PluginFolder.svelte";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -47,7 +48,7 @@
     }
 </script>
 
-<ScriptList manager={PluginManager} Script={Plugin}>
+<ScriptList manager={PluginManager} Script={Plugin} Folder={PluginFolder}>
     {#snippet buttons()}
         <Button class="h-7" onclick={() => officialPluginsOpen = true}>
             Official Plugins

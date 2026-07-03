@@ -32,7 +32,7 @@
     }
 </script>
 
-<ScriptList manager={LibManager} Script={ScriptItem}>
+<ScriptList manager={LibManager}>
     {#snippet buttons()}
         <DropdownMenu.Root>
             <DropdownMenu.Trigger class="mr-1.5!">

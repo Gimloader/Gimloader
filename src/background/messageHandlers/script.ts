@@ -143,6 +143,14 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         return scripts;
     }
 
+    getFolderWillDisable(state: State, folderId: string) {
+        const allWillDisable = new Set<string>();
+        const inFolder = this.getScriptsInFolder(state, folderId);
+
+        for(const script of inFolder) Scripts.checkDependents(script, allWillDisable);
+        return allWillDisable.difference(inFolder);
+    }
+
     onFolderCreate(state: State, message: FolderCreate) {
         state[this.layoutKey][message.id] = {
             name: message.name,
@@ -159,11 +167,7 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
     }
 
     async onTryFolderDelete(state: State, message: FolderTryDelete, respond: (response: DeleteResult) => void) {
-        const allWillDisable = new Set<string>();
-        const inFolder = this.getScriptsInFolder(state, message.id);
-
-        for(const script of inFolder) Scripts.checkDependents(script, allWillDisable);
-        const willDisable = allWillDisable.difference(inFolder);
+        const willDisable = this.getFolderWillDisable(state, message.id);
 
         // Confirm if necessary
         if(willDisable.size > 0 && !message.confirmed) {
