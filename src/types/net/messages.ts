@@ -3,10 +3,31 @@ import type { UpdateResponse } from "./downloads";
 import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, SavedState, State } from "./state";
 
 export type ScriptType = "plugin" | "library";
-export type ScriptEdit = { name: string; newName: string; code: string; updated?: boolean };
-export type ScriptDelete = { name: string };
-export type ScriptArrange = { folder: string; order: string[] };
-export type FolderCreate = { parent: string; name: string; id: string };
+export interface ScriptEdit {
+    name: string;
+    newName: string;
+    code: string;
+    updated?: boolean;
+}
+export interface ScriptDelete {
+    name: string;
+}
+export interface ScriptArrange {
+    folder: string;
+    order: string[];
+}
+export interface FolderCreate {
+    parent: string;
+    name: string;
+    id: string;
+}
+export interface FolderDelete {
+    id: string;
+}
+export interface FolderEdit {
+    id: string;
+    newName: string;
+}
 
 // These go both ways
 export interface StateMessages {
@@ -18,6 +39,8 @@ export interface StateMessages {
     libraryCreate: { folder: string; info: LibraryInfo };
     libraryArrange: ScriptArrange;
     libraryFolderCreate: FolderCreate;
+    libraryFolderDelete: FolderDelete;
+    libraryFolderEdit: FolderEdit;
 
     pluginDelete: ScriptDelete;
     pluginDeleteAll: void;
@@ -26,6 +49,8 @@ export interface StateMessages {
     pluginToggled: { name: string; enabled: boolean };
     pluginSetAll: { enabled: boolean };
     pluginFolderCreate: FolderCreate;
+    pluginFolderDelete: FolderDelete;
+    pluginFolderEdit: FolderEdit;
 
     settingUpdate: { key: string; value: any };
 
@@ -50,6 +75,10 @@ export interface ScriptTryDelete {
     name: string;
     confirmed?: boolean;
 }
+export interface FolderTryDelete {
+    id: string;
+    confirmed?: boolean;
+}
 
 // These go from content to background and generally expect a response
 export interface OnceMessages {
@@ -61,6 +90,8 @@ export interface OnceMessages {
     showEditor: { type: ScriptType; name?: string };
     pluginTryDelete: ScriptTryDelete;
     libraryTryDelete: ScriptTryDelete;
+    pluginFolderTryDelete: FolderTryDelete;
+    libraryFolderTryDelete: FolderTryDelete;
     tryDeleteAllLibraries: { confirmed?: boolean };
     tryTogglePlugin: { name: string; enabled: boolean; confirmed?: boolean };
     trySetAllPlugins: { enabled: boolean; confirmed?: boolean };
@@ -113,6 +144,8 @@ export interface OnceResponses {
     showEditor: void;
     pluginTryDelete: DeleteResult;
     libraryTryDelete: DeleteResult;
+    pluginFolderTryDelete: DeleteResult;
+    libraryFolderTryDelete: DeleteResult;
     tryDeleteAllLibraries: DeleteResult;
     tryTogglePlugin: ToggleResult;
     trySetAllPlugins: SetAllResult;

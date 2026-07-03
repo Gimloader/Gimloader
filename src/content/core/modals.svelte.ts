@@ -2,7 +2,6 @@ import type { Plugin } from "./scripts/plugin.svelte";
 import type { Script } from "./scripts/script.svelte";
 import { mount, unmount, type Component } from "svelte";
 import { domLoaded } from "$content/utils";
-import ScriptManager from "./scripts/scriptManager.svelte";
 
 export interface Updated {
     name: string;
@@ -29,8 +28,7 @@ type ModalTypes =
     | ModalInfo<"pluginSettings", { plugin: Plugin }>
     | ModalInfo<"dependency", DependencyProps, boolean>
     | ModalInfo<"singleChangelog", SingleChangelogProps>
-    | ModalInfo<"input", { title: string; placeholder?: string }, string | null>
-    | ModalInfo<"urlInstall", { manager: ScriptManager }>;
+    | ModalInfo<"input", { title: string; defaultVal?: string; placeholder?: string }, string | null>;
 
 type ExtractModal<Type extends ModalTypes["type"]> = Extract<ModalTypes, ModalInfo<Type, any, any>>;
 

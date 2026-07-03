@@ -8,6 +8,7 @@ import { folderLocations, getItemFolder, scripts } from "./map";
 import Commands from "../commands.svelte";
 import type { CommandContext } from "$types/api/commands";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
+import Modals from "$core/modals.svelte";
 
 export default abstract class ScriptManager<T extends Script = any, I extends ScriptInfo = any> {
     abstract singular: string;
@@ -28,6 +29,8 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         Port.on(`${type}DeleteAll`, () => this.onDeleteAll());
         Port.on(`${type}Arrange`, ({ folder, order }) => this.onArrange(folder, order));
         Port.on(`${type}FolderCreate`, ({ parent, name, id }) => this.onCreateFolder(parent, name, id));
+        Port.on(`${type}FolderDelete`, ({ id }) => this.onFolderDelete(id));
+        Port.on(`${type}FolderEdit`, ({ id, newName }) => this.onEditFolder(id, newName));
     }
 
     init(info: I[], layout: ScriptLayout) {
@@ -37,9 +40,10 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
             scripts.set(script.headers.name, script);
         }
 
-        // Set the folders that items are in
+        // Set the folders that scripts are in
         for(const folderId in layout) {
             for(const item of layout[folderId].contents) {
+                if(item.type === "folder") continue;
                 folderLocations.set(item.id, folderId);
             }
         }
@@ -124,6 +128,13 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         if(oldName !== headers.name) {
             scripts.delete(oldName);
             scripts.set(headers.name, script);
+
+            // Move the folder location if renamed
+            const folder = folderLocations.get(oldName);
+            if(folder) {
+                folderLocations.delete(oldName);
+                folderLocations.set(headers.name, folder);
+            }
         }
 
         if(updated && headers.version && headers.changelog.length > 0) {
@@ -143,9 +154,6 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         const folder = getItemFolder(name);
         const itemIndex = this.layout[folder].contents.findIndex(i => i.id === name);
         this.layout[folder].contents.splice(itemIndex, 1);
-
-        scripts.delete(name);
-        folderLocations.delete(name);
     }
 
     deleteAll(shouldToast: boolean) {
@@ -164,7 +172,6 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
     onDeleteAll() {
         for(const script of this.scripts) {
             script.delete();
-            scripts.delete(script.headers.name);
         }
 
         this.scripts = [];
@@ -187,12 +194,11 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
     }
 
     deleteConflicting(name: string) {
-        const index = this.scripts.findIndex(s => s.headers.name === name);
-        if(index === -1) return;
+        if(!this.getScript(name)) return;
 
-        this.scripts.splice(index, 1);
-        scripts.delete(name);
+        this.onDelete(name);
         Port.send(`${this.type}Delete`, { name });
+
         toast.warning(`Overwrote ${this.singular} ${name}`);
     }
 
@@ -259,5 +265,54 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
             type: "folder",
             id
         });
+    }
+
+    async folderTryDelete(id: string, confirmed = false) {
+        const response = await Port.sendAndRecieve(`${this.type}FolderTryDelete`, { id, confirmed });
+
+        if(response.status === "confirm") {
+            const title = `Plugins depend on ${this.plural} in this folder`;
+            const confirmed = await Modals.open("confirm", {
+                text: response.message,
+                title
+            });
+            if(!confirmed) return;
+
+            this.folderTryDelete(id, true);
+        }
+    }
+
+    onFolderDelete(id: string) {
+        const parent = this.layout[id].parent;
+        if(!parent) return;
+
+        const contents = this.layout[parent].contents;
+        const index = contents.findIndex((s) => s.id === id);
+        contents.splice(index, 1);
+
+        this.deleteFolderContents(id);
+    }
+
+    deleteFolderContents(id: string) {
+        for(const item of this.layout[id].contents) {
+            if(item.type === "script") {
+                const index = this.scripts.findIndex((s) => s.headers.name === item.id);
+                this.scripts[index].delete();
+                this.scripts.splice(index, 1);
+            } else {
+                this.onFolderDelete(item.id);
+            }
+        }
+
+        delete this.layout[id];
+    }
+
+    editFolder(id: string, newName: string) {
+        Port.send("pluginFolderEdit", { id, newName });
+        this.onEditFolder(id, newName);
+    }
+
+    onEditFolder(id: string, newName: string) {
+        this.layout[id].name = newName;
     }
 }

@@ -1,8 +1,8 @@
-import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
 import type { Dependency } from "$types/net/downloads";
 import type { ScriptType } from "$types/net/messages";
 import type { ScriptHeaders } from "$types/scripts";
 import type { LibraryInfo, PluginInfo } from "$types/net/state";
+import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
 
 interface BaseEntry {
     // Only direct dependents/dependencies
@@ -172,9 +172,7 @@ export default class Scripts {
         return { error, willDownload, willEnable };
     }
 
-    static checkDependents(name: string) {
-        const willDisable: string[] = [];
-
+    static checkDependents(name: string, willDisable = new Set<string>()) {
         const check = (name: string) => {
             const script = this.map.get(name);
             if(!script) return;
@@ -184,14 +182,14 @@ export default class Scripts {
                 if(!entry) continue;
 
                 if(entry.type === "plugin" && entry.info.enabled) {
-                    willDisable.push(depName);
+                    willDisable.add(depName);
                 }
 
                 check(depName);
             }
         };
-        check(name);
 
+        check(name);
         return willDisable;
     }
 }

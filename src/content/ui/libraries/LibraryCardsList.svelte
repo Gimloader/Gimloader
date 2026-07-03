@@ -7,6 +7,7 @@
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import ScriptItem from "../components/scripts/ScriptItem.svelte";
     import Modals from "$core/modals.svelte";
+    import { downloadScript } from "$core/net/download";
 
     function importLib() {
         readUserFile(".js", (code) => {
@@ -20,8 +21,14 @@
         LibManager.deleteAllConfirm();
     }
 
-    function openUrlInstall() {
-        Modals.open("urlInstall", { manager: LibManager });
+    async function openUrlInstall() {
+        const url = await Modals.open("input", {
+            title: "Install library from URL",
+            placeholder: "Library URL"
+        });
+        if(!url) return;
+
+        downloadScript(url, LibManager.openFolderId, "library");
     }
 </script>
 

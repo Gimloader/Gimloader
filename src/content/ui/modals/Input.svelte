@@ -1,17 +1,19 @@
 <script lang="ts">
     import { Button } from "$shared/ui/button";
     import * as Dialog from "$shared/ui/dialog";
+    import type { Action } from "svelte/action";
 
     interface Props {
         title: string;
         placeholder?: string;
+        defaultVal: string;
         onClose: (value: string) => void;
     }
 
-    let { title, placeholder, onClose }: Props = $props();
+    let { title, placeholder, defaultVal = "", onClose }: Props = $props();
 
     let cancelled = false;
-    let value = $state("");
+    let value = $state(defaultVal);
     let open = $state(true);
 
     function onOpenChange() {
@@ -27,6 +29,19 @@
     function onConfirmClick() {
         open = false;
     }
+
+    function onkeydown(e: KeyboardEvent) {
+        if(e.key === "Enter") {
+            open = false;
+            e.preventDefault();
+        }
+    }
+
+    const focusAction: Action = (input) => {
+        if(!defaultVal || !(input instanceof HTMLInputElement)) return;
+        input.focus();
+        input.select();
+    };
 </script>
 
 <Dialog.Root bind:open onOpenChangeComplete={onOpenChange}>
@@ -36,7 +51,9 @@
         </Dialog.Header>
         <input
             {placeholder}
+            {onkeydown}
             bind:value
+            use:focusAction
             class="
                 border-primary border-3 rounded-md
                 w-full mt-10! mb-5! px-3 py-2 text-gray-600!

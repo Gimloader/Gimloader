@@ -14,8 +14,6 @@
     import Pencil from "svelte-material-icons/Pencil.svelte";
     import BookSettings from "svelte-material-icons/BookSettings.svelte";
     import Update from "svelte-material-icons/Update.svelte";
-    import Cog from "svelte-material-icons/Cog.svelte";
-    import Reload from "svelte-material-icons/Reload.svelte";
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";

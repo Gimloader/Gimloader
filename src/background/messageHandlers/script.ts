@@ -1,4 +1,4 @@
-import type { DeleteResult, FolderCreate, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
+import type { DeleteResult, FolderCreate, FolderDelete, FolderEdit, FolderTryDelete, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
 import type { LayoutItem, State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { saveDebounced } from "$bg/state";
@@ -25,7 +25,10 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         Server.on(`${this.type}Arrange`, this.onScriptArrange.bind(this));
         Server.on(`${this.type}DeleteAll`, this.onScriptDeleteAll.bind(this));
         Server.on(`${this.type}FolderCreate`, this.onFolderCreate.bind(this));
+        Server.on(`${this.type}FolderDelete`, this.onFolderDelete.bind(this));
+        Server.on(`${this.type}FolderEdit`, this.onFolderEdit.bind(this));
         Server.onMessage(`${this.type}TryDelete`, this.onTryDelete.bind(this));
+        Server.onMessage(`${this.type}FolderTryDelete`, this.onTryFolderDelete.bind(this));
     }
 
     save() {
@@ -96,8 +99,8 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
     async onTryDelete(_: State, message: ScriptTryDelete, respond: (response: DeleteResult) => void) {
         const willDisable = Scripts.checkDependents(message.name);
 
-        if(willDisable.length > 0 && !message.confirmed) {
-            const names = englishList(willDisable);
+        if(willDisable.size > 0 && !message.confirmed) {
+            const names = englishList([...willDisable]);
             const msg = `Deleting ${message.name} will also disable ${names}. Continue?`;
             respond({ status: "confirm", message: msg });
             return;
@@ -126,6 +129,20 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         this.saveLayout();
     }
 
+    getScriptsInFolder(state: State, folderId: string, scripts = new Set<string>()) {
+        const folder = state[this.layoutKey][folderId];
+
+        for(const item of folder.contents) {
+            if(item.type === "folder") {
+                this.getScriptsInFolder(state, item.id, scripts);
+            } else {
+                scripts.add(item.id);
+            }
+        }
+
+        return scripts;
+    }
+
     onFolderCreate(state: State, message: FolderCreate) {
         state[this.layoutKey][message.id] = {
             name: message.name,
@@ -138,6 +155,65 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
             id: message.id
         });
 
+        this.saveLayout();
+    }
+
+    async onTryFolderDelete(state: State, message: FolderTryDelete, respond: (response: DeleteResult) => void) {
+        const allWillDisable = new Set<string>();
+        const inFolder = this.getScriptsInFolder(state, message.id);
+
+        for(const script of inFolder) Scripts.checkDependents(script, allWillDisable);
+        const willDisable = allWillDisable.difference(inFolder);
+
+        // Confirm if necessary
+        if(willDisable.size > 0 && !message.confirmed) {
+            const names = englishList([...willDisable]);
+            const folderName = state[this.layoutKey][message.id]?.name;
+            const confirmMessage = `Deleting ${folderName} will also disable ${names}. Continue?`;
+            respond({ status: "confirm", message: confirmMessage });
+            return;
+        }
+
+        // Disable dependents
+        for(const name of willDisable) {
+            await Server.executeAndSend("pluginToggled", { name, enabled: false });
+        }
+
+        Server.executeAndSend(`${this.type}FolderDelete`, { id: message.id });
+        respond({ status: "success" });
+    }
+
+    onFolderDelete(state: State, message: FolderDelete) {
+        const parent = state[this.layoutKey][message.id]?.parent;
+        if(!parent) return;
+
+        // Remove the folder entry from its parents
+        const contents = state[this.layoutKey][parent].contents;
+        const index = contents.findIndex((i) => i.id === message.id);
+        contents.splice(index, 1);
+
+        this.deleteFolderContents(state, message.id);
+
+        this.save();
+        this.saveLayout();
+    }
+
+    deleteFolderContents(state: State, folder: string) {
+        for(const item of state[this.layoutKey][folder].contents) {
+            if(item.type === "folder") {
+                this.deleteFolderContents(state, item.id);
+            } else {
+                // Delete the script
+                const index = state[this.key].findIndex((s) => s.name === item.id);
+                state[this.key].splice(index, 1);
+            }
+        }
+
+        delete state[this.layoutKey][folder];
+    }
+
+    onFolderEdit(state: State, message: FolderEdit) {
+        state[this.layoutKey][message.id].name = message.newName;
         this.saveLayout();
     }
 }

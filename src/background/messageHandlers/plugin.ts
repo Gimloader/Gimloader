@@ -119,8 +119,8 @@ export default new class PluginsHandler extends ScriptHandler<"plugins"> {
         } else {
             const willDisable = Scripts.checkDependents(message.name);
 
-            if(willDisable.length > 0 && !message.confirmed) {
-                const names = englishList(willDisable);
+            if(willDisable.size > 0 && !message.confirmed) {
+                const names = englishList([...willDisable]);
                 const msg = `Disabling ${message.name} will also disable ${names}. Continue?`;
                 respond({ status: "confirm", message: msg });
                 return;

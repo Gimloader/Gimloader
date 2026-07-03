@@ -14,7 +14,7 @@ export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
         super.init();
 
         Server.on("libraryCreate", this.onLibraryCreate.bind(this));
-        Server.onMessage("tryDeleteAllLibraries", this.tryDeleteAllLibraries.bind(this));
+        Server.onMessage("tryDeleteAllLibraries", this.onTryDeleteAllLibraries.bind(this));
     }
 
     async onLibraryCreate(state: State, message: Messages["libraryCreate"]) {
@@ -32,18 +32,19 @@ export default new class LibrariesHandler extends ScriptHandler<"libraries"> {
         this.saveLayout();
     }
 
-    async tryDeleteAllLibraries(state: State, message: OnceMessages["tryDeleteAllLibraries"], respond: (response: OnceResponses["tryDeleteAllLibraries"]) => void) {
-        const willDisable = new Set<string>();
+    async onTryDeleteAllLibraries(state: State, message: OnceMessages["tryDeleteAllLibraries"], respond: (response: OnceResponses["tryDeleteAllLibraries"]) => void) {
+        const allWillDisable = new Set<string>();
+        const willDelete = new Set<string>();
 
         for(const lib of state.libraries) {
-            const dependents = Scripts.checkDependents(lib.name);
-            for(const dep of dependents) {
-                willDisable.add(dep);
-            }
+            Scripts.checkDependents(lib.name, allWillDisable);
+            willDelete.add(lib.name);
         }
 
+        const willDisable = allWillDisable.difference(willDelete);
+
         if(willDisable.size > 0 && !message.confirmed) {
-            const names = englishList(Array.from(willDisable));
+            const names = englishList([...willDisable]);
             const message = `Deleting all libraries will also disable ${names}. Continue?`;
             respond({ status: "confirm", message });
             return;

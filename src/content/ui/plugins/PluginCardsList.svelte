@@ -7,6 +7,7 @@
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import Modals from "$core/modals.svelte";
+    import { downloadScript } from "$core/net/download";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -35,8 +36,14 @@
         PluginManager.deleteAll(false);
     }
 
-    function openUrlInstall() {
-        Modals.open("urlInstall", { manager: PluginManager });
+    async function openUrlInstall() {
+        const url = await Modals.open("input", {
+            title: "Install plugin from URL",
+            placeholder: "Plugin URL"
+        });
+        if(!url) return;
+
+        downloadScript(url, PluginManager.openFolderId, "plugin");
     }
 </script>
 

@@ -6,7 +6,7 @@ import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
 import { gameState } from "$content/stores";
 import Modals from "../modals.svelte";
-import { scripts } from "./map";
+import { folderLocations, scripts } from "./map";
 import Port from "$shared/net/port.svelte";
 import { signaturePublicKey } from "$shared/consts";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
@@ -244,6 +244,9 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     delete() {
         this.stop();
+
+        scripts.delete(this.headers.name);
+        folderLocations.delete(this.headers.name);
     }
 
     signatureRegex = /\n\s*\*\s*@signature \S+\n/g;
