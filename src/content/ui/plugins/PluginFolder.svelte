@@ -6,12 +6,13 @@
 
     interface Props {
         id: string;
+        dragging: string | null;
         startDrag: () => void;
         dragDisabled: boolean;
         dragAllowed: boolean;
     }
 
-    let { id, startDrag, dragDisabled, dragAllowed }: Props = $props();
+    let { id, dragging, startDrag, dragDisabled, dragAllowed }: Props = $props();
 
     function setAll(enabled: boolean) {
         const name = PluginManager.layout[id].name;
@@ -20,7 +21,7 @@
     }
 </script>
 
-<ScriptFolder {id} {startDrag} {dragDisabled} {dragAllowed} manager={PluginManager}>
+<ScriptFolder {id} {dragging} {startDrag} {dragDisabled} {dragAllowed} manager={PluginManager}>
     {#snippet toggle()}
         <div class="border-gray-700 border rounded-md flex overflow-hidden shrink-0">
             <button class="p-1 hover:bg-gray-300 border-r border-gray-700" onclick={() => setAll(true)}>

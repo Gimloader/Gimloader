@@ -1,4 +1,5 @@
 import type { Settings } from "$types/net/state";
+import type { Options } from "svelte-dnd-action";
 
 export const isFirefox = navigator.userAgent.includes("Firefox");
 
@@ -35,7 +36,14 @@ export const defaultSettings: Settings = {
     showPluginButtons: true
 };
 
-export const flipDurationMs = 300;
+export const flipDurationMs = 350;
+
+export const dndZoneSettings: Partial<Options> = {
+    flipDurationMs,
+    useCursorForDetection: true,
+    morphDisabled: true,
+    dropTargetStyle: {}
+};
 
 export const glslTypes = [
     "bool",

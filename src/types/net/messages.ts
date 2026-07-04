@@ -1,6 +1,6 @@
 import type { HotkeyTrigger } from "../api/hotkeys";
 import type { UpdateResponse } from "./downloads";
-import type { ConfigurableHotkeysState, LibraryInfo, PluginInfo, SavedState, State } from "./state";
+import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, SavedState, State } from "./state";
 
 export type ScriptType = "plugin" | "library";
 export interface ScriptEdit {
@@ -28,6 +28,10 @@ export interface FolderEdit {
     id: string;
     newName: string;
 }
+export interface ItemMove {
+    item: LayoutItem;
+    folder: string;
+}
 
 // These go both ways
 export interface StateMessages {
@@ -41,6 +45,7 @@ export interface StateMessages {
     libraryFolderCreate: FolderCreate;
     libraryFolderDelete: FolderDelete;
     libraryFolderEdit: FolderEdit;
+    libraryItemMove: ItemMove;
 
     pluginDelete: ScriptDelete;
     pluginDeleteAll: void;
@@ -51,6 +56,7 @@ export interface StateMessages {
     pluginFolderCreate: FolderCreate;
     pluginFolderDelete: FolderDelete;
     pluginFolderEdit: FolderEdit;
+    pluginItemMove: ItemMove;
 
     settingUpdate: { key: string; value: any };
 
@@ -131,9 +137,9 @@ export type OnceMessages =
     | OnceMessage<"libraryFolderTryDelete", FolderTryDelete, DeleteResult>
     | OnceMessage<"tryDeleteAllLibraries", { confirmed?: boolean }, DeleteResult>
     | OnceMessage<"tryTogglePlugin", { name: string; enabled: boolean; confirmed?: boolean }, ToggleResult>
-    | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string, confirmed?: boolean }, SetAllResult>
+    | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string; confirmed?: boolean }, SetAllResult>
     | OnceMessage<"downloadScript", { url: string; folder: string; confirmed?: boolean; type?: ScriptType }, DownloadResult>
-    | OnceMessage<"editOrCreate", { code: string; name: string | null; updated?: boolean }>
+    | OnceMessage<"editOrCreate", { code: string; name: string | null; updated?: boolean }>;
 
 export type ExtractOnceMessage<Channel extends OnceMessages["channel"]> = Extract<OnceMessages, OnceMessage<Channel, any, any>>;
 export type OnceMessageProps<Channel extends OnceMessages["channel"]> = ExtractOnceMessage<Channel>["props"];

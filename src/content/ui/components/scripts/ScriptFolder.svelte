@@ -1,17 +1,22 @@
 <script lang="ts">
-    import Modals from "$core/modals.svelte";
     import type ScriptManager from "$core/scripts/scriptManager.svelte";
+    import type { LayoutItem } from "$types/net/state";
+    import type { Snippet } from "svelte";
+    import Modals from "$core/modals.svelte";
     import Storage from "$core/storage.svelte";
     import { englishList } from "$shared/utils";
-    import type { Snippet } from "svelte";
     import Card from "../Card.svelte";
     import ListItem from "../ListItem.svelte";
     import FolderOpen from "@lucide/svelte/icons/folder-open";
     import Delete from "svelte-material-icons/Delete.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte";
+    import { dndzone, type DndEvent } from "svelte-dnd-action";
+    import { dndZoneSettings } from "$shared/consts";
+    import { createTransformDragged } from "$content/utils";
 
     interface Props {
         id: string;
+        dragging: string | null;
         manager: ScriptManager;
         startDrag: () => void;
         dragDisabled: boolean;
@@ -21,6 +26,7 @@
 
     let {
         id,
+        dragging,
         manager,
         startDrag,
         dragDisabled,
@@ -63,9 +69,46 @@
 
         manager.editFolder(id, newName);
     }
+
+    let items: LayoutItem[] = $state([]);
+
+    function handleDndConsider(e: CustomEvent<DndEvent<LayoutItem>>) {
+        items = e.detail.items;
+    }
+
+    function handleDndFinalize(e: CustomEvent<DndEvent<LayoutItem>>) {
+        items = [];
+
+        const droppedItem = e.detail.items[0];
+        if(!droppedItem) return;
+
+        manager.moveItem(droppedItem, id);
+    }
 </script>
 
 <Component {dragDisabled} {startDrag} {dragAllowed} {toggle}>
+    {#snippet overlay()}
+        {#if dragging && dragging !== id}
+            <div
+                class="absolute top-0 left-0 w-full h-full bg-gray-500/50"
+                use:dndzone={{
+                    ...dndZoneSettings,
+                    items,
+                    dragDisabled: true,
+                    transformDraggedElement: createTransformDragged("scale(50%)")
+                }}
+                onconsider={handleDndConsider}
+                onfinalize={handleDndFinalize}
+            >
+                {#each items as item (item.id)}
+                    <div></div>
+                {/each}
+            </div>
+            <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                <FolderOpen color="var(--color-primary)" class="h-1/2 w-1/2" />
+            </div>
+        {/if}
+    {/snippet}
     {#snippet header()}
         <button class="flex items-center gap-2 border-b border-gray-400 w-full" onclick={openFolder}>
             <FolderOpen />

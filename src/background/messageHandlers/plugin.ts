@@ -151,7 +151,7 @@ export default new class PluginsHandler extends ScriptHandler<"plugins"> {
         if(!message.enabled) {
             if(message.folder) {
                 const willDisable = this.getFolderWillDisable(state, message.folder);
-                
+
                 if(willDisable.size > 0 && !message.confirmed) {
                     const names = englishList([...willDisable]);
                     const folderName = state.pluginLayout[message.folder]?.name;

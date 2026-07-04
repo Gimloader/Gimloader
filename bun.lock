@@ -18,7 +18,7 @@
         "monaco-editor": "^0.52.2",
         "svelte": "5.43.0",
         "svelte-awesome-color-picker": "^4.1.0",
-        "svelte-dnd-action": "^0.9.66",
+        "svelte-dnd-action": "^0.9.70",
         "svelte-material-icons": "^3.0.5",
         "svelte-sonner": "^1.0.6",
         "wildcard-match": "^5.1.4",
@@ -451,7 +451,7 @@
 
     "svelte-check": ["svelte-check@4.3.4", "", { "dependencies": { "@jridgewell/trace-mapping": "^0.3.25", "chokidar": "^4.0.1", "fdir": "^6.2.0", "picocolors": "^1.0.0", "sade": "^1.7.4" }, "peerDependencies": { "svelte": "^4.0.0 || ^5.0.0-next.0", "typescript": ">=5.0.0" }, "bin": { "svelte-check": "bin/svelte-check" } }, "sha512-DVWvxhBrDsd+0hHWKfjP99lsSXASeOhHJYyuKOFYJcP7ThfSCKgjVarE8XfuMWpS5JV3AlDf+iK1YGGo2TACdw=="],
 
-    "svelte-dnd-action": ["svelte-dnd-action@0.9.66", "", { "peerDependencies": { "svelte": ">=3.23.0 || ^5.0.0-next.0" } }, "sha512-arH+Xd72qV1DRfOOY0I0n+RBtKlt1vjVVW4ao2B0sU9OW7rXNNukxs+DMyudFJGxuOcxfMaP/PBsD2hsrH97zw=="],
+    "svelte-dnd-action": ["svelte-dnd-action@0.9.70", "", { "peerDependencies": { "svelte": ">=3.23.0 || ^5.0.0-next.0" } }, "sha512-iVqDAW1PtQArA96dHhM5Lwxj39iKNjIuYE+tqpq9DUaBWfv410SpGGFJ3NzPtvptx+YkXBzMYV3lpey8s07q+w=="],
 
     "svelte-material-icons": ["svelte-material-icons@3.0.5", "", { "peerDependencies": { "svelte": "^3.0.0 || ^4.0.0" } }, "sha512-UbhAa+Btd5y6e6DMljVccP+cbJ8lvesltMippiCOvfIUtYe2TsQqM+P6osfrVsZHV47b1tY6AmqCuSpMKnwMOQ=="],
 

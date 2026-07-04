@@ -308,11 +308,28 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
     }
 
     editFolder(id: string, newName: string) {
-        Port.send("pluginFolderEdit", { id, newName });
         this.onEditFolder(id, newName);
+        Port.send("pluginFolderEdit", { id, newName });
     }
 
     onEditFolder(id: string, newName: string) {
         this.layout[id].name = newName;
+    }
+
+    moveItem(item: LayoutItem, folder: string) {
+        this.onMoveItem(item, folder);
+        Port.send(`${this.type}ItemMove`, { item, folder });
+    }
+
+    onMoveItem(item: LayoutItem, folder: string) {
+        const parentId = item.type === "folder" ? this.layout[item.id]?.parent : getItemFolder(item.id);
+        if(!parentId) return;
+
+        const parent = this.layout[parentId];
+        if(!parent) return;
+
+        const index = parent.contents.findIndex((i) => i.id === item.id);
+        parent.contents.splice(index, 1);
+        this.layout[folder]?.contents?.push(item);
     }
 }

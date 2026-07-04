@@ -107,3 +107,10 @@ export const domLoaded = new Promise<void>((res) => {
 });
 
 export const changelog = rawChangelog.split("\n").filter(line => line);
+
+export function createTransformDragged(transform: string) {
+    return (el?: HTMLElement) => {
+        const changeEl = el?.firstElementChild;
+        if(changeEl instanceof HTMLElement) changeEl.style.transform = transform;
+    };
+}

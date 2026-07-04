@@ -1,4 +1,4 @@
-import type { DeleteResult, FolderCreate, FolderDelete, FolderEdit, FolderTryDelete, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
+import type { DeleteResult, FolderCreate, FolderDelete, FolderEdit, FolderTryDelete, ItemMove, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
 import type { LayoutItem, State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { saveDebounced } from "$bg/state";
@@ -27,6 +27,7 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         Server.on(`${this.type}FolderCreate`, this.onFolderCreate.bind(this));
         Server.on(`${this.type}FolderDelete`, this.onFolderDelete.bind(this));
         Server.on(`${this.type}FolderEdit`, this.onFolderEdit.bind(this));
+        Server.on(`${this.type}ItemMove`, this.onItemMove.bind(this));
         Server.onMessage(`${this.type}TryDelete`, this.onTryDelete.bind(this));
         Server.onMessage(`${this.type}FolderTryDelete`, this.onTryFolderDelete.bind(this));
     }
@@ -218,6 +219,20 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
 
     onFolderEdit(state: State, message: FolderEdit) {
         state[this.layoutKey][message.id].name = message.newName;
+        this.saveLayout();
+    }
+
+    onItemMove(state: State, { item, folder }: ItemMove) {
+        const parentId = item.type === "folder" ? state[this.layoutKey][item.id]?.parent : Scripts.getFolder(item.id);
+        if(!parentId) return;
+
+        const parent = state[this.layoutKey][parentId];
+        if(!parent) return;
+
+        const index = parent.contents.findIndex((i) => i.id === item.id);
+        parent.contents.splice(index, 1);
+        state[this.layoutKey][folder]?.contents?.push(item);
+
         this.saveLayout();
     }
 }

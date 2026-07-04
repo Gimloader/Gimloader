@@ -139,6 +139,8 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
                 contents.push({ type: "folder", id: item.id });
             }
         }
+
+        layout[folderId].contents = contents;
     }
 
     // Add scripts that are not elsewhere to root

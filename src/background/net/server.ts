@@ -1,4 +1,4 @@
-import type { Messages, OnceMessages, ExtractOnceMessage, OnceMessageProps, OnceResponder } from "$types/net/messages";
+import type { ExtractOnceMessage, Messages, OnceMessageProps, OnceMessages, OnceResponder } from "$types/net/messages";
 import type { State } from "$types/net/state";
 import HotkeysHandler from "$bg/messageHandlers/hotkeys";
 import JsCacheHandler from "$bg/messageHandlers/jsCache";
