@@ -9,6 +9,8 @@
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
     import PluginFolder from "./PluginFolder.svelte";
+    import Port from "$shared/net/port.svelte";
+    import type { LayoutItem } from "$types/net/state";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -20,16 +22,30 @@
     }
 
     function sortEnabled() {
-        // let enabled = PluginManager.scripts.filter((p) => p.enabled);
-        // let disabled = PluginManager.scripts.filter((p) => !p.enabled);
-        // PluginManager.scripts = enabled.concat(disabled);
-        // Port.send("pluginArrange", { order: PluginManager.scripts.map(p => p.headers.name) });
+        const folders = PluginManager.currentFolder.contents.filter(i => i.type === "folder");
+        const plugins = PluginManager.currentFolder.contents.filter(i => i.type !== "folder");
+        const enabled = plugins.filter((p) => PluginManager.getScript(p.id)?.enabled);
+        const disabled = plugins.filter((p) => !PluginManager.getScript(p.id)?.enabled);
+        PluginManager.currentFolder.contents = folders.concat(enabled, disabled);
+
+        Port.send("pluginArrange", {
+            order: PluginManager.currentFolder.contents.map(p => p.id),
+            folder: PluginManager.openFolderId
+        });
+    }
+
+    function getItemName(item: LayoutItem) {
+        if(item.type === "folder") return PluginManager.layout[item.id].name!;
+        return item.id;
     }
 
     function sortAlphabetical() {
-        // let sorted = PluginManager.scripts.sort((a, b) => a.headers.name.localeCompare(b.headers.name));
-        // PluginManager.scripts = sorted;
-        // Port.send("pluginArrange", { order: sorted.map(p => p.headers.name) });
+        PluginManager.currentFolder.contents.sort((a, b) => getItemName(a).localeCompare(getItemName(b)));
+
+        Port.send("pluginArrange", {
+            order: PluginManager.currentFolder.contents.map(p => p.id),
+            folder: PluginManager.openFolderId
+        });
     }
 
     function deleteAll() {

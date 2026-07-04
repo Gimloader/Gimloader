@@ -5,7 +5,6 @@
     import { Button } from "$shared/ui/button";
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
     import ScriptList from "../components/scripts/ScriptList.svelte";
-    import ScriptItem from "../components/scripts/ScriptItem.svelte";
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
 

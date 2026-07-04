@@ -1,5 +1,5 @@
 import type { ScriptHeaders } from "$types/scripts";
-import type { OnceMessages, OnceResponses } from "$types/net/messages";
+import type { OnceMessageProps, OnceResponder } from "$types/net/messages";
 import type { State } from "$types/net/state";
 import type { Dependency, Update } from "$types/net/downloads";
 import { parseScriptHeaders } from "$shared/parseHeader";
@@ -125,13 +125,13 @@ export default class Updater {
         Server.send("availableUpdates", []);
     }
 
-    static async onApplyUpdates(state: State, message: OnceMessages["applyUpdates"], respond: () => void) {
+    static async onApplyUpdates(state: State, message: OnceMessageProps<"applyUpdates">, respond: OnceResponder<"applyUpdates">) {
         await this.applyUpdates(state, message.apply);
 
         respond();
     }
 
-    static async updateAll(state: State, _: OnceMessages["updateAll"], respond: (names: OnceResponses["updateAll"]) => void) {
+    static async updateAll(state: State, _: OnceMessageProps<"updateAll">, respond: OnceResponder<"updateAll">) {
         await this.checkUpdates(false);
         const names = this.updates.map(u => u.name);
 
@@ -139,7 +139,7 @@ export default class Updater {
         respond(names);
     }
 
-    static async updateSingle(_: State, message: OnceMessages["updateSingle"], respond: (updated: OnceResponses["updateSingle"]) => void) {
+    static async updateSingle(_: State, message: OnceMessageProps<"updateSingle">, respond: OnceResponder<"updateSingle">) {
         const script = Scripts.get(message.name);
         if(!script) return respond({ updated: false, failed: true });
 

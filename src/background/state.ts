@@ -119,6 +119,8 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
     layout.root ??= { contents: [] };
 
     // Confirm all the items are valid
+    const seenFolders = new Set<string>(["root"]);
+
     for(const folderId in layout) {
         const folder = layout[folderId];
         const contents: LayoutItem[] = [];
@@ -133,7 +135,8 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
                 contents.push({ type: "script", id: item.id });
                 Scripts.setFolder(item.id, folderId);
             } else if(item.type === "folder") {
-                if(!layout[item.id]) continue;
+                if(!layout[item.id] || seenFolders.has(item.id)) continue;
+                seenFolders.add(item.id);
 
                 layout[item.id].parent = folderId;
                 contents.push({ type: "folder", id: item.id });
@@ -141,6 +144,16 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
         }
 
         layout[folderId].contents = contents;
+    }
+
+    // Add unlinked folders to root
+    for(const folderId in layout) {
+        if(seenFolders.has(folderId)) continue;
+
+        layout.root.contents.push({
+            type: "folder",
+            id: folderId
+        });
     }
 
     // Add scripts that are not elsewhere to root

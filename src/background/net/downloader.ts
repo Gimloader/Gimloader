@@ -1,4 +1,4 @@
-import type { OnceMessages, OnceResponses, ScriptType } from "$types/net/messages";
+import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
 import type { State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { formatDownloadUrl } from "$shared/net/util";
@@ -15,7 +15,7 @@ export default class Downloader {
         Server.onMessage("downloadScript", this.downloadScript.bind(this));
     }
 
-    static async downloadScript(state: State, message: OnceMessages["downloadScript"], respond: (response: OnceResponses["downloadScript"]) => void) {
+    static async downloadScript(state: State, message: OnceMessageProps<"downloadScript">, respond: OnceResponder<"downloadScript">) {
         if(!message.url.startsWith("http://") && !message.url.startsWith("https://")) {
             respond({ status: "downloadError", message: "Invalid URL" });
             return;
