@@ -60,7 +60,11 @@
             }
         }
 
-        Port.sendAndRecieve("editOrCreate", { name, code });
+        Port.sendAndRecieve("editOrCreate", {
+            name,
+            code,
+            folder: params.get("folder") ?? undefined
+        });
 
         name = headers.name;
         saved = true;

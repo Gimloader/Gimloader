@@ -64,7 +64,7 @@ export default class MiscHandler {
                 });
             }
         } else {
-            await this.createScript(type, headers.name, message.code, "root");
+            await this.createScript(type, headers.name, message.code, message.folder ?? "root");
         }
 
         await Server.executeAndSend("cacheInvalid", { invalid: true });

@@ -130,7 +130,7 @@ export type OnceMessages =
     | OnceMessage<"applyUpdates", { apply: boolean }>
     | OnceMessage<"updateAll", void, string[]>
     | OnceMessage<"updateSingle", { name: string }, UpdateResponse>
-    | OnceMessage<"showEditor", { type: ScriptType; name?: string }>
+    | OnceMessage<"showEditor", { type: ScriptType; folder?: string; name?: string }>
     | OnceMessage<"pluginTryDelete", ScriptTryDelete, DeleteResult>
     | OnceMessage<"libraryTryDelete", ScriptTryDelete, DeleteResult>
     | OnceMessage<"pluginFolderTryDelete", FolderTryDelete, DeleteResult>
@@ -139,7 +139,7 @@ export type OnceMessages =
     | OnceMessage<"tryTogglePlugin", { name: string; enabled: boolean; confirmed?: boolean }, ToggleResult>
     | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string; confirmed?: boolean }, SetAllResult>
     | OnceMessage<"downloadScript", { url: string; folder: string; confirmed?: boolean; type?: ScriptType }, DownloadResult>
-    | OnceMessage<"editOrCreate", { code: string; name: string | null; updated?: boolean }>;
+    | OnceMessage<"editOrCreate", { code: string; name: string | null; folder?: string; updated?: boolean }>;
 
 export type ExtractOnceMessage<Channel extends OnceMessages["channel"]> = Extract<OnceMessages, OnceMessage<Channel, any, any>>;
 export type OnceMessageProps<Channel extends OnceMessages["channel"]> = ExtractOnceMessage<Channel>["props"];

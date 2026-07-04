@@ -7,7 +7,6 @@
     import VerifiedCheck from "../VerifiedCheck.svelte";
     import AuthorDisplay from "../AuthorDisplay.svelte";
     import Modals from "$core/modals.svelte";
-    import { showEditor } from "$content/utils";
     import { checkUpdate } from "$core/net/checkUpdates";
     import * as Tooltip from "$shared/ui/tooltip";
     import Delete from "svelte-material-icons/Delete.svelte";
@@ -17,6 +16,7 @@
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
+    import Port from "$shared/net/port.svelte";
 
     interface Props {
         script: Script;
@@ -50,6 +50,13 @@
             script,
             type: "info",
             title: `Dependencies for ${script.headers.name}`
+        });
+    }
+
+    function showEditor() {
+        Port.sendAndRecieve("showEditor", {
+            type: script.type,
+            name: script.headers.name
         });
     }
 </script>
@@ -86,7 +93,7 @@
         <button title="Delete" onclick={deleteScript}>
             <Delete size={28} />
         </button>
-        <button title="Open plugin editor" onclick={() => showEditor(script.type, script.headers.name)}>
+        <button title="Open plugin editor" onclick={showEditor}>
             <Pencil size={28} />
         </button>
         {@render scriptButtons?.()}

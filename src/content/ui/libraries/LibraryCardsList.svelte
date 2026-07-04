@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { readUserFile, showEditor } from "$content/utils";
+    import { createScript, readUserFile } from "$content/utils";
     import LibManager from "$core/scripts/libManager.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import { Button } from "$shared/ui/button";
@@ -42,7 +42,7 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => showEditor("library")}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => createScript(LibManager)}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importLib}>Upload File</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>

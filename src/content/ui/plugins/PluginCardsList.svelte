@@ -1,6 +1,6 @@
 <script lang="ts">
     import Plugin from "./Plugin.svelte";
-    import { readUserFile, showEditor } from "$content/utils";
+    import { createScript, readUserFile } from "$content/utils";
     import { Button } from "$shared/ui/button";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
@@ -61,7 +61,7 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => showEditor("plugin")}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => createScript(PluginManager)}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importPlugin}>Upload File</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
