@@ -9,7 +9,6 @@
     import ViewControl from "../ViewControl.svelte";
     import ScriptFolder from "./ScriptFolder.svelte";
     import Modals from "$core/modals.svelte";
-    import FolderPlus from "@lucide/svelte/icons/folder-plus";
     import { capitalize } from "$shared/utils";
     import ScriptItem from "./ScriptItem.svelte";
     import FolderOpen from "@lucide/svelte/icons/folder-open";
@@ -17,6 +16,9 @@
     import { createTransformDragged } from "$content/utils";
     import { dndZoneSettings } from "$content/stores.svelte";
     import { flipDurationMs } from "$shared/consts";
+    import FolderPlus from "@lucide/svelte/icons/folder-plus";
+    import Eraser from "@lucide/svelte/icons/eraser";
+    import { _length } from "zod/v4/core";
 
     interface Props {
         buttons: Snippet;
@@ -34,6 +36,7 @@
         Folder = ScriptFolder
     }: Props = $props();
 
+    let searchOpen = $state(false);
     let searchValue = $state("");
     let searchLower = $derived(searchValue.toLowerCase());
     let dragAllowed = $derived(searchValue.length === 0);
@@ -42,8 +45,31 @@
 
     let items = $state([...manager.currentFolder.contents]);
     $effect(() => {
-        items = manager.currentFolder.contents
-            .filter(item => manager.getItemName(item).toLowerCase().includes(searchLower));
+        if(!searchLower) {
+            items = [...manager.currentFolder.contents];
+            return;
+        }
+
+        // Search through all available items
+        const matches = (item: LayoutItem) => manager.getItemName(item).toLowerCase().includes(searchLower);
+        let newItems = manager.currentFolder.contents.filter(matches);
+
+        const searchFolder = (id: string, isCurrent = false) => {
+            if(!isCurrent) {
+                if(id === manager.openFolderId) return;
+                newItems = newItems.concat(manager.layout[id].contents.filter(matches));
+            }
+
+            for(const item of manager.layout[id].contents) {
+                if(item.type === "folder") searchFolder(item.id);
+            }
+        };
+
+        // First search items in the current folder, then others
+        searchFolder(manager.openFolderId, true);
+        searchFolder("root");
+
+        items = newItems;
     });
 
     function startDrag(id: string) {
@@ -89,6 +115,11 @@
         if(!droppedItem || !manager.currentFolder.parent) return;
 
         manager.moveItem($state.snapshot(droppedItem), manager.currentFolder.parent);
+    }
+
+    function closeSearch() {
+        searchOpen = false;
+        searchValue = "";
     }
 </script>
 
@@ -145,18 +176,37 @@
             <FolderPlus />
         </button>
         <ViewControl />
-        <Search bind:value={searchValue} />
+        <Search bind:value={searchValue} bind:searchOpen />
     </div>
-    {#if manager.scripts.length === 0}
-        {@render noScripts()}
-    {/if}
-    {#if manager.currentFolder.parent}
-        <div class="flex items-center gap-2 pb-1">
-            <button class="underline" onclick={() => manager.viewFolder("root")}>
-                {capitalize(manager.plural)}
-            </button>
-            {@render folderName(manager.openFolderId)}
-        </div>
+    {#if searchValue.length === 0}
+        {#if manager.scripts.length === 0}
+            <h2 class="text-xl w-full text-center">
+                {@render noScripts()}
+            </h2>
+        {/if}
+        {#if manager.currentFolder.parent}
+            <div class="flex items-center gap-2 pb-1">
+                <button class="underline" onclick={() => manager.viewFolder("root")}>
+                    {capitalize(manager.plural)}
+                </button>
+                {@render folderName(manager.openFolderId)}
+            </div>
+        {/if}
+        {#if manager.currentFolder.contents.length === 0 && manager.openFolderId !== "root"}
+            <h2 class="text-xl">
+                This folder is empty!
+            </h2>
+        {/if}
+    {:else}
+        <button class="underline flex items-center gap-2 pb-1" onclick={closeSearch}>
+            {capitalize(manager.singular)} Search
+            <Eraser size={16} />
+        </button>
+        {#if items.length === 0}
+            <h2 class="text-xl w-full text-center">
+                No {manager.plural} or folders match your search!
+            </h2>
+        {/if}
     {/if}
     <div
         class="overflow-y-auto outline-none grid gap-4 pb-1 grow view-{Storage.settings.menuView} min-h-auto!"

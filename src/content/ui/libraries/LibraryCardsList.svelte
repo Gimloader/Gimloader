@@ -61,6 +61,6 @@
         </DropdownMenu.Root>
     {/snippet}
     {#snippet noScripts()}
-        <h2 class="text-xl">No libraries installed!</h2>
+        No libraries installed! You will be prompted to install these when plugins require them.
     {/snippet}
 </ScriptList>

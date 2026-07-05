@@ -105,12 +105,10 @@
         </DropdownMenu.Root>
     {/snippet}
     {#snippet noScripts()}
-        <h2 class="text-xl w-full text-center">
-            No plugins installed! Check out the
-            <button class="underline" onclick={() => officialPluginsOpen = true}>
-                Official Plugins
-            </button>
-            or import or create your own.
-        </h2>
+        No plugins installed! Check out the
+        <button class="underline" onclick={() => officialPluginsOpen = true}>
+            Official Plugins
+        </button>
+        or import or create your own.
     {/snippet}
 </ScriptList>
