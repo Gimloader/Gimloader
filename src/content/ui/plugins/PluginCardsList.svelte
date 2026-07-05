@@ -10,7 +10,6 @@
     import { downloadScript } from "$core/net/download";
     import PluginFolder from "./PluginFolder.svelte";
     import Port from "$shared/net/port.svelte";
-    import type { LayoutItem } from "$types/net/state";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -34,13 +33,10 @@
         });
     }
 
-    function getItemName(item: LayoutItem) {
-        if(item.type === "folder") return PluginManager.layout[item.id].name!;
-        return item.id;
-    }
-
     function sortAlphabetical() {
-        PluginManager.currentFolder.contents.sort((a, b) => getItemName(a).localeCompare(getItemName(b)));
+        PluginManager.currentFolder.contents.sort((a, b) =>
+            PluginManager.getItemName(a).localeCompare(PluginManager.getItemName(b))
+        );
 
         Port.send("pluginArrange", {
             order: PluginManager.currentFolder.contents.map(p => p.id),

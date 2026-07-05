@@ -5,7 +5,6 @@
     import Storage from "$core/storage.svelte";
     import { dndzone, type DndEvent } from "svelte-dnd-action";
     import Search from "../Search.svelte";
-    import { dndZoneSettings, flipDurationMs } from "$shared/consts";
     import { flip } from "svelte/animate";
     import ViewControl from "../ViewControl.svelte";
     import ScriptFolder from "./ScriptFolder.svelte";
@@ -16,6 +15,8 @@
     import FolderOpen from "@lucide/svelte/icons/folder-open";
     import { Portal } from "bits-ui";
     import { createTransformDragged } from "$content/utils";
+    import { dndZoneSettings } from "$content/stores.svelte";
+    import { flipDurationMs } from "$shared/consts";
 
     interface Props {
         buttons: Snippet;
@@ -39,15 +40,10 @@
     let dragDisabled = $state(true);
     let dragging: string | null = $state(null);
 
-    const getItemName = (item: LayoutItem) => {
-        if(item.type === "folder") return manager.layout[item.id].name!;
-        return item.id;
-    };
-
     let items = $state([...manager.currentFolder.contents]);
     $effect(() => {
         items = manager.currentFolder.contents
-            .filter(item => getItemName(item).toLowerCase().includes(searchLower));
+            .filter(item => manager.getItemName(item).toLowerCase().includes(searchLower));
     });
 
     function startDrag(id: string) {
@@ -92,7 +88,7 @@
         const droppedItem = e.detail.items[0];
         if(!droppedItem || !manager.currentFolder.parent) return;
 
-        manager.moveItem(droppedItem, manager.currentFolder.parent);
+        manager.moveItem($state.snapshot(droppedItem), manager.currentFolder.parent);
     }
 </script>
 
@@ -106,7 +102,7 @@
                         ...dndZoneSettings,
                         items: backItems,
                         dragDisabled: true,
-                        transformDraggedElement: createTransformDragged("scale(50%)")
+                        transformDraggedElement: createTransformDragged("scale(50%)", true)
                     }}
                     onconsider={handleDndConsiderBack}
                     onfinalize={handleDndFinalizeBack}
@@ -122,7 +118,7 @@
                         {#if manager.currentFolder.parent === "root"}
                             {capitalize(manager.plural)}
                         {:else}
-                            {manager.layout[manager.currentFolder.parent]?.name}
+                            {manager.getFolderName(manager.currentFolder.parent)}
                         {/if}
                     </div>
                 </div>
@@ -164,7 +160,12 @@
     {/if}
     <div
         class="overflow-y-auto outline-none grid gap-4 pb-1 grow view-{Storage.settings.menuView} min-h-auto!"
-        use:dndzone={{ ...dndZoneSettings, items, dragDisabled, transformDraggedElement: createTransformDragged("") }}
+        use:dndzone={{
+            ...dndZoneSettings,
+            items,
+            dragDisabled,
+            transformDraggedElement: createTransformDragged("", false)
+        }}
         onconsider={handleDndConsider}
         onfinalize={handleDndFinalize}
     >

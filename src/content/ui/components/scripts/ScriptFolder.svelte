@@ -11,8 +11,8 @@
     import Delete from "svelte-material-icons/Delete.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte";
     import { dndzone, type DndEvent } from "svelte-dnd-action";
-    import { dndZoneSettings } from "$shared/consts";
     import { createTransformDragged } from "$content/utils";
+    import { dndZoneSettings } from "$content/stores.svelte";
 
     interface Props {
         id: string;
@@ -34,7 +34,7 @@
         toggle
     }: Props = $props();
 
-    let name = $derived(manager.layout[id]?.name);
+    let name = $derived(manager.getFolderName(id));
     let Component = $derived(Storage.settings.menuView === "grid" ? Card : ListItem);
 
     const maxListedItems = 5;
@@ -45,7 +45,7 @@
         if(contents.length === 0) return `Contains no ${manager.plural} or folders.`;
 
         // Show up to 5 items
-        const names = contents.map((item) => item.type === "script" ? item.id : manager.layout[item.id].name!);
+        const names = contents.map((item) => manager.getItemName(item));
         if(names.length <= maxListedItems) return `Contains ${englishList(names)}.`;
         return `Contains ${englishList([...names, `${names.length - maxListedItems} more`])}.`;
     });
@@ -82,7 +82,7 @@
         const droppedItem = e.detail.items[0];
         if(!droppedItem) return;
 
-        manager.moveItem(droppedItem, id);
+        manager.moveItem($state.snapshot(droppedItem), id);
     }
 </script>
 
@@ -95,7 +95,7 @@
                     ...dndZoneSettings,
                     items,
                     dragDisabled: true,
-                    transformDraggedElement: createTransformDragged("scale(50%)")
+                    transformDraggedElement: createTransformDragged("scale(50%)", true)
                 }}
                 onconsider={handleDndConsider}
                 onfinalize={handleDndFinalize}

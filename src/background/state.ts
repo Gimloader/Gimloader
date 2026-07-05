@@ -116,7 +116,8 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
     }
 
     // Make sure root exists
-    layout.root ??= { contents: [] };
+    const rootContents = layout.root.contents ?? [];
+    layout.root = { contents: rootContents };
 
     // Confirm all the items are valid
     const seenFolders = new Set<string>(["root"]);

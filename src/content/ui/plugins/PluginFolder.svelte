@@ -15,7 +15,7 @@
     let { id, dragging, startDrag, dragDisabled, dragAllowed }: Props = $props();
 
     function setAll(enabled: boolean) {
-        const name = PluginManager.layout[id].name;
+        const name = PluginManager.getFolderName(id);
         if(!confirm(`Are you sure you want to ${enabled ? "enable" : "disable"} all plugins in ${name}?`)) return;
         PluginManager.setAllConfirm(enabled, id);
     }

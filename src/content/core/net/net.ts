@@ -6,7 +6,7 @@ import { log } from "$shared/utils";
 import Patcher from "../patcher";
 import Rewriter from "../rewriter";
 import wildcardMatch from "wildcard-match";
-import { gameState } from "$content/stores";
+import { gameState } from "$content/stores.svelte";
 import type { WithSymbols } from "$types/util";
 import type { Stores } from "$types/stores";
 

@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { focusTrapEnabled } from "$content/stores";
+import { focusTrapEnabled } from "$content/stores.svelte";
 import GenericModal from "$content/ui/modals/Generic.svelte";
 import { mount, unmount } from "svelte";
 

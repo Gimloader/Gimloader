@@ -225,6 +225,15 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         });
     }
 
+    getFolderName(id: string) {
+        return this.layout[id]?.name ?? this.plural;
+    }
+
+    getItemName(item: LayoutItem) {
+        if(item.type === "folder") return this.getFolderName(item.id);
+        return item.id;
+    }
+
     arrange(folder: string, order: string[]) {
         this.onArrange(folder, order);
         Port.send(`${this.type}Arrange`, { folder, order });
@@ -319,6 +328,7 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
     moveItem(item: LayoutItem, folder: string) {
         this.onMoveItem(item, folder);
         Port.send(`${this.type}ItemMove`, { item, folder });
+        toast.success(`Moved ${this.getItemName(item)} into ${this.getFolderName(folder)}`);
     }
 
     onMoveItem(item: LayoutItem, folder: string) {
@@ -331,5 +341,8 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         const index = parent.contents.findIndex((i) => i.id === item.id);
         parent.contents.splice(index, 1);
         this.layout[folder]?.contents?.push(item);
+
+        if(item.type === "script") folderLocations.set(item.id, folder);
+        else this.layout[item.id].parent = folder;
     }
 }

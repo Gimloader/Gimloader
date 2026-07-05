@@ -233,6 +233,9 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         parent.contents.splice(index, 1);
         state[this.layoutKey][folder]?.contents?.push(item);
 
+        if(item.type === "script") Scripts.setFolder(item.id, folder);
+        else state[this.layoutKey][item.id].parent = folder;
+
         this.saveLayout();
     }
 }

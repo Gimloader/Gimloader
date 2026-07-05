@@ -3,6 +3,8 @@ import Port from "$shared/net/port.svelte";
 import { nop } from "$shared/utils";
 import * as z from "zod";
 import rawChangelog from "../../release-notes.txt";
+import { dndZoneSettings } from "./stores.svelte";
+import { flipDurationMs } from "$shared/consts";
 
 export function validate(fnName: string, args: IArguments, ...schema: [string, string | z.ZodType][]) {
     for(let i = 0; i < schema.length; i++) {
@@ -111,9 +113,12 @@ export const domLoaded = new Promise<void>((res) => {
 
 export const changelog = rawChangelog.split("\n").filter(line => line);
 
-export function createTransformDragged(transform: string) {
+export function createTransformDragged(transform: string, disableFlip: boolean) {
     return (el?: HTMLElement) => {
         const changeEl = el?.firstElementChild;
-        if(changeEl instanceof HTMLElement) changeEl.style.transform = transform;
+        if(!(changeEl instanceof HTMLElement)) return;
+
+        dndZoneSettings.flipDurationMs = disableFlip ? undefined : flipDurationMs;
+        changeEl.style.transform = transform;
     };
 }

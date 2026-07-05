@@ -4,7 +4,7 @@ import type { ScriptInfo } from "$types/net/state";
 import { error } from "$shared/utils";
 import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
-import { gameState } from "$content/stores";
+import { gameState } from "$content/stores.svelte";
 import Modals from "../modals.svelte";
 import { folderLocations, scripts } from "./map";
 import Port from "$shared/net/port.svelte";
