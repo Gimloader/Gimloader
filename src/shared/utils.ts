@@ -17,4 +17,19 @@ export function capitalize(string: string) {
     return string[0].toUpperCase() + string.slice(1);
 }
 
+export function amountWithS(amount: number, word: string) {
+    return `${amount} ${word}${amount === 1 ? "" : "s"}`;
+}
+
+export function downloadJson(json: any, name: string) {
+    const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = name;
+    link.href = url;
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
 export const nop = () => {};

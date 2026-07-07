@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ScriptManager from "$core/scripts/scriptManager.svelte";
+    import ScriptManager from "$core/scripts/scriptManager.svelte";
     import type { LayoutItem } from "$types/net/state";
     import type { Snippet } from "svelte";
     import Modals from "$core/modals.svelte";
@@ -8,11 +8,12 @@
     import Card from "../Card.svelte";
     import ListItem from "../ListItem.svelte";
     import FolderOpen from "@lucide/svelte/icons/folder-open";
-    import Delete from "svelte-material-icons/Delete.svelte";
-    import Pencil from "svelte-material-icons/Pencil.svelte";
     import { dndzone, type DndEvent } from "svelte-dnd-action";
     import { createTransformDragged } from "$content/utils";
     import { dndZoneSettings } from "$content/stores.svelte";
+    import Delete from "svelte-material-icons/Delete.svelte";
+    import Pencil from "svelte-material-icons/Pencil.svelte";
+    import ArrowDownToLine from "@lucide/svelte/icons/arrow-down-to-line";
 
     interface Props {
         id: string;
@@ -84,6 +85,11 @@
 
         manager.moveItem($state.snapshot(droppedItem), id);
     }
+
+    function downloadFolder() {
+        if(!confirm(`Are you sure you want to download ${name}?`)) return;
+        manager.exportFolder(id);
+    }
 </script>
 
 <Component {dragDisabled} {startDrag} {dragAllowed} {toggle}>
@@ -126,6 +132,9 @@
         </button>
         <button title="Change folder name" onclick={editFolder}>
             <Pencil size={28} />
+        </button>
+        <button title="Download" onclick={downloadFolder}>
+            <ArrowDownToLine size={28} />
         </button>
     {/snippet}
 </Component>

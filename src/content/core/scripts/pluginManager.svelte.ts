@@ -10,7 +10,7 @@ import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
 import { scripts } from "./map";
 
-export default new class PluginManager extends ScriptManager<Plugin, PluginInfo> {
+export default new class PluginManager extends ScriptManager<PluginInfo, Plugin> {
     singular = "plugin";
     plural = "plugins";
     loaded = Deferred.create();

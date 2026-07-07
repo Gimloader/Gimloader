@@ -9,8 +9,11 @@ import Commands from "../commands.svelte";
 import type { CommandContext } from "$types/api/commands";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
 import Modals from "$core/modals.svelte";
+import { amountWithS, downloadJson } from "$shared/utils";
+import type { FolderExport } from "$types/net/messages";
+import { readUserFile } from "$content/utils";
 
-export default abstract class ScriptManager<T extends Script = any, I extends ScriptInfo = any> {
+export default abstract class ScriptManager<I extends ScriptInfo = any, T extends Script<I> = any> {
     abstract singular: string;
     abstract plural: string;
     scripts: T[] = $state([]);
@@ -58,7 +61,6 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
 
     updateState(scriptInfo: I[], layout: ScriptLayout) {
         // Update the folders that things are in
-        folderLocations.clear();
         for(const folderId in layout) {
             for(const item of layout[folderId].contents) {
                 folderLocations.set(item.id, folderId);
@@ -148,12 +150,12 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         const index = this.scripts.findIndex(s => s.headers.name === name);
         if(index === -1) return;
 
-        this.scripts[index].delete();
-        this.scripts.splice(index, 1);
-
         const folder = getItemFolder(name);
         const itemIndex = this.layout[folder].contents.findIndex(i => i.id === name);
         this.layout[folder].contents.splice(itemIndex, 1);
+
+        this.scripts[index].delete();
+        this.scripts.splice(index, 1);
     }
 
     deleteAll(shouldToast: boolean) {
@@ -189,6 +191,7 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
         });
 
         scripts.set(script.headers.name, script);
+        folderLocations.set(script.headers.name, folder);
 
         return script;
     }
@@ -344,5 +347,57 @@ export default abstract class ScriptManager<T extends Script = any, I extends Sc
 
         if(item.type === "script") folderLocations.set(item.id, folder);
         else this.layout[item.id].parent = folder;
+    }
+
+    exportFolder(id: string) {
+        const exportedLayout: ScriptLayout = {};
+        const scripts: I[] = [];
+
+        const addFolder = (folderId: string) => {
+            exportedLayout[folderId] = this.layout[folderId];
+
+            for(const item of this.layout[folderId].contents) {
+                if(item.type === "folder") {
+                    addFolder(item.id);
+                } else {
+                    const script = this.getScript(item.id);
+                    if(script) scripts.push(script.getInfo());
+                }
+            }
+        };
+
+        addFolder(id);
+
+        const exported: FolderExport = {
+            layout: exportedLayout,
+            entryId: id,
+            type: this.type,
+            scripts
+        };
+
+        downloadJson(exported, `${this.getFolderName(id)}.json`);
+    }
+
+    importFolder() {
+        readUserFile(".json", async (contents) => {
+            try {
+                const json: FolderExport = JSON.parse(contents);
+
+                if(json.type !== this.type) {
+                    toast.error(`That folder import isn't for ${this.plural}!`);
+                    return;
+                }
+
+                const { scripts, folders } = await Port.sendAndRecieve(`${this.type}FolderImport`, {
+                    folder: this.openFolderId,
+                    exported: json
+                });
+
+                toast.success(`Imported a folder containing ${amountWithS(scripts, "script")} and ${amountWithS(folders, "folder")}`);
+            } catch (e) {
+                console.error(e);
+                toast.error("That folder appears to be invalid!");
+            }
+        });
     }
 }

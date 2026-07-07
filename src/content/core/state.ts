@@ -11,6 +11,7 @@ import Rewriter from "./rewriter";
 import { version } from "../../../package.json";
 import Commands from "./commands.svelte";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
+import { downloadJson } from "$shared/utils";
 
 export default class StateManager {
     static init() {
@@ -53,14 +54,7 @@ export default class StateManager {
         const state = await Port.sendAndRecieve("getState", undefined);
         const { availableUpdates, ...savedState } = state;
 
-        const blob = new Blob([JSON.stringify(savedState, null, 4)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.download = "gimloader_config.json";
-        link.href = url;
-        link.click();
-
-        URL.revokeObjectURL(url);
+        downloadJson(savedState, "gimloader_config.json");
     }
 
     static async loadState(e: MouseEvent) {

@@ -19,6 +19,14 @@ export class Plugin extends Script<PluginInfo> {
         this.enabled = info.enabled;
     }
 
+    getInfo() {
+        return {
+            name: this.headers.name,
+            code: this.code,
+            enabled: this.enabled
+        };
+    }
+
     getDependencyStrings() {
         return {
             plugin: {

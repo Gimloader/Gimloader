@@ -8,7 +8,7 @@ import { toast } from "svelte-sonner";
 import { downloadScript } from "../net/download";
 import { scripts } from "./map";
 
-export default new class LibraryManager extends ScriptManager<Library, LibraryInfo> {
+export default new class LibraryManager extends ScriptManager<LibraryInfo, Library> {
     singular = "library";
     plural = "libraries";
 

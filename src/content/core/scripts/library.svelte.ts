@@ -6,6 +6,13 @@ export class Library extends Script<ScriptInfo> {
     type: ScriptType = "library";
     warnAbout = false;
 
+    getInfo() {
+        return {
+            name: this.headers.name,
+            code: this.code
+        };
+    }
+
     getDependencyStrings() {
         return {
             library: {

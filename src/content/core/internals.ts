@@ -1,15 +1,17 @@
-import Rewriter from "./rewriter";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
-import { clearId, splicer } from "$content/utils";
 import type { ClassicStores } from "$types/classicStores";
 import type { Stores } from "$types/stores";
+import type { Untyped } from "$types/util";
+import Rewriter from "./rewriter";
+import { clearId, splicer } from "$content/utils";
 
 export interface Internals {
     stores: Stores.Stores;
     notification: AntdNotification;
     message: AntdMessage;
     modal: AntdModal;
-    platformerPhysics: any;
+    classicStores: ClassicStores.ClassicStores;
+    platformerPhysics: Untyped;
 }
 
 interface LoadCallback<K extends keyof Internals> {
@@ -40,6 +42,8 @@ export default class GimkitInternals {
         // GL.classicStores
         Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
             this.classicStores = classicStores;
+
+            this.onLoaded("classicStores", classicStores);
         });
 
         // ant-design notifications

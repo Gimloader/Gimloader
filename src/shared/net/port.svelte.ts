@@ -128,6 +128,7 @@ export default new class Port extends EventEmitter2 {
             callback(response);
             this.pendingMessages.delete(returnId);
         } else {
+            log("Recieved message:", data.type, data.message);
             this.emit(data.type, data.message);
         }
     }

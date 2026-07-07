@@ -31,6 +31,8 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         this.updateHeaders(headers);
     }
 
+    abstract getInfo(): T;
+
     updateHeaders(headers?: ScriptHeaders) {
         if(headers) this.headers = headers;
         else this.headers = parseScriptHeaders(this.code);

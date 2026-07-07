@@ -1,4 +1,18 @@
-import type { DeleteResult, FolderCreate, FolderDelete, FolderEdit, FolderTryDelete, ItemMove, ScriptArrange, ScriptDelete, ScriptEdit, ScriptTryDelete, ScriptType } from "$types/net/messages";
+import type {
+    DeleteResult,
+    FolderCreate,
+    FolderDelete,
+    FolderEdit,
+    FolderTryDelete,
+    ImportFolder,
+    ImportResults,
+    ItemMove,
+    ScriptArrange,
+    ScriptDelete,
+    ScriptEdit,
+    ScriptTryDelete,
+    ScriptType
+} from "$types/net/messages";
 import type { LayoutItem, State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { saveDebounced } from "$bg/state";
@@ -30,6 +44,7 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         Server.on(`${this.type}ItemMove`, this.onItemMove.bind(this));
         Server.onMessage(`${this.type}TryDelete`, this.onTryDelete.bind(this));
         Server.onMessage(`${this.type}FolderTryDelete`, this.onTryFolderDelete.bind(this));
+        Server.onMessage(`${this.type}FolderImport`, this.onFolderImport.bind(this));
     }
 
     save() {
@@ -72,15 +87,15 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         const index = state[this.key].findIndex((s) => s.name === message.name);
         if(index === -1) return;
 
-        // Delete the script
-        state[this.key].splice(index, 1);
-        Scripts.delete(message.name);
-
         // Remove it from the layout
         const folderId = Scripts.getFolder(message.name);
         const folder = state[this.layoutKey][folderId];
         const itemIndex = folder.contents.findIndex((i) => i.id === message.name);
         folder.contents.splice(itemIndex, 1);
+
+        // Delete the script
+        state[this.key].splice(index, 1);
+        Scripts.delete(message.name);
 
         Server.executeAndSend("cacheInvalid", { invalid: true });
         this.save();
@@ -211,6 +226,7 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
                 // Delete the script
                 const index = state[this.key].findIndex((s) => s.name === item.id);
                 state[this.key].splice(index, 1);
+                Scripts.delete(item.id);
             }
         }
 
@@ -237,5 +253,42 @@ export default abstract class ScriptHandler<K extends ScriptKey> {
         else state[this.layoutKey][item.id].parent = folder;
 
         this.saveLayout();
+    }
+
+    async onFolderImport(_: State, { folder, exported }: ImportFolder, respond: (results: ImportResults) => void) {
+        const results: ImportResults = { folders: 0, scripts: 0 };
+
+        // Recursively create folders and scripts
+        const createItems = async (folderId: string, parent: string) => {
+            const name = exported.layout[folderId]?.name;
+            if(!name) return;
+
+            const newId = crypto.randomUUID();
+            await Server.executeAndSend(`${this.type}FolderCreate`, {
+                id: newId,
+                name,
+                parent
+            });
+
+            for(const item of exported.layout[folderId].contents) {
+                if(item.type === "folder") {
+                    createItems(folderId, newId);
+                    results.folders++;
+                } else {
+                    const info = exported.scripts.find(s => s.name === item.id);
+                    if(!info) return;
+
+                    await Server.executeAndSend(`${this.type}Create`, {
+                        folder: newId,
+                        info
+                    });
+
+                    results.scripts++;
+                }
+            }
+        };
+
+        await createItems(exported.entryId, folder);
+        respond(results);
     }
 }

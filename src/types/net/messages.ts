@@ -1,6 +1,6 @@
 import type { HotkeyTrigger } from "../api/hotkeys";
 import type { UpdateResponse } from "./downloads";
-import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, SavedState, State } from "./state";
+import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, SavedState, ScriptInfo, ScriptLayout, State } from "./state";
 
 export type ScriptType = "plugin" | "library";
 export interface ScriptEdit {
@@ -81,9 +81,27 @@ export interface ScriptTryDelete {
     name: string;
     confirmed?: boolean;
 }
+
 export interface FolderTryDelete {
     id: string;
     confirmed?: boolean;
+}
+
+export interface FolderExport {
+    layout: ScriptLayout;
+    entryId: string;
+    type: ScriptType;
+    scripts: ScriptInfo[];
+}
+
+export interface ImportFolder {
+    folder: string;
+    exported: FolderExport;
+}
+
+export interface ImportResults {
+    scripts: number;
+    folders: number;
 }
 
 interface Success {
@@ -135,6 +153,8 @@ export type OnceMessages =
     | OnceMessage<"libraryTryDelete", ScriptTryDelete, DeleteResult>
     | OnceMessage<"pluginFolderTryDelete", FolderTryDelete, DeleteResult>
     | OnceMessage<"libraryFolderTryDelete", FolderTryDelete, DeleteResult>
+    | OnceMessage<"pluginFolderImport", ImportFolder, ImportResults>
+    | OnceMessage<"libraryFolderImport", ImportFolder, ImportResults>
     | OnceMessage<"tryDeleteAllLibraries", { confirmed?: boolean }, DeleteResult>
     | OnceMessage<"tryTogglePlugin", { name: string; enabled: boolean; confirmed?: boolean }, ToggleResult>
     | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string; confirmed?: boolean }, SetAllResult>
