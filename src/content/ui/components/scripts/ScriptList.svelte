@@ -18,7 +18,6 @@
     import { flipDurationMs } from "$shared/consts";
     import FolderPlus from "@lucide/svelte/icons/folder-plus";
     import Eraser from "@lucide/svelte/icons/eraser";
-    import FolderUp from "@lucide/svelte/icons/folder-up";
 
     interface Props {
         buttons: Snippet;
@@ -95,7 +94,13 @@
     async function createFolder() {
         const name = await Modals.open("input", {
             title: "Create New Folder",
-            placeholder: "Folder name"
+            placeholder: "Folder name",
+            otherButtons: [
+                {
+                    text: "Import file",
+                    onClick: () => manager.importFolder()
+                }
+            ]
         });
         if(!name) return;
 
@@ -174,9 +179,6 @@
         {@render buttons()}
         <button onclick={createFolder} class="mr-1.5!">
             <FolderPlus />
-        </button>
-        <button onclick={() => manager.importFolder()} class="mx-1.5!">
-            <FolderUp />
         </button>
         <ViewControl />
         <Search bind:value={searchValue} bind:searchOpen />

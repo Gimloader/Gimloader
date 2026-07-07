@@ -1,16 +1,10 @@
 <script lang="ts">
+    import type { ModalProps } from "$core/modals.svelte";
     import { Button } from "$shared/ui/button";
     import * as Dialog from "$shared/ui/dialog";
     import type { Action } from "svelte/action";
 
-    interface Props {
-        title: string;
-        placeholder?: string;
-        defaultVal: string;
-        onClose: (value: string) => void;
-    }
-
-    let { title, placeholder, defaultVal = "", onClose }: Props = $props();
+    let { title, placeholder, defaultVal = "", otherButtons = [], onClose }: ModalProps<"input"> = $props();
 
     let cancelled = false;
     let value = $state(defaultVal);
@@ -60,6 +54,17 @@
             "
         />
         <Dialog.Footer>
+            {#each otherButtons as button}
+                <Button
+                    onclick={() => {
+                        open = false;
+                        cancelled = true;
+                        button.onClick();
+                    }}
+                >
+                    {button.text}
+                </Button>
+            {/each}
             <Button onclick={onCancelClick}>Cancel</Button>
             <Button onclick={onConfirmClick}>Confirm</Button>
         </Dialog.Footer>
