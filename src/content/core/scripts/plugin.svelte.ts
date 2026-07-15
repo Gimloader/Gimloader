@@ -2,9 +2,9 @@ import type { ScriptType } from "$types/net/messages";
 import type { ScriptHeaders } from "$types/scripts";
 import type { PluginSettingsDescription } from "$types/api/settings";
 import type { PluginInfo } from "$types/net/state";
-import Port from "$shared/net/port.svelte";
 import { Script } from "./script.svelte";
 import Modals from "../modals.svelte";
+import StateManager from "$shared/state";
 
 export class Plugin extends Script<PluginInfo> {
     type: ScriptType = "plugin";
@@ -39,11 +39,6 @@ export class Plugin extends Script<PluginInfo> {
         };
     }
 
-    setEnabled(enabled: boolean) {
-        this.enabled = enabled;
-        Port.send("pluginToggled", { name: this.headers.name, enabled });
-    }
-
     override edit(code: string, headers?: ScriptHeaders) {
         super.edit(code, headers);
         if(this.started) this.stop();
@@ -73,11 +68,6 @@ export class Plugin extends Script<PluginInfo> {
         else this.disableConfirm();
     }
 
-    async toggle(enabled: boolean) {
-        Port.send("pluginToggled", { name: this.headers.name, enabled });
-        await this.onToggled(enabled);
-    }
-
     async onToggled(enabled: boolean, initial = false) {
         this.enabled = enabled;
 
@@ -93,12 +83,8 @@ export class Plugin extends Script<PluginInfo> {
         }
     }
 
-    async enableConfirm(downloadConfirmed = false): Promise<boolean> {
-        const response = await Port.sendAndRecieve("tryTogglePlugin", {
-            name: this.headers.name,
-            enabled: true,
-            confirmed: downloadConfirmed
-        });
+    async enableConfirm(confirmed = false): Promise<boolean> {
+        const response = await StateManager.plugin.tryTogglePlugin(this.headers.name, true, confirmed);
 
         switch (response.status) {
             case "dependencyError":
@@ -132,12 +118,8 @@ export class Plugin extends Script<PluginInfo> {
         }
     }
 
-    async disableConfirm(stopConfirmed = false) {
-        const response = await Port.sendAndRecieve("tryTogglePlugin", {
-            name: this.headers.name,
-            enabled: false,
-            confirmed: stopConfirmed
-        });
+    async disableConfirm(confirmed = false) {
+        const response = await StateManager.plugin.tryTogglePlugin(this.headers.name, false, confirmed);
 
         if(response.status === "confirm") {
             const title = "Other plugins depend on this plugin";

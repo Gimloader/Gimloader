@@ -1,9 +1,9 @@
 <script lang="ts" module>
     let openState = $state(false);
-    let currentTab = $state("plugins");
+    let currentTab = $state("plugin");
     let officialPluginsOpen = $state(false);
 
-    export function showMenu(tab = "plugins", officialOpen = false) {
+    export function showMenu(tab = "plugin", officialOpen = false) {
         openState = true;
         currentTab = tab;
         officialPluginsOpen = officialOpen;
@@ -30,9 +30,10 @@
     import Update from "svelte-material-icons/Update.svelte";
     import Cog from "svelte-material-icons/Cog.svelte";
     import FileUploadOutline from "svelte-material-icons/FileUploadOutline.svelte";
+    import StateManager from "$shared/state";
 
     let modalDragCounter = $state(0);
-    let canDrop = $derived(currentTab === "plugins" || currentTab === "libraries");
+    let canDrop = $derived(currentTab === "plugin" || currentTab === "library");
 
     async function onDrop(e: DragEvent) {
         if(!canDrop) return;
@@ -40,17 +41,21 @@
         e.preventDefault();
         modalDragCounter = 0;
 
-        let file = e.dataTransfer?.files[0];
+        const file = e.dataTransfer?.files[0];
         if(!file) return;
 
         if(file.type !== "text/javascript") {
             toast.error("That doesn't appear to be a script you can install");
             return;
         }
-        let text = await file.text();
 
-        if(currentTab === "plugins") PluginManager.create(text);
-        else LibManager.create(text);
+        const text = await file.text();
+
+        if(currentTab === "plugin") {
+            StateManager.plugin.create(text, PluginManager.openFolderId);
+        } else if(currentTab === "library") {
+            StateManager.library.create(text, LibManager.openFolderId);
+        }
     }
 
     function blurFocused() {
@@ -95,11 +100,11 @@
         {/if}
         <Tabs.Root bind:value={currentTab} class="w-full">
             <Tabs.List class="w-full">
-                <Tabs.Trigger value="plugins">
+                <Tabs.Trigger value="plugin">
                     <Wrench size={24} />
                     <span class="ml-2">Plugins</span>
                 </Tabs.Trigger>
-                <Tabs.Trigger value="libraries">
+                <Tabs.Trigger value="library">
                     <Book size={24} />
                     <span class="ml-2">Libraries</span>
                 </Tabs.Trigger>
@@ -116,14 +121,14 @@
                     <span class="ml-2">Settings</span>
                 </Tabs.Trigger>
             </Tabs.List>
-            <Tabs.Content value="plugins">
+            <Tabs.Content value="plugin">
                 {#if officialPluginsOpen}
                     <OfficialPlugins bind:officialPluginsOpen />
                 {:else}
                     <PluginCardsList bind:officialPluginsOpen />
                 {/if}
             </Tabs.Content>
-            <Tabs.Content value="libraries">
+            <Tabs.Content value="library">
                 <LibraryCardsList />
             </Tabs.Content>
             <Tabs.Content value="hotkeys">

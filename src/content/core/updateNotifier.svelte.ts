@@ -1,27 +1,30 @@
 import Port from "$shared/net/port.svelte";
 import { englishList } from "$shared/utils";
 import { createConfirmToast } from "$shared/toast/create";
+import { toast } from "svelte-sonner";
+import StateManager from "$shared/state";
 
 export default class UpdateNotifier {
-    static init(availableUpdates: string[]) {
-        if(availableUpdates.length > 0) {
-            this.showToast(availableUpdates);
+    static init() {
+        this.updateToast(StateManager.updates.available.value);
+        StateManager.updates.on("available", this.updateToast.bind(this));
+    }
+
+    static toastId: string | null = null;
+    static updateToast(availableUpdates: string[]) {
+        if(this.toastId) {
+            toast.dismiss(this.toastId);
+            this.toastId = null;
         }
 
-        Port.on("availableUpdates", this.onUpdate.bind(this));
-    }
+        if(availableUpdates.length === 0) return;
 
-    static onUpdate(availableUpdates: string[]) {
-        if(availableUpdates.length > 0) this.showToast(availableUpdates);
-    }
-
-    static showToast(availableUpdates: string[]) {
         const names = englishList(availableUpdates);
         const descriptor = availableUpdates.length === 1 ? "has an update" : "have updates";
         const plural = availableUpdates.length === 1 ? "it" : "them";
         const message = `${names} ${descriptor} available. Would you like to download ${plural}?`;
 
-        createConfirmToast(message, (apply) => {
+        this.toastId = createConfirmToast(message, (apply) => {
             Port.sendAndRecieve("applyUpdates", { apply });
         });
     }

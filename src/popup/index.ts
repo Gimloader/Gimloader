@@ -1,9 +1,9 @@
 import Popup from "./Popup.svelte";
 import { mount } from "svelte";
 import styles from "./tailwind.css";
-import state from "$shared/net/bareState.svelte";
+import Port from "$shared/net/port.svelte";
 
-state.init();
+Port.init();
 
 const style = document.createElement("style");
 style.innerHTML = styles;

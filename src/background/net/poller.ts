@@ -1,6 +1,6 @@
-import SettingsHandler from "$bg/messageHandlers/settings";
 import Server from "$bg/net/server";
 import { parseScriptHeaders } from "$shared/parseHeader";
+import StateManager from "$shared/state";
 
 export default class Poller {
     static enabled = false;
@@ -9,7 +9,7 @@ export default class Poller {
     static init(enabled: boolean) {
         this.setEnabled(enabled);
 
-        SettingsHandler.on("pollerEnabled", (enabled) => {
+        StateManager.settings.on("pollerEnabled", (enabled) => {
             this.setEnabled(enabled);
         });
     }
@@ -43,9 +43,6 @@ export default class Poller {
         const headers = parseScriptHeaders(code);
         Server.send("toast", { type: "success", message: `Hot reloaded ${headers.name}` });
 
-        await Server.trigger("editOrCreate", {
-            code,
-            name: headers.name
-        });
+        StateManager.allScripts.editOrCreate(code, headers.name);
     }
 }

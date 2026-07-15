@@ -1,6 +1,5 @@
 <script lang="ts">
     import Tree from "./Tree.svelte";
-    import { scripts } from "$core/scripts/map";
     import { parseDep } from "$shared/parseHeader";
     import ArrowRightBottom from "svelte-material-icons/ArrowRightBottom.svelte";
     import AlertCircle from "svelte-material-icons/AlertCircleOutline.svelte";
@@ -11,6 +10,7 @@
     import Download from "svelte-material-icons/Download.svelte";
     import { Plugin } from "$core/scripts/plugin.svelte";
     import { downloadScript } from "$core/net/download";
+    import { scriptInstanceMap } from "$core/scripts/map";
 
     interface Props {
         name: string;
@@ -22,7 +22,7 @@
     }
 
     let { name, type, stack, root = false, optional = false, url }: Props = $props();
-    let script = $state(scripts.get(name));
+    let script = $state(scriptInstanceMap.get(name));
 
     function getError() {
         if(root) return null;
@@ -53,7 +53,7 @@
         if(!url) return;
         await downloadScript(url, "root");
 
-        script = scripts.get(name);
+        script = scriptInstanceMap.get(name);
         error = getError();
         warning = getWarning();
     }

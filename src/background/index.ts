@@ -1,21 +1,20 @@
 import Poller from "./net/poller";
 import Server from "./net/server";
-import { statePromise } from "./state";
 import Updater from "./net/updater";
-import { log } from "$shared/utils";
 import Downloader from "./net/downloader";
+import StateManager from "$shared/state";
+import loadState from "./state";
 
 Server.init();
 Updater.init();
 Downloader.init();
 
-statePromise.then((state) => {
-    log(state);
+StateManager.events.on("init", (state) => {
     Poller.init(state.settings.pollerEnabled);
 });
 
 // open the editor when requested
-Server.onMessage("showEditor", async (_, { type, name, folder }) => {
+Server.onMessage("showEditor", async ({ type, name, folder }) => {
     const params = new URLSearchParams();
     params.set("type", type);
     if(folder) params.set("folder", folder);
@@ -28,3 +27,5 @@ Server.onMessage("showEditor", async (_, { type, name, folder }) => {
         openerTabId: tabs[0]?.id
     });
 });
+
+loadState();

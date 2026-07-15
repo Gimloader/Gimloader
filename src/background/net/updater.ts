@@ -1,12 +1,10 @@
 import type { ScriptHeaders } from "$types/scripts";
 import type { OnceMessageProps, OnceResponder } from "$types/net/messages";
-import type { State } from "$types/net/state";
 import type { Dependency, Update } from "$types/net/downloads";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
-import { statePromise } from "../state";
-import Scripts from "$bg/scripts";
 import Downloader from "./downloader";
+import StateManager from "$shared/state";
 
 export default class Updater {
     static updates: Update[] = [];
@@ -16,8 +14,7 @@ export default class Updater {
         Server.onMessage("updateAll", this.updateAll.bind(this));
         Server.onMessage("updateSingle", this.updateSingle.bind(this));
 
-        const state = await statePromise;
-        if(!state.settings.autoUpdate) return;
+        if(!StateManager.settings.settings.value.autoUpdate) return;
 
         const stored = await chrome.storage.local.get({
             lastUpdateCheck: 0
@@ -33,7 +30,6 @@ export default class Updater {
 
     static async checkUpdates(broadcast = true) {
         return new Promise<void>(async (res) => {
-            const state = await statePromise;
             const updaters: (() => Promise<void>)[] = [];
 
             const checkUpdate = (headers: ScriptHeaders, downloadUrl: string) => {
@@ -53,13 +49,13 @@ export default class Updater {
                 };
             };
 
-            for(const plugin of state.plugins) {
+            for(const plugin of StateManager.plugin.scripts.value) {
                 const headers = parseScriptHeaders(plugin.code);
                 if(!headers.downloadUrl) continue;
                 updaters.push(checkUpdate(headers, headers.downloadUrl));
             }
 
-            for(const lib of state.libraries) {
+            for(const lib of StateManager.library.scripts.value) {
                 const headers = parseScriptHeaders(lib.code);
                 if(!headers.downloadUrl) continue;
                 updaters.push(checkUpdate(headers, headers.downloadUrl));
@@ -74,11 +70,8 @@ export default class Updater {
                     finished = true;
 
                     chrome.storage.local.set({ lastUpdateCheck: Date.now() });
+                    if(broadcast) StateManager.apply("availableUpdates", { updates: this.updates.map(u => u.name) });
 
-                    if(broadcast) {
-                        state.availableUpdates = this.updates.map(s => s.name);
-                        Server.send("availableUpdates", state.availableUpdates);
-                    }
                     res();
                     return;
                 }
@@ -112,7 +105,7 @@ export default class Updater {
         return false;
     }
 
-    static async applyUpdates(state: State, apply: boolean) {
+    static async applyUpdates(apply: boolean) {
         if(apply) {
             for(const update of this.updates) {
                 this.applyUpdate(update.name, update.code, update.dependencies);
@@ -120,27 +113,26 @@ export default class Updater {
         }
 
         this.updates = [];
-        state.availableUpdates = [];
 
-        Server.send("availableUpdates", []);
+        StateManager.apply("availableUpdates", { updates: [] });
     }
 
-    static async onApplyUpdates(state: State, message: OnceMessageProps<"applyUpdates">, respond: OnceResponder<"applyUpdates">) {
-        await this.applyUpdates(state, message.apply);
+    static async onApplyUpdates(message: OnceMessageProps<"applyUpdates">, respond: OnceResponder<"applyUpdates">) {
+        await this.applyUpdates(message.apply);
 
         respond();
     }
 
-    static async updateAll(state: State, _: OnceMessageProps<"updateAll">, respond: OnceResponder<"updateAll">) {
+    static async updateAll(_: OnceMessageProps<"updateAll">, respond: OnceResponder<"updateAll">) {
         await this.checkUpdates(false);
         const names = this.updates.map(u => u.name);
 
-        this.applyUpdates(state, true);
+        this.applyUpdates(true);
         respond(names);
     }
 
-    static async updateSingle(_: State, message: OnceMessageProps<"updateSingle">, respond: OnceResponder<"updateSingle">) {
-        const script = Scripts.get(message.name);
+    static async updateSingle(message: OnceMessageProps<"updateSingle">, respond: OnceResponder<"updateSingle">) {
+        const script = StateManager.allScripts.get(message.name);
         if(!script) return respond({ updated: false, failed: true });
 
         const headers = parseScriptHeaders(script.info.code);
@@ -159,15 +151,11 @@ export default class Updater {
     }
 
     static async applyUpdate(name: string, code: string, dependencies: Dependency[]) {
-        await Server.trigger("editOrCreate", {
-            name,
-            code,
-            updated: true
-        });
+        StateManager.allScripts.editOrCreate(code, name, undefined, true);
 
         for(const dep of dependencies) {
             // TODO: Some kind of confirmation
-            if(!dep.url || Scripts.has(dep.name)) continue;
+            if(!dep.url || StateManager.allScripts.exists(dep.name)) continue;
 
             await Downloader.downloadDeps(dependencies);
         }

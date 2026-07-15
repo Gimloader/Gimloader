@@ -1,8 +1,7 @@
 import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyOptions, HotkeyTrigger } from "$types/api/hotkeys";
-import type { ConfigurableHotkeysState } from "$types/net/state";
 import ConfigurableHotkey from "./configurable.svelte";
 import { clearId, splicer } from "$content/utils";
-import Port from "$shared/net/port.svelte";
+import StateManager from "$shared/state";
 
 type DefaultHotkey = HotkeyOptions & { callback: HotkeyCallback; id: string };
 
@@ -11,11 +10,8 @@ export default new class Hotkeys {
     configurableHotkeys: ConfigurableHotkey[] = $state([]);
     pressedKeys = new Set<string>();
     pressed = new Set<string>();
-    savedHotkeys: ConfigurableHotkeysState = {};
 
-    init(saved: ConfigurableHotkeysState) {
-        this.savedHotkeys = saved;
-
+    init() {
         window.addEventListener("keydown", (event) => {
             this.pressed.add(event.code);
             this.pressedKeys.add(event.key.toLowerCase());
@@ -31,16 +27,10 @@ export default new class Hotkeys {
             this.releaseAll();
         });
 
-        Port.on("hotkeyUpdate", ({ id, trigger }) => this.updateConfigurable(id, trigger));
-        Port.on("hotkeysUpdate", ({ hotkeys }) => this.updateAllConfigurable(hotkeys));
-    }
-
-    updateState(saved: ConfigurableHotkeysState) {
-        this.savedHotkeys = saved;
-
-        for(const hotkey of this.configurableHotkeys) {
-            hotkey.loadTrigger();
-        }
+        StateManager.hotkeys.addListener("configurableUpdate", (id, trigger) => {
+            const hotkey = this.configurableHotkeys.find(h => h.id === id);
+            if(hotkey) hotkey.trigger = trigger;
+        });
     }
 
     addHotkey(id: any, options: HotkeyOptions, callback: HotkeyCallback) {
@@ -115,33 +105,12 @@ export default new class Hotkeys {
     }
 
     saveConfigurable(id: string, trigger: HotkeyTrigger | null) {
-        this.savedHotkeys[id] = $state.snapshot(trigger);
-        Port.send("hotkeyUpdate", { id, trigger });
+        StateManager.apply("hotkeyUpdate", { id, trigger });
     }
 
     saveAllConfigurable() {
-        for(const hotkey of this.configurableHotkeys) {
-            this.savedHotkeys[hotkey.id] = $state.snapshot(hotkey.trigger);
-        }
-
-        Port.send("hotkeysUpdate", { hotkeys: this.savedHotkeys });
-    }
-
-    updateConfigurable(id: string, trigger: HotkeyTrigger | null) {
-        const hotkey = this.configurableHotkeys.find(h => h.id === id);
-        if(!hotkey) return;
-
-        hotkey.trigger = trigger;
-    }
-
-    updateAllConfigurable(hotkeys: ConfigurableHotkeysState) {
-        this.savedHotkeys = hotkeys;
-
-        for(const id in hotkeys) {
-            const existing = this.configurableHotkeys.find(h => h.id === id);
-            if(existing && existing.trigger !== hotkeys[id]) {
-                existing.trigger = hotkeys[id];
-            }
-        }
+        StateManager.apply("hotkeysUpdate", {
+            hotkeys: StateManager.hotkeys.configurable.value
+        });
     }
 }();

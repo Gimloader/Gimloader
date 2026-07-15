@@ -1,5 +1,5 @@
 <script lang="ts">
-    import state from "$shared/net/bareState.svelte";
+    import type { PluginInfo } from "$types/net/state";
     import Web from "svelte-material-icons/Web.svelte";
     import GithubIcon from "$assets/github-mark-white.svg";
     import Xml from "svelte-material-icons/Xml.svelte";
@@ -7,18 +7,24 @@
     import { parseScriptHeaders } from "$shared/parseHeader";
     import { toast, Toaster } from "svelte-sonner";
     import Plugin from "./Plugin.svelte";
+    import StateManager from "$shared/state";
+
+    let plugins: PluginInfo[] = $state([]);
+    StateManager.plugin.scripts.bind(() => plugins, (value) => plugins = value);
 
     function openSite() {
         chrome.tabs.create({ url: "https://gimloader.github.io" });
     }
+
     function openRepo() {
         chrome.tabs.create({ url: "https://github.com/Gimloader/Gimloader" });
     }
+
     function copyDebugInfo() {
-        const plugins = state.plugins
+        const plugins = StateManager.plugin.scripts.value
             .toSorted((a, b) => a.name.localeCompare(b.name))
             .toSorted((a, b) => a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1);
-        const libraries = state.libraries
+        const libraries = StateManager.library.scripts.value
             .toSorted((a, b) => a.name.localeCompare(b.name));
 
         let debugInfo = `**Core:**\nGimloader v${version}`;
@@ -48,12 +54,12 @@
         <button onclick={copyDebugInfo} title="Copy debug info"><Xml size={24} /></button>
     </div>
     <div class="max-h-[500px] overflow-y-auto w-full py-1">
-        {#if state.plugins.length === 0}
+        {#if plugins.length === 0}
             <div class="w-full text-center text-xl font-semibold">
                 No plugins installed!
             </div>
         {:else}
-            {#each state.plugins as plugin}
+            {#each plugins as plugin}
                 <Plugin {plugin} />
             {/each}
         {/if}

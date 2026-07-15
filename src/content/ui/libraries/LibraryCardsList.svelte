@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createScript, readUserFile } from "$content/utils";
+    import { readUserFile } from "$content/utils";
     import LibManager from "$core/scripts/libManager.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import { Button } from "$shared/ui/button";
@@ -7,11 +7,13 @@
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
+    import Port from "$shared/net/port.svelte";
+    import StateManager from "$shared/state";
 
     function importLib() {
         readUserFile(".js", (code) => {
             code = code.replaceAll("\r\n", "\n");
-            LibManager.create(code);
+            StateManager.library.create(code, LibManager.openFolderId);
         });
     }
 
@@ -29,6 +31,13 @@
 
         downloadScript(url, LibManager.openFolderId, "library");
     }
+
+    function createScript() {
+        Port.sendAndRecieve("showEditor", {
+            type: "library",
+            folder: LibManager.openFolderId
+        });
+    }
 </script>
 
 <ScriptList manager={LibManager}>
@@ -41,7 +50,7 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => createScript(LibManager)}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={createScript}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importLib}>Upload File</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>

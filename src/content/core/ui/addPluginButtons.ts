@@ -23,10 +23,10 @@ export function addPluginButtons() {
         ctrl: false
     }, () => showMenu());
 
-    addTabCommand("Open Gimloader Menu", "plugins", ["manager"]);
-    addTabCommand("View Plugins", "plugins");
-    addTabCommand("View Official Plugins", "plugins", [], true);
-    addTabCommand("View Libraries", "libraries", ["libs"]);
+    addTabCommand("Open Gimloader Menu", "plugin", ["manager"]);
+    addTabCommand("View Plugins", "plugin");
+    addTabCommand("View Official Plugins", "plugin", [], true);
+    addTabCommand("View Libraries", "library", ["libs"]);
     addTabCommand("View Hotkeys", "hotkeys", ["binds"]);
     addTabCommand("View Updates", "updates", ["versions"]);
     addTabCommand("View Settings", "settings", ["options", "prefs"]);

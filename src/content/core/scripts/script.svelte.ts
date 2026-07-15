@@ -6,10 +6,10 @@ import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
 import { gameState } from "$content/stores.svelte";
 import Modals from "../modals.svelte";
-import { folderLocations, scripts } from "./map";
-import Port from "$shared/net/port.svelte";
 import { signaturePublicKey } from "$shared/consts";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
+import { scriptInstanceMap } from "./map";
+import StateManager from "$shared/state";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
 
@@ -29,6 +29,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     constructor(info: T, headers?: ScriptHeaders) {
         this.code = info.code;
         this.updateHeaders(headers);
+        scriptInstanceMap.set(this.headers.name, this);
     }
 
     abstract getInfo(): T;
@@ -170,7 +171,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
             // Confirm the dependencies are all the correct type
             for(const depName of allDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) continue;
 
                 if(script.type !== type) throw new Error(`${this.headers.name} expected dependency ${depName} to be a ${type}, but it is a ${script.type}`);
@@ -178,13 +179,13 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
             // Confirm all required dependencies exist
             for(const depName of requiredDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) throw new Error(`${this.headers.name} is missing ${type} dependency: ${depName}`);
                 required.push(script);
             }
 
             for(const depName of optionalDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) continue;
                 optional.push(script);
             }
@@ -222,15 +223,14 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     }
 
     edit(code: string, headers?: ScriptHeaders) {
+        scriptInstanceMap.delete(this.headers.name);
         this.code = code;
         this.updateHeaders(headers);
+        scriptInstanceMap.set(this.headers.name, this);
     }
 
     async deleteConfirm(confirmed = false) {
-        const response = await Port.sendAndRecieve(`${this.type}TryDelete`, {
-            name: this.headers.name,
-            confirmed
-        });
+        const response = StateManager[this.type].tryDelete(this.headers.name, confirmed);
 
         if(response.status === "confirm") {
             const title = `Plugins depend on ${this.headers.name}`;
@@ -246,9 +246,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     delete() {
         this.stop();
-
-        scripts.delete(this.headers.name);
-        folderLocations.delete(this.headers.name);
+        scriptInstanceMap.delete(this.headers.name);
     }
 
     signatureRegex = /\n\s*\*\s*@signature \S+\n/g;

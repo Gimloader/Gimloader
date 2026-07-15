@@ -1,14 +1,12 @@
+import type { PluginInfo } from "$types/net/state";
 import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
-import Port from "$shared/net/port.svelte";
 import { Deferred } from "$content/utils";
-import type { PluginInfo, ScriptLayout } from "$types/net/state";
 import Modals from "../modals.svelte";
-import { parseScriptHeaders } from "$shared/parseHeader";
-import { toast } from "svelte-sonner";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
-import { scripts } from "./map";
+import StateManager from "$shared/state";
+import { scriptInstanceMap } from "./map";
 
 export default new class PluginManager extends ScriptManager<PluginInfo, Plugin> {
     singular = "plugin";
@@ -18,18 +16,13 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
     constructor() {
         super(Plugin, "plugin");
 
-        Port.on("pluginCreate", ({ info, folder }) => this.onCreate(info, folder));
-        Port.on("pluginSetAll", ({ enabled, folder }) => this.onSetAll(enabled, folder));
-        Port.on("pluginToggled", ({ name, enabled }) => this.onToggled(name, enabled));
-    }
+        StateManager.plugin.on("pluginToggled", this.onToggled.bind(this));
+        StateManager.events.on("init", async () => {
+            const toRun = this.scripts.filter(p => p.enabled);
+            await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
 
-    override async init(info: PluginInfo[], layout: ScriptLayout) {
-        super.init(info, layout);
-
-        const toRun = this.scripts.filter(p => p.enabled);
-        await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
-
-        this.loaded.resolve();
+            this.loaded.resolve();
+        });
     }
 
     isEnabled(name: string) {
@@ -40,11 +33,7 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
     }
 
     async setAllConfirm(enabled: boolean, folder?: string, confirmed = false) {
-        const response = await Port.sendAndRecieve("trySetAllPlugins", {
-            enabled,
-            folder,
-            confirmed
-        });
+        const response = await StateManager.plugin.trySetAllPlugins(enabled, folder, confirmed);
 
         switch (response.status) {
             case "dependencyError": {
@@ -92,34 +81,6 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
         }
     }
 
-    setAll(enabled: boolean, folder?: string) {
-        this.onSetAll(enabled, folder);
-        Port.send("pluginSetAll", { enabled });
-    }
-
-    onSetAll(enabled: boolean, folder?: string) {
-        if(folder) {
-            this.folderSetAll(enabled, folder);
-        } else {
-            const toSet = this.scripts.filter(p => p.enabled !== enabled);
-            for(const plugin of toSet) plugin.onToggled(enabled);
-        }
-    }
-
-    folderSetAll(enabled: boolean, id: string) {
-        const folder = this.layout[id];
-        if(!folder) return;
-
-        for(const item of folder.contents) {
-            if(item.type === "folder") {
-                this.folderSetAll(enabled, item.id);
-            } else {
-                const plugin = this.getScript(item.id);
-                if(plugin && plugin.enabled !== enabled) plugin.onToggled(enabled);
-            }
-        }
-    }
-
     onToggled(name: string, enabled: boolean) {
         const plugin = this.getScript(name);
         if(!plugin) return;
@@ -127,35 +88,15 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
         plugin.onToggled(enabled);
     }
 
-    async create(code: string) {
-        const headers = parseScriptHeaders(code);
-        if(headers.isLibrary !== "false") {
-            toast.error("Plugins must not have the @isLibrary header set");
-            return;
-        }
-
-        const info = { name: headers.name, code, enabled: false };
-        this.deleteConflicting(info.name);
-
-        const folder = this.openFolderId;
-        const created = this.onCreate(info, folder);
-
-        // Create it disabled and enable it
-        Port.send("pluginCreate", { folder, info });
-        created.toggleConfirm(true);
-
-        return created;
-    }
-
-    override onCreate(info: PluginInfo, folder: string) {
-        const plugin = super.onCreate(info, folder);
-        if(info.enabled) plugin.start(false);
+    override onCreate(info: PluginInfo, initial: boolean) {
+        const plugin = super.onCreate(info, initial);
+        if(!initial && info.enabled) plugin.start(false);
 
         return plugin;
     }
 
     async require(requirer: string, name: string, downloadUrl?: string) {
-        const requirerScript = scripts.get(requirer);
+        const requirerScript = scriptInstanceMap.get(requirer);
         if(!requirerScript) throw new Error(`Requirer script ${requirer} not found`);
 
         // Try to enable the plugin if it already exists

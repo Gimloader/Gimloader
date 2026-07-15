@@ -6,11 +6,19 @@ import { log } from "$shared/utils";
 import Port from "$shared/net/port.svelte";
 import { version } from "../../package.json";
 import { disableConsoleWarning, fixRDT } from "$core/qol";
-import StateManager from "$core/state";
 import setupModals from "./core/ui/setupModals";
 import { toast } from "svelte-sonner";
 import { createToaster } from "$shared/toast/create";
-import { domLoaded } from "./utils";
+import { changelog, domLoaded } from "./utils";
+import StateManager from "$shared/state";
+import { addUpdated } from "./ui/modals/Changelog.svelte";
+import Storage from "$core/storage.svelte";
+import LibManager from "$core/scripts/libManager.svelte";
+import PluginManager from "$core/scripts/pluginManager.svelte";
+import Hotkeys from "$core/hotkeys/hotkeys.svelte";
+import UpdateNotifier from "$core/updateNotifier.svelte";
+import Rewriter from "$core/rewriter";
+import Commands from "$core/commands.svelte";
 
 Object.defineProperty(window, "GL", {
     value: Api,
@@ -22,9 +30,28 @@ disableConsoleWarning();
 UI.init();
 Net.init();
 GimkitInternals.init();
-StateManager.init();
 setupModals();
 domLoaded.then(createToaster);
+
+StateManager.events.on("error", toast.error);
+StateManager.events.on("init", () => {
+    const lastVersion = localStorage.getItem("gl-version");
+    localStorage.setItem("gl-version", version);
+
+    const versionChanged = version !== lastVersion;
+    const updated = lastVersion && versionChanged;
+    if(updated) addUpdated("Gimloader", version, changelog);
+
+    Storage.init();
+    LibManager.init();
+    PluginManager.init();
+    Hotkeys.init();
+    UpdateNotifier.init();
+    Rewriter.init();
+    Commands.init();
+
+    if(updated) Rewriter.invalidate();
+});
 
 Port.on("toast", (msg) => {
     if(msg.type === "success") toast.success(msg.message);
@@ -33,13 +60,12 @@ Port.on("toast", (msg) => {
     else toast(msg.message);
 });
 
-Port.init((state) => {
-    log("Recieved initial state", state);
-    StateManager.initState(state);
-}, (state) => {
-    log("Resynchronizing with state", state);
-    StateManager.syncWithState(state);
-}, "game");
+Port.on("setState", (state) => {
+    StateManager.update(state);
+    toast.success("New config applied");
+});
+
+Port.init("game");
 
 fixRDT();
 

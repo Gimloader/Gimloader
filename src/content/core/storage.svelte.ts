@@ -1,9 +1,8 @@
-import { clearId, splicer } from "$content/utils";
-import { defaultSettings } from "$shared/consts";
-import Port from "$shared/net/port.svelte";
 import type { SettingsChangeCallback } from "$types/api/settings";
 import type { PluginStorage, Settings } from "$types/net/state";
-import EventEmitter2 from "eventemitter2";
+import { clearId, splicer } from "$content/utils";
+import { defaultSettings } from "$shared/consts";
+import StateManager from "$shared/state";
 
 /** @inline */
 export type ValueChangeCallback = (value: any, remote: boolean) => void;
@@ -20,92 +19,53 @@ interface SettingsChangeListener {
     callback: SettingsChangeCallback;
 }
 
-export default new class Storage extends EventEmitter2 {
+export default new class Storage {
     settings: Settings = $state(defaultSettings);
-    values: PluginStorage = {};
     pluginSettings: PluginStorage = $state({});
     valueListeners: ValueChangeListener[] = [];
     settingsListeners: SettingsChangeListener[] = [];
 
-    init(values: PluginStorage, settings: Settings, pluginSettings: PluginStorage) {
-        this.values = values;
-        this.settings = settings;
-        this.pluginSettings = pluginSettings;
-
+    init() {
         if(this.settings.showPluginButtons) {
             document.documentElement.classList.remove("noPluginButtons");
         }
 
-        Port.on("settingUpdate", ({ key, value }) => this.updateSetting(key, value, false));
-        Port.on("pluginValueUpdate", ({ id, key, value }) => this.setPluginValue(id, key, value, false));
-        Port.on("pluginValueDelete", ({ id, key }) => this.deletePluginValue(id, key, false));
-        Port.on("pluginSettingUpdate", ({ id, key, value }) => this.setPluginSetting(id, key, value, false));
-        Port.on("clearPluginStorage", ({ id }) => this.deletePluginStorage(id, false));
-    }
+        StateManager.settings.settings.bind(() => this.settings, (settings) => this.settings = settings);
+        StateManager.storage.pluginSettings.bind(() => this.pluginSettings, (pluginSettings) => this.pluginSettings = pluginSettings);
 
-    updateState(values: PluginStorage, settings: Settings) {
-        this.values = values;
-        this.settings = settings;
+        StateManager.settings.on("showPluginButtons", (value) => {
+            document.documentElement.classList.toggle("noPluginButtons", !value);
+        });
 
-        document.documentElement.classList.toggle("noPluginButtons", !this.settings.showPluginButtons);
-    }
+        StateManager.storage.on("pluginValueUpdate", (id, key, value, remote) => {
+            for(const listener of this.valueListeners) {
+                if(listener.id === id && listener.key === key) {
+                    listener.callback(value, remote);
+                }
+            }
+        });
 
-    updateSetting(key: string, value: any, emit = true) {
-        // @ts-expect-error there's probably a better way to do this
-        this.settings[key] = value;
-        if(emit) Port.send("settingUpdate", { key, value });
-        else this.emit(key, value);
-
-        switch (key) {
-            case "showPluginButtons":
-                document.documentElement.classList.toggle("noPluginButtons", !value);
-                break;
-        }
+        StateManager.storage.on("pluginSettingUpdate", (id, key, value, remote) => {
+            for(const listener of this.valueListeners) {
+                if(listener.id === id && listener.key === key) {
+                    listener.callback(value, remote);
+                }
+            }
+        });
     }
 
     getPluginValue(id: string, key: string, defaultVal?: any) {
-        const val = this.values[id]?.[key];
+        const val = StateManager.storage.storage.value[id]?.[key];
         if(val !== undefined) return val;
         return defaultVal ?? null;
     }
 
-    setPluginValue(id: string, key: string, value: any, emit = true) {
-        if(!this.values[id]) this.values[id] = {};
-        this.values[id][key] = value;
-
-        for(const listener of this.valueListeners) {
-            if(listener.id === id && listener.key === key) {
-                // if we are emitting it's not remote, and vice versa
-                listener.callback(value, !emit);
-            }
-        }
-
-        if(emit) Port.send("pluginValueUpdate", { id, key, value });
+    setPluginValue(id: string, key: string, value: any) {
+        StateManager.apply("pluginValueUpdate", { id, key, value });
     }
 
-    setPluginSetting(id: string, key: string, value: any, emit = true) {
-        if(!this.pluginSettings[id]) this.pluginSettings[id] = {};
-        this.pluginSettings[id][key] = value;
-
-        for(const listener of this.settingsListeners) {
-            if(listener.id === id && listener.key === key) {
-                listener.callback(value, !emit);
-            }
-        }
-
-        if(emit) Port.send("pluginSettingUpdate", { id, key, value });
-    }
-
-    deletePluginValue(id: string, key: string, emit = true) {
-        const plugin = this.values[id];
-        if(!plugin) return;
-        delete plugin[key];
-        if(emit) Port.send("pluginValueDelete", { id, key });
-    }
-
-    deletePluginStorage(id: string, emit = true) {
-        delete this.values[id];
-        if(emit) Port.send("clearPluginStorage", { id });
+    deletePluginValue(id: string, key: string) {
+        StateManager.apply("pluginValueDelete", { id, key });
     }
 
     onPluginValueUpdate(id: string, key: string, callback: ValueChangeCallback) {

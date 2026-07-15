@@ -2,10 +2,10 @@ import { clearId, splicer } from "$content/utils";
 import { domLoaded } from "$content/utils";
 import { clear, get, set } from "idb-keyval";
 import PluginManager from "./scripts/pluginManager.svelte";
-import Port from "$shared/net/port.svelte";
 import { englishList, error, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
+import StateManager from "$shared/state";
 
 interface Import {
     text: string;
@@ -56,11 +56,15 @@ export default class Rewriter {
     static parseHooks: ParseHook[] = [];
     static runInScopes: RunInScope[] = [];
 
-    static async init(cacheInvalid: boolean) {
-        if(cacheInvalid) this.invalidate(true);
+    static async init() {
+        // Don't bother broadcasting when the cache is invalidated since we can handle it locally
+        StateManager.filterBroadcast("cacheInvalid", ({ invalid }) => invalid);
 
-        Port.on("cacheInvalid", ({ invalid }) => {
-            if(invalid) this.invalidate(true);
+        StateManager.cache.on("invalid", (remote: boolean) => {
+            this.invalidate();
+
+            if(remote) StateManager.apply("cacheInvalid", { invalid: false });
+            else StateManager.handle("cacheInvalid", { invalid: false });
         });
 
         Object.defineProperties(window, {
@@ -98,20 +102,14 @@ export default class Rewriter {
         this.import(index.src, true);
     }
 
-    static updateState(cacheInvalid: boolean) {
-        if(cacheInvalid) this.invalidate(true);
-    }
-
     static getName(src: string) {
         return src.split("/").pop()!;
     }
 
-    static invalidate(broadcast = false) {
+    static invalidate() {
         if(this.cleared) return;
         this.cleared = true;
         clear();
-
-        if(broadcast) Port.send("cacheInvalid", { invalid: false });
     }
 
     static loadingSrcs = new Map<string, Promise<string>>();

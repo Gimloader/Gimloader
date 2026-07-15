@@ -61,19 +61,15 @@
         else stopConfigure();
     }
 
-    function reset(hotkey: ConfigurableHotkey, noSave = false) {
+    function reset(hotkey: ConfigurableHotkey) {
         hotkey.reset();
-
-        if(noSave) return;
         Hotkeys.saveConfigurable(hotkey.id, hotkey.trigger);
     }
 
     function resetAll() {
         if(!confirm("Are you sure you want to reset all hotkeys?")) return;
-        for(let hotkey of hotkeys.values()) {
-            reset(hotkey, true);
-        }
 
+        for(let hotkey of hotkeys.values()) hotkey.reset();
         Hotkeys.saveAllConfigurable();
     }
 
@@ -113,7 +109,7 @@
             <h1 class="col-span-4 text-center font-bold text-3xl pt-5">There aren't any hotkeys!</h1>
             <h2 class="col-span-4 text-center text-xl">Some plugins will add hotkeys that can be changed here.</h2>
         {/if}
-        {#each Object.entries(categories) as [category, hotkeys], i}
+        {#each Object.entries(categories) as [category, hotkeys]}
             <h2 class="text-xl font-bold! col-span-4 border-b border-gray-200">{category}</h2>
             {#each hotkeys as hotkey}
                 <div class="flex items-center">

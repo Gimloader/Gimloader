@@ -2,9 +2,10 @@
     import ViewModule from "svelte-material-icons/ViewModule.svelte";
     import ViewList from "svelte-material-icons/ViewList.svelte";
     import Storage from "$core/storage.svelte";
+    import StateManager from "$shared/state";
 
     function setView(mode: string) {
-        Storage.updateSetting("menuView", mode);
+        StateManager.apply("settingUpdate", { key: "menuView", value: mode });
     }
 </script>
 

@@ -1,14 +1,6 @@
 import type { Messages, OnceMessageProps, OnceMessages, OnceResponder } from "$types/net/messages";
-import type { State } from "$types/net/state";
-import HotkeysHandler from "$bg/messageHandlers/hotkeys";
-import JsCacheHandler from "$bg/messageHandlers/jsCache";
-import LibrariesHandler from "$bg/messageHandlers/library";
-import PluginsHandler from "$bg/messageHandlers/plugin";
-import SettingsHandler from "$bg/messageHandlers/settings";
-import StorageHandler from "$bg/messageHandlers/storage";
-import MiscHandler from "$bg/messageHandlers/misc";
-import { statePromise } from "$bg/state";
 import { nop } from "$shared/utils";
+import StateManager from "$shared/state";
 
 type Port = chrome.runtime.Port;
 
@@ -18,16 +10,13 @@ interface Message {
     returnId?: string;
 }
 
-type UpdateCallback<Channel extends keyof Messages> = (state: State, message: Messages[Channel]) => boolean | void | Promise<boolean | void>;
 type MessageCallback<Channel extends OnceMessages["channel"]> = (
-    state: State,
     message: OnceMessageProps<Channel>,
     respond: OnceResponder<Channel>
 ) => void | Promise<void>;
 
 export default new class Server {
     open = new Set<Port>();
-    listeners = new Map<string, UpdateCallback<any>>();
     messageListeners = new Map<string, MessageCallback<any>>();
 
     init() {
@@ -37,14 +26,6 @@ export default new class Server {
         // these are only used to keep the worker alive
         chrome.runtime.onMessageExternal.addListener(nop);
         chrome.runtime.onMessage.addListener(nop);
-
-        HotkeysHandler.init();
-        LibrariesHandler.init();
-        PluginsHandler.init();
-        StorageHandler.init();
-        SettingsHandler.init();
-        JsCacheHandler.init();
-        MiscHandler.init();
     }
 
     onConnect(port: Port) {
@@ -54,14 +35,14 @@ export default new class Server {
             this.open.delete(port);
         });
 
-        statePromise.then((state) => port.postMessage(state));
+        port.postMessage(StateManager.getState());
 
         port.onMessage.addListener((message) => {
             this.onPortMessage(port, message);
         });
     }
 
-    async onPortMessage(port: Port, msg: Message) {
+    onPortMessage(port: Port, msg: Message) {
         const { type, message, returnId } = msg;
 
         if(returnId) {
@@ -69,16 +50,12 @@ export default new class Server {
             const callback = this.messageListeners.get(type);
             if(!callback) return;
 
-            callback(await statePromise, message, (response: any) => {
+            callback(message, (response: any) => {
                 port.postMessage({ returnId, response });
             });
         } else {
             // no reply expected, just a state update
-            const callback = this.listeners.get(type);
-            if(!callback) return;
-
-            const cancelled = await callback(await statePromise, message);
-            if(cancelled === true) return;
+            StateManager.handle(type, message, true);
 
             // send the message to other connected ports
             for(const openPort of this.open) {
@@ -88,36 +65,13 @@ export default new class Server {
         }
     }
 
-    on<Channel extends keyof Messages>(type: Channel, callback: UpdateCallback<Channel>) {
-        this.listeners.set(type, callback);
-    }
-
     onMessage<Channel extends OnceMessages["channel"]>(type: Channel, callback: MessageCallback<Channel>) {
         this.messageListeners.set(type, callback);
     }
 
-    send<Channel extends keyof Messages>(type: Channel, message: Messages[Channel]) {
+    send<Channel extends Messages["type"]>(type: Channel, message: Extract<Messages, { type: Channel }>["props"]) {
         for(const port of this.open) {
             port.postMessage({ type, message });
         }
-    }
-
-    async executeAndSend<Channel extends keyof Messages>(type: Channel, message: Messages[Channel]) {
-        const callback = this.listeners.get(type);
-        if(!callback) return;
-
-        const cancelled = await callback(await statePromise, message);
-        if(cancelled === true) return;
-
-        for(const port of this.open) {
-            port.postMessage({ type, message });
-        }
-    }
-
-    async trigger<Channel extends OnceMessages["channel"]>(type: Channel, message: OnceMessageProps<Channel>) {
-        const listener = this.messageListeners.get(type);
-        if(!listener) return;
-
-        await listener(await statePromise, message, nop);
     }
 }();

@@ -22,9 +22,13 @@ export function disableConsoleWarning() {
     const log = console.log;
     let remainingIgnores = 2;
 
-    console.log = (...data: any[]) => {
-        // Allow all Gimloader logs through
-        if(data[0] === "%c[GL]") return log(...data);
+    console.log = (start, ...data: any[]) => {
+        // Allow other logs through
+        if(
+            typeof start !== "string"
+            || !start.startsWith("%cStop")
+                && !start.startsWith("%cThis is a browser")
+        ) return log(start, ...data);
 
         remainingIgnores--;
         if(remainingIgnores <= 0) console.log = log;

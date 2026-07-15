@@ -1,11 +1,10 @@
+import type { Dependency } from "$types/net/downloads";
 import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
-import type { State } from "$types/net/state";
 import Server from "$bg/net/server";
 import { formatDownloadUrl } from "$shared/net/util";
 import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
-import Scripts from "$bg/scripts";
 import { englishList } from "$shared/utils";
-import type { Dependency } from "$types/net/downloads";
+import StateManager from "$shared/state";
 
 export default class Downloader {
     static maxDepth = 16;
@@ -13,9 +12,10 @@ export default class Downloader {
 
     static init() {
         Server.onMessage("downloadScript", this.downloadScript.bind(this));
+        Server.onMessage("downloadDependencies", this.onDownloadDeps.bind(this));
     }
 
-    static async downloadScript(state: State, message: OnceMessageProps<"downloadScript">, respond: OnceResponder<"downloadScript">) {
+    static async downloadScript(message: OnceMessageProps<"downloadScript">, respond: OnceResponder<"downloadScript">) {
         if(!message.url.startsWith("http://") && !message.url.startsWith("https://")) {
             respond({ status: "downloadError", message: "Invalid URL" });
             return;
@@ -45,8 +45,8 @@ export default class Downloader {
 
         // Check if confirmation is needed
         const warnAbout = willDownload.filter((dep) => (
-            (dep.type === "library" && !state.settings.autoDownloadMissingLibs)
-            || (dep.type === "plugin" && !state.settings.autoDownloadMissingPlugins)
+            (dep.type === "library" && !StateManager.settings.settings.value.autoDownloadMissingLibs)
+            || (dep.type === "plugin" && !StateManager.settings.settings.value.autoDownloadMissingPlugins)
         ));
         if(warnAbout.length > 0) {
             const message = `${englishList(warnAbout.map(d => d.name))} will also be downloaded. Continue?`;
@@ -87,7 +87,7 @@ export default class Downloader {
 
                 // Check if missing dependencies can be downloaded
                 for(const dep of dependencies) {
-                    if(Scripts.has(dep.name)) continue;
+                    if(StateManager.allScripts.exists(dep.name)) continue;
 
                     if(!dep.url) {
                         error = `${dep.name} is required and cannot be automatically downloaded`;
@@ -139,11 +139,16 @@ export default class Downloader {
         return { text, headers, dependencies, type };
     }
 
+    static async onDownloadDeps(message: OnceMessageProps<"downloadDependencies">, respond: OnceResponder<"downloadDependencies">) {
+        const errors = await this.downloadDeps(message);
+        respond(errors);
+    }
+
     static async downloadDeps(dependencies: Dependency[]) {
         const errors: string[] = [];
 
         for(const dep of dependencies) {
-            if(Scripts.has(dep.name) || !dep.url) continue;
+            if(StateManager.allScripts.exists(dep.name) || !dep.url) continue;
             const downloadRes = await this.download(dep.url, "root", 0);
             errors.push(...downloadRes.errors);
         }
@@ -163,7 +168,7 @@ export default class Downloader {
 
             const errors: string[] = [];
             for(const dep of dependencies) {
-                if(Scripts.has(dep.name)) continue;
+                if(StateManager.allScripts.exists(dep.name)) continue;
                 if(!dep.url) {
                     errors.push(`${dep.name} is required and cannot be automatically downloaded`);
                     continue;
@@ -175,12 +180,12 @@ export default class Downloader {
 
             // Create the script after dependencies are installed
             if(type === "library") {
-                await Server.executeAndSend("libraryCreate", {
+                StateManager.apply("libraryCreate", {
                     folder,
                     info: { name: headers.name, code: text }
                 });
             } else {
-                await Server.executeAndSend("pluginCreate", {
+                StateManager.apply("pluginCreate", {
                     folder,
                     info: { name: headers.name, code: text, enabled: true }
                 });

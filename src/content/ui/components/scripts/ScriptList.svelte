@@ -18,6 +18,7 @@
     import { flipDurationMs } from "$shared/consts";
     import FolderPlus from "@lucide/svelte/icons/folder-plus";
     import Eraser from "@lucide/svelte/icons/eraser";
+    import StateManager from "$shared/state";
 
     interface Props {
         buttons: Snippet;
@@ -88,7 +89,7 @@
         // Update the order of the plugins
         if(e.detail.info.trigger === "droppedIntoAnother") return;
         let order = items.map(i => i.id);
-        manager.arrange(manager.openFolderId, order);
+        StateManager.apply(`${manager.type}Arrange`, { folder: manager.openFolderId, order });
     }
 
     async function createFolder() {
@@ -104,7 +105,11 @@
         });
         if(!name) return;
 
-        manager.createFolder(manager.openFolderId, name);
+        StateManager.apply(`${manager.type}FolderCreate`, {
+            parent: manager.openFolderId,
+            name,
+            id: crypto.randomUUID()
+        });
     }
 
     let backItems: LayoutItem[] = $state([]);
@@ -119,7 +124,10 @@
         const droppedItem = e.detail.items[0];
         if(!droppedItem || !manager.currentFolder.parent) return;
 
-        manager.moveItem($state.snapshot(droppedItem), manager.currentFolder.parent);
+        StateManager.apply(`${manager.type}ItemMove`, {
+            item: droppedItem,
+            folder: manager.currentFolder.parent
+        });
     }
 
     function closeSearch() {

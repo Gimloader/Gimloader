@@ -1,6 +1,6 @@
 <script lang="ts">
     import Plugin from "./Plugin.svelte";
-    import { createScript, readUserFile } from "$content/utils";
+    import { readUserFile } from "$content/utils";
     import { Button } from "$shared/ui/button";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
@@ -9,6 +9,7 @@
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
     import PluginFolder from "./PluginFolder.svelte";
+    import StateManager from "$shared/state";
     import Port from "$shared/net/port.svelte";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
@@ -16,7 +17,7 @@
     function importPlugin() {
         readUserFile(".js", (code) => {
             code = code.replaceAll("\r\n", "\n");
-            PluginManager.create(code);
+            StateManager.plugin.create(code, PluginManager.openFolderId);
         });
     }
 
@@ -25,28 +26,28 @@
         const plugins = PluginManager.currentFolder.contents.filter(i => i.type !== "folder");
         const enabled = plugins.filter((p) => PluginManager.getScript(p.id)?.enabled);
         const disabled = plugins.filter((p) => !PluginManager.getScript(p.id)?.enabled);
-        PluginManager.currentFolder.contents = folders.concat(enabled, disabled);
+        const sorted = folders.concat(enabled, disabled);
 
-        Port.send("pluginArrange", {
-            order: PluginManager.currentFolder.contents.map(p => p.id),
+        StateManager.apply("pluginArrange", {
+            order: sorted.map(p => p.id),
             folder: PluginManager.openFolderId
         });
     }
 
     function sortAlphabetical() {
-        PluginManager.currentFolder.contents.sort((a, b) =>
+        const sorted = PluginManager.currentFolder.contents.toSorted((a, b) =>
             PluginManager.getItemName(a).localeCompare(PluginManager.getItemName(b))
         );
 
-        Port.send("pluginArrange", {
-            order: PluginManager.currentFolder.contents.map(p => p.id),
+        StateManager.apply("pluginArrange", {
+            order: sorted.map(p => p.id),
             folder: PluginManager.openFolderId
         });
     }
 
     function deleteAll() {
         if(!confirm("Are you sure you want to delete all plugins?")) return;
-        PluginManager.deleteAll(false);
+        StateManager.apply("pluginDeleteAll", undefined);
     }
 
     async function openUrlInstall() {
@@ -57,6 +58,13 @@
         if(!url) return;
 
         downloadScript(url, PluginManager.openFolderId, "plugin");
+    }
+
+    function createScript() {
+        Port.sendAndRecieve("showEditor", {
+            type: "plugin",
+            folder: PluginManager.openFolderId
+        });
     }
 </script>
 
@@ -73,7 +81,7 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => createScript(PluginManager)}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={createScript}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importPlugin}>Upload File</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>

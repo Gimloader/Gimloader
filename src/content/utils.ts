@@ -1,5 +1,3 @@
-import type ScriptManager from "$core/scripts/scriptManager.svelte";
-import Port from "$shared/net/port.svelte";
 import { nop } from "$shared/utils";
 import * as z from "zod";
 import rawChangelog from "../../release-notes.txt";
@@ -68,13 +66,6 @@ export function readUserFile(accept: string, callback: (text: string) => void) {
     });
 
     input.click();
-}
-
-export function createScript(manager: ScriptManager) {
-    Port.sendAndRecieve("showEditor", {
-        type: manager.type,
-        folder: manager.openFolderId
-    });
 }
 
 // Because of some nonsense with the spec subclassing promises is wonky

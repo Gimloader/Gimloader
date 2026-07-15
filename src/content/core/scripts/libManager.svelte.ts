@@ -1,12 +1,10 @@
 import ScriptManager from "./scriptManager.svelte";
 import { Library } from "./library.svelte";
 import type { LibraryInfo } from "$types/net/state";
-import Port from "$shared/net/port.svelte";
 import Modals from "../modals.svelte";
-import { parseScriptHeaders } from "$shared/parseHeader";
-import { toast } from "svelte-sonner";
 import { downloadScript } from "../net/download";
-import { scripts } from "./map";
+import { scriptInstanceMap } from "./map";
+import StateManager from "$shared/state";
 
 export default new class LibraryManager extends ScriptManager<LibraryInfo, Library> {
     singular = "library";
@@ -14,29 +12,10 @@ export default new class LibraryManager extends ScriptManager<LibraryInfo, Libra
 
     constructor() {
         super(Library, "library");
-
-        Port.on("libraryCreate", ({ info, folder }) => this.onCreate(info, folder));
-    }
-
-    async create(code: string) {
-        const headers = parseScriptHeaders(code);
-        if(headers.isLibrary === "false") {
-            toast.error("Libraries must have the @isLibrary header set");
-            return;
-        }
-
-        const info = { name: headers.name, code };
-        this.deleteConflicting(info.name);
-
-        const folder = this.openFolderId;
-        const created = this.onCreate(info, folder);
-        Port.send("libraryCreate", { info, folder });
-
-        return created;
     }
 
     async deleteAllConfirm(confirmed = false) {
-        const response = await Port.sendAndRecieve("tryDeleteAllLibraries", { confirmed });
+        const response = StateManager.library.tryDeleteAll(confirmed);
 
         if(response.status === "confirm") {
             const title = "Plugins depend on some libraries";
@@ -51,7 +30,7 @@ export default new class LibraryManager extends ScriptManager<LibraryInfo, Libra
     }
 
     async require(requirer: string, name: string, downloadUrl?: string) {
-        const requirerScript = scripts.get(requirer);
+        const requirerScript = scriptInstanceMap.get(requirer);
         if(!requirerScript) throw new Error(`Requirer script ${requirer} not found`);
 
         // Try to enable the plugin if it already exists

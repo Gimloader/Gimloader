@@ -14,6 +14,7 @@
     import Delete from "svelte-material-icons/Delete.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte";
     import ArrowDownToLine from "@lucide/svelte/icons/arrow-down-to-line";
+    import StateManager from "$shared/state";
 
     interface Props {
         id: string;
@@ -68,7 +69,7 @@
         });
         if(!newName) return;
 
-        manager.editFolder(id, newName);
+        StateManager.apply(`${manager.type}FolderEdit`, { id, newName });
     }
 
     let items: LayoutItem[] = $state([]);
@@ -83,7 +84,10 @@
         const droppedItem = e.detail.items[0];
         if(!droppedItem) return;
 
-        manager.moveItem($state.snapshot(droppedItem), id);
+        StateManager.apply(`${manager.type}ItemMove`, {
+            item: droppedItem,
+            folder: id
+        });
     }
 
     function downloadFolder() {

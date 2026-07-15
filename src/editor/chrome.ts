@@ -1,9 +1,12 @@
+import type { EditorOptions } from "$types/editor";
 import * as monaco from "monaco-editor";
 import types from "./gimloaderTypes.txt";
 import { mount } from "svelte";
 import Editor from "./Editor.svelte";
 import styles from "./tailwind.css";
-import type { EditorOptions } from "$types/editor";
+import Port from "$shared/net/port.svelte";
+
+Port.init();
 
 self.MonacoEnvironment = {
     getWorkerUrl: (_, label) => {

@@ -11,6 +11,11 @@ export interface PluginInfo extends ScriptInfo {
 
 export type LibraryInfo = ScriptInfo;
 
+export interface ScriptInfoTypes {
+    plugin: PluginInfo;
+    library: LibraryInfo;
+}
+
 export type PluginStorage = Record<string, Record<string, any>>;
 export type ConfigurableHotkeysState = Record<string, HotkeyTrigger | null>;
 

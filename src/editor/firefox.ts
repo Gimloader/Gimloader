@@ -9,6 +9,9 @@ import { indentWithTab } from "@codemirror/commands";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorState } from "@codemirror/state";
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link";
+import Port from "$shared/net/port.svelte";
+
+Port.init();
 
 const style = document.createElement("style");
 style.innerHTML = styles;

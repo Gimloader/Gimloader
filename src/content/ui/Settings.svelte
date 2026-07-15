@@ -1,12 +1,58 @@
 <script lang="ts">
+    import type { Settings, State } from "$types/net/state";
     import { Button } from "$shared/ui/button";
     import { Switch } from "$shared/ui/switch";
     import Storage from "$core/storage.svelte";
-    import StateManager from "$core/state";
-    import type { Settings } from "$types/net/state";
+    import StateManager from "$shared/state";
+    import { downloadJson } from "$shared/utils";
+    import { readUserFile } from "$content/utils";
+    import { toast } from "svelte-sonner";
+    import Port from "$shared/net/port.svelte";
 
     function saveKey(key: keyof Settings) {
-        Storage.updateSetting(key, Storage.settings[key]);
+        StateManager.apply("settingUpdate", { key, value: Storage.settings[key] });
+    }
+
+    function downloadState() {
+        downloadJson(StateManager.getSavedState(), "gimloader_config.json");
+    }
+
+    function loadState(e: MouseEvent) {
+        if(!e.isTrusted) return;
+        if(
+            !confirm(
+                "Do you want to load a new config? You will lose everything, including plugins, libraries, settings, and hotkeys."
+            )
+        ) return;
+
+        readUserFile(".json", (text) => {
+            try {
+                const state: State = JSON.parse(text);
+                if(typeof state !== "object" || state === null) throw new Error("Invalid config");
+
+                const {
+                    plugins,
+                    libraries,
+                    pluginLayout,
+                    libraryLayout,
+                    pluginStorage,
+                    pluginSettings,
+                    settings,
+                    hotkeys
+                } = state;
+                if(
+                    !plugins && !libraries && !pluginLayout && !libraryLayout && !pluginStorage && !pluginSettings
+                    && !settings && !hotkeys
+                ) {
+                    throw new Error("No valid keys present");
+                }
+
+                Port.sendAndRecieve("setState", state);
+            } catch (e) {
+                console.error(e);
+                toast.error("That config appears to be invalid");
+            }
+        });
     }
 </script>
 
@@ -29,7 +75,10 @@
                     return;
                 }
             }
-            Storage.updateSetting("showPluginButtons", Storage.settings.showPluginButtons);
+            StateManager.apply("settingUpdate", {
+                key: "showPluginButtons",
+                value: Storage.settings.showPluginButtons
+            });
         }}
     />
     Show buttons to open Gimloader menu
@@ -54,7 +103,7 @@
     <Switch
         bind:checked={Storage.settings.pollerEnabled}
         onCheckedChange={() => {
-            Storage.updateSetting("pollerEnabled", Storage.settings.pollerEnabled);
+            StateManager.apply("settingUpdate", { key: "pollerEnabled", value: Storage.settings.pollerEnabled });
         }}
     />
     Poll for plugins/libraries being served locally
@@ -62,5 +111,5 @@
 
 <h2 class="text-xl font-bold! mt-3! mb-0!">Export/Import Config</h2>
 <div>Your config consists of plugins, plugin values, libraries, hotkeys, and settings.</div>
-<Button onclick={StateManager.downloadState}>Export Config</Button>
-<Button onclick={StateManager.loadState}>Import Config</Button>
+<Button onclick={downloadState}>Export Config</Button>
+<Button onclick={loadState}>Import Config</Button>

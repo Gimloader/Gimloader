@@ -1,6 +1,6 @@
 import type { HotkeyTrigger } from "../api/hotkeys";
-import type { UpdateResponse } from "./downloads";
-import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, SavedState, ScriptInfo, ScriptLayout, State } from "./state";
+import type { Dependency, UpdateResponse } from "./downloads";
+import type { ConfigurableHotkeysState, LayoutItem, SavedState, ScriptInfo, ScriptInfoTypes, ScriptLayout, State } from "./state";
 
 export type ScriptType = "plugin" | "library";
 export interface ScriptEdit {
@@ -34,58 +34,41 @@ export interface ItemMove {
 }
 
 // These go both ways
-export interface StateMessages {
-    hotkeyUpdate: { id: string; trigger: HotkeyTrigger | null };
-    hotkeysUpdate: { hotkeys: ConfigurableHotkeysState };
+export type Message<Type extends string, Props = void> = { type: Type; props: Props };
 
-    libraryDelete: ScriptDelete;
-    libraryDeleteAll: void;
-    libraryCreate: { folder: string; info: LibraryInfo };
-    libraryArrange: ScriptArrange;
-    libraryFolderCreate: FolderCreate;
-    libraryFolderDelete: FolderDelete;
-    libraryFolderEdit: FolderEdit;
-    libraryItemMove: ItemMove;
+export type ScriptStateMessages<T extends ScriptType> =
+    | Message<`${T}Delete`, ScriptDelete>
+    | Message<`${T}DeleteAll`>
+    | Message<`${T}Create`, { folder: string; info: ScriptInfoTypes[T] }>
+    | Message<`${T}Arrange`, ScriptArrange>
+    | Message<`${T}FolderCreate`, FolderCreate>
+    | Message<`${T}FolderDelete`, FolderDelete>
+    | Message<`${T}FolderEdit`, FolderEdit>
+    | Message<`${T}ItemMove`, ItemMove>
+    | Message<`${T}Edit`, ScriptEdit>;
 
-    pluginDelete: ScriptDelete;
-    pluginDeleteAll: void;
-    pluginCreate: { folder: string; info: PluginInfo };
-    pluginArrange: ScriptArrange;
-    pluginToggled: { name: string; enabled: boolean };
-    pluginSetAll: { enabled: boolean; folder?: string };
-    pluginFolderCreate: FolderCreate;
-    pluginFolderDelete: FolderDelete;
-    pluginFolderEdit: FolderEdit;
-    pluginItemMove: ItemMove;
+export type StateMessages =
+    | Message<"hotkeyUpdate", { id: string; trigger: HotkeyTrigger | null }>
+    | Message<"hotkeysUpdate", { hotkeys: ConfigurableHotkeysState }>
+    | Message<"settingUpdate", { key: string; value: any }>
+    | Message<"pluginValueUpdate", { id: string; key: string; value: string }>
+    | Message<"pluginValueDelete", { id: string; key: string }>
+    | Message<"pluginSettingUpdate", { id: string; key: string; value: string }>
+    | Message<"clearPluginStorage", { id: string }>
+    | Message<"cacheInvalid", { invalid: boolean }>
+    | Message<"pluginToggled", { name: string; enabled: boolean }>
+    | Message<"pluginSetAll", { enabled: boolean; folder?: string }>
+    | ScriptStateMessages<"library">
+    | ScriptStateMessages<"plugin">
+    | Message<"availableUpdates", { updates: string[] }>;
 
-    settingUpdate: { key: string; value: any };
-
-    pluginValueUpdate: { id: string; key: string; value: string };
-    pluginValueDelete: { id: string; key: string };
-    pluginSettingUpdate: { id: string; key: string; value: string };
-    clearPluginStorage: { id: string };
-
-    cacheInvalid: { invalid: boolean };
-}
+export type StateMessageProps<Type extends StateMessages["type"]> = Extract<StateMessages, { type: Type }>["props"];
 
 // These only go from the background to content
-export interface Messages extends StateMessages {
-    pluginEdit: ScriptEdit;
-    libraryEdit: ScriptEdit;
-    setState: State;
-    toast: { type: "success" | "error" | "warning" | "normal"; message: string };
-    availableUpdates: string[];
-}
-
-export interface ScriptTryDelete {
-    name: string;
-    confirmed?: boolean;
-}
-
-export interface FolderTryDelete {
-    id: string;
-    confirmed?: boolean;
-}
+export type Messages =
+    | StateMessages
+    | Message<"setState", State>
+    | Message<"toast", { type: "success" | "error" | "warning" | "normal"; message: string }>;
 
 export interface FolderExport {
     layout: ScriptLayout;
@@ -94,45 +77,40 @@ export interface FolderExport {
     scripts: ScriptInfo[];
 }
 
-export interface ImportFolder {
-    folder: string;
-    exported: FolderExport;
-}
-
 export interface ImportResults {
     scripts: number;
     folders: number;
 }
 
-interface Success {
+export interface Success {
     status: "success";
 }
 
-interface DependencyError {
+export interface DependencyError {
     status: "dependencyError";
     message: string;
 }
 
-interface DownloadError {
+export interface DownloadError {
     status: "downloadError";
     message: string;
 }
 
-interface Confirm {
+export interface Confirm {
     status: "confirm";
     message: string;
 }
 
-interface DependencyConfirm {
+export interface DependencyConfirm {
     status: "dependencyConfirm";
     scripts: string[];
 }
 
-interface MultipleDependencyError extends DependencyError {
+export interface MultipleDependencyError extends DependencyError {
     scripts: string[];
 }
 
-interface DownloadSuccess extends Success {
+export interface DownloadSuccess extends Success {
     name: string;
 }
 
@@ -143,23 +121,13 @@ export type DownloadResult = DownloadSuccess | Confirm | DownloadError;
 
 export type OnceMessage<Channel extends string, Props, Response = void> = { channel: Channel; props: Props; response: Response };
 export type OnceMessages =
-    | OnceMessage<"getState", void, State>
     | OnceMessage<"setState", SavedState>
     | OnceMessage<"applyUpdates", { apply: boolean }>
     | OnceMessage<"updateAll", void, string[]>
     | OnceMessage<"updateSingle", { name: string }, UpdateResponse>
     | OnceMessage<"showEditor", { type: ScriptType; folder?: string; name?: string }>
-    | OnceMessage<"pluginTryDelete", ScriptTryDelete, DeleteResult>
-    | OnceMessage<"libraryTryDelete", ScriptTryDelete, DeleteResult>
-    | OnceMessage<"pluginFolderTryDelete", FolderTryDelete, DeleteResult>
-    | OnceMessage<"libraryFolderTryDelete", FolderTryDelete, DeleteResult>
-    | OnceMessage<"pluginFolderImport", ImportFolder, ImportResults>
-    | OnceMessage<"libraryFolderImport", ImportFolder, ImportResults>
-    | OnceMessage<"tryDeleteAllLibraries", { confirmed?: boolean }, DeleteResult>
-    | OnceMessage<"tryTogglePlugin", { name: string; enabled: boolean; confirmed?: boolean }, ToggleResult>
-    | OnceMessage<"trySetAllPlugins", { enabled: boolean; folder?: string; confirmed?: boolean }, SetAllResult>
     | OnceMessage<"downloadScript", { url: string; folder: string; confirmed?: boolean; type?: ScriptType }, DownloadResult>
-    | OnceMessage<"editOrCreate", { code: string; name: string | null; folder?: string; updated?: boolean }>;
+    | OnceMessage<"downloadDependencies", Dependency[], string[]>;
 
 export type ExtractOnceMessage<Channel extends OnceMessages["channel"]> = Extract<OnceMessages, OnceMessage<Channel, any, any>>;
 export type OnceMessageProps<Channel extends OnceMessages["channel"]> = ExtractOnceMessage<Channel>["props"];

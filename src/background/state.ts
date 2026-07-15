@@ -1,10 +1,15 @@
 import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, PluginStorage, SavedState, ScriptLayout, Settings, State } from "$types/net/state";
+import type { ScriptType } from "$types/net/messages";
 import { defaultSettings } from "$shared/consts";
 import debounce from "debounce";
-import type { ScriptType } from "$types/net/messages";
-import Scripts from "./scripts";
+import StateManager from "$shared/state";
+import Downloader from "./net/downloader";
+import Server from "./net/server";
 
-export const statePromise = new Promise<State>(async (res) => {
+const isString = (value: any) => value && typeof value === "string";
+const isObject = (value: any) => typeof value === "object" && value !== null;
+
+export default async function loadState() {
     const savedState = await chrome.storage.local.get<SavedState>({
         plugins: [],
         libraries: [],
@@ -17,44 +22,70 @@ export const statePromise = new Promise<State>(async (res) => {
         cacheInvalid: false
     });
 
-    const plugins = sanitizePlugins(savedState.plugins);
-    const libraries = sanitizeLibraries(savedState.libraries);
+    StateManager.plugin.on("scriptUpdate", () => saveDebounced("plugins"));
+    StateManager.plugin.on("layoutUpdate", () => saveDebounced("pluginLayout"));
+    StateManager.library.on("scriptUpdate", () => saveDebounced("libraries"));
+    StateManager.library.on("layoutUpdate", () => saveDebounced("libraryLayout"));
+    StateManager.settings.on("any", () => saveDebounced("settings"));
+    StateManager.storage.on("pluginStorageChange", () => saveDebounced("pluginStorage"));
+    StateManager.storage.on("pluginSettingsChange", () => saveDebounced("pluginSettings"));
+    StateManager.hotkeys.on("configurablesChange", () => saveDebounced("hotkeys"));
+    StateManager.cache.on("invalidUpdate", () => saveDebounced("cacheInvalid"));
+
+    StateManager.init(sanitizeState(savedState), {
+        downloadDependencies: (deps) => Downloader.downloadDeps(deps),
+        broadcast: (type, props) => Server.send(type, props)
+    });
+
+    Server.onMessage("setState", (newState) => {
+        if(!isObject(newState)) return;
+
+        const merged = Object.assign({}, StateManager.getSavedState(), newState);
+        const state = sanitizeState(merged);
+        state.cacheInvalid = true;
+
+        StateManager.update(state);
+        Server.send("setState", state);
+    });
+}
+
+function sanitizeState(state: SavedState): State {
+    const usedNames = new Set<string>();
+    const plugins = sanitizePlugins(state.plugins, usedNames);
+    const libraries = sanitizeLibraries(state.libraries, usedNames);
     const pluginNames = new Set(plugins.map(p => p.name));
     const libraryNames = new Set(libraries.map(p => p.name));
 
-    res({
+    return {
         plugins,
         libraries,
-        pluginLayout: sanitizeLayout(savedState.pluginLayout, pluginNames),
-        libraryLayout: sanitizeLayout(savedState.libraryLayout, libraryNames),
-        pluginStorage: sanitizePluginStorage(savedState.pluginStorage),
-        pluginSettings: sanitizePluginStorage(savedState.pluginSettings),
-        settings: sanitizeSettings(savedState.settings),
-        hotkeys: sanitizeHotkeys(savedState.hotkeys),
-        cacheInvalid: sanitizeCacheInvalid(savedState.cacheInvalid),
+        pluginLayout: sanitizeLayout(state.pluginLayout, pluginNames),
+        libraryLayout: sanitizeLayout(state.libraryLayout, libraryNames),
+        pluginStorage: sanitizePluginStorage(state.pluginStorage),
+        pluginSettings: sanitizePluginStorage(state.pluginSettings),
+        settings: sanitizeSettings(state.settings),
+        hotkeys: sanitizeHotkeys(state.hotkeys),
+        cacheInvalid: sanitizeCacheInvalid(state.cacheInvalid),
         availableUpdates: []
-    });
-});
+    };
+}
 
 const debounced: Record<string, () => void> = {};
 
-export function saveDebounced(key: keyof SavedState) {
+function saveDebounced(key: keyof SavedState) {
     // debounce just to be safe
-    if(!debounced[key]) {
-        debounced[key] = debounce(async () => {
-            chrome.storage.local.set({ [key]: (await statePromise)[key] });
-        }, 100);
-    }
+    debounced[key] ??= debounce(async () => {
+        chrome.storage.local.set({
+            [key]: StateManager.getSavedState()[key]
+        });
+    }, 100);
 
     debounced[key]();
 }
 
-const isString = (value: any) => value && typeof value === "string";
-const isObject = (value: any) => typeof value === "object" && value !== null;
-
-export function sanitizeScriptInfo(info: PluginInfo[], type: "plugin"): PluginInfo[];
-export function sanitizeScriptInfo(info: LibraryInfo[], type: "library"): LibraryInfo[];
-export function sanitizeScriptInfo(info: any[], type: ScriptType) {
+function sanitizeScriptInfo(info: PluginInfo[], type: "plugin", usedNames: Set<string>): PluginInfo[];
+function sanitizeScriptInfo(info: LibraryInfo[], type: "library", usedNames: Set<string>): LibraryInfo[];
+function sanitizeScriptInfo(info: any[], type: ScriptType, usedNames: Set<string>) {
     if(!Array.isArray(info)) return [];
 
     const needsEnabled = type === "plugin";
@@ -78,28 +109,26 @@ export function sanitizeScriptInfo(info: any[], type: ScriptType) {
 
     // Remove duplicates
     for(let i = 0; i < info.length; i++) {
-        let failed = false;
-        if(Scripts.has(info[i].name)) failed = true;
-        else failed = Scripts.createScript(type, info[i]);
-
-        if(failed) {
+        if(usedNames.has(info[i].name)) {
             info.splice(i, 1);
             i--;
+        } else {
+            usedNames.add(info[i].name);
         }
     }
 
     return info;
 }
 
-export function sanitizePlugins(plugins: PluginInfo[]) {
-    return sanitizeScriptInfo(plugins, "plugin");
+function sanitizePlugins(plugins: PluginInfo[], usedNames: Set<string>) {
+    return sanitizeScriptInfo(plugins, "plugin", usedNames);
 }
 
-export function sanitizeLibraries(libraries: LibraryInfo[]) {
-    return sanitizeScriptInfo(libraries, "library");
+function sanitizeLibraries(libraries: LibraryInfo[], usedNames: Set<string>) {
+    return sanitizeScriptInfo(libraries, "library", usedNames);
 }
 
-export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
+function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
     if(!isObject(layout)) layout = {};
 
     // Remove invalid folders
@@ -134,7 +163,6 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
                 scripts.delete(item.id);
 
                 contents.push({ type: "script", id: item.id });
-                Scripts.setFolder(item.id, folderId);
             } else if(item.type === "folder") {
                 if(!layout[item.id] || seenFolders.has(item.id)) continue;
                 seenFolders.add(item.id);
@@ -168,7 +196,7 @@ export function sanitizeLayout(layout: ScriptLayout, scripts: Set<string>) {
     return layout;
 }
 
-export function sanitizePluginStorage(storage: PluginStorage) {
+function sanitizePluginStorage(storage: PluginStorage) {
     if(!isObject(storage)) return {};
 
     for(const key in storage) {
@@ -180,7 +208,7 @@ export function sanitizePluginStorage(storage: PluginStorage) {
     return storage;
 }
 
-export function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
+function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
     if(!isObject(hotkeys)) return {};
 
     for(const id in hotkeys) {
@@ -235,7 +263,7 @@ export function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
     return hotkeys;
 }
 
-export function copyOverDefault<T extends Record<string, any>>(obj: T, defaultVal: T): T {
+function copyOverDefault<T extends Record<string, any>>(obj: T, defaultVal: T): T {
     const newObj = Object.assign({}, defaultVal);
     if(!isObject(obj)) return newObj;
 
@@ -248,7 +276,7 @@ export function copyOverDefault<T extends Record<string, any>>(obj: T, defaultVa
     return newObj;
 }
 
-export function sanitizeSettings(settings: Settings) {
+function sanitizeSettings(settings: Settings) {
     const newSettings = copyOverDefault(settings, defaultSettings);
 
     // make sure menu view is either "grid" or "list"
@@ -259,6 +287,6 @@ export function sanitizeSettings(settings: Settings) {
     return newSettings;
 }
 
-export function sanitizeCacheInvalid(cacheInvalid: boolean) {
+function sanitizeCacheInvalid(cacheInvalid: boolean) {
     return typeof cacheInvalid === "boolean" ? cacheInvalid : false;
 }
