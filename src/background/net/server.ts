@@ -1,5 +1,5 @@
 import type { Messages, OnceMessageProps, OnceMessages, OnceResponder } from "$types/net/messages";
-import { nop } from "$shared/utils";
+import { log, nop } from "$shared/utils";
 import StateManager from "$shared/state";
 
 type Port = chrome.runtime.Port;
@@ -43,6 +43,7 @@ export default new class Server {
     }
 
     onPortMessage(port: Port, msg: Message) {
+        log("Recieved message", msg);
         const { type, message, returnId } = msg;
 
         if(returnId) {

@@ -223,12 +223,8 @@ export default abstract class ScriptState<
         const script = this.getScriptData(name);
         if(!script) return;
 
-        this.deleteIfExists(newName);
-
-        script.info.code = code;
-        script.info.name = newName;
-
         if(name !== newName) {
+            this.deleteIfExists(newName);
             scriptMap.delete(name);
             scriptMap.set(newName, script);
 
@@ -239,6 +235,9 @@ export default abstract class ScriptState<
                 this.emit("layoutUpdate");
             }
         }
+
+        script.info.code = code;
+        script.info.name = newName;
 
         this.emit("scriptEdit", name, newName, code, updated);
         this.emit("scriptUpdate");

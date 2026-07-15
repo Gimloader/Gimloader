@@ -48,7 +48,7 @@
     function stopConfigure() {
         if(!configuring) return;
 
-        StateManager.apply("hotkeyUpdate", configuring);
+        StateManager.apply("hotkeyUpdate", { id: configuring.id, trigger: configuring.trigger });
         configuring = null;
     }
 
@@ -64,7 +64,7 @@
 
     function reset(hotkey: ConfigurableHotkey) {
         hotkey.reset();
-        StateManager.apply("hotkeyUpdate", hotkey);
+        StateManager.apply("hotkeyUpdate", { id: hotkey.id, trigger: hotkey.trigger });
     }
 
     async function resetAll() {
