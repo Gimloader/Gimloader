@@ -40,8 +40,11 @@
 
     let Component = $derived(Storage.settings.menuView === "grid" ? Card : ListItem);
 
-    function deleteScript() {
-        if(!confirm(`Are you sure you want to delete ${script.headers.name}?`)) return;
+    async function deleteScript() {
+        const text = `Are you sure you want to delete ${script.headers.name}?`;
+        const confirmed = await Modals.open("confirm", { text, title: "Delete Script" });
+        if(!confirmed) return;
+
         script.deleteConfirm();
     }
 

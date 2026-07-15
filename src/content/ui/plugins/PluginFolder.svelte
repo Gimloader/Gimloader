@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Modals from "$core/modals.svelte";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import ScriptFolder from "../components/scripts/ScriptFolder.svelte";
     import Check from "@lucide/svelte/icons/check";
@@ -14,9 +15,12 @@
 
     let { id, dragging, startDrag, dragDisabled, dragAllowed }: Props = $props();
 
-    function setAll(enabled: boolean) {
+    async function setAll(enabled: boolean) {
         const name = PluginManager.getFolderName(id);
-        if(!confirm(`Are you sure you want to ${enabled ? "enable" : "disable"} all plugins in ${name}?`)) return;
+        const text = `Are you sure you want to ${enabled ? "enable" : "disable"} all plugins in ${name}?`;
+        const title = `${enabled ? "Enable" : "Disable"} All Plugins`;
+        const confirm = await Modals.open("confirm", { text, title });
+
         PluginManager.setAllConfirm(enabled, id);
     }
 </script>

@@ -38,10 +38,7 @@ export default class HotkeysState extends TypedEventEmitter<HotkeysEvents> {
 
     onHotkeysUpdate({ hotkeys }: StateMessageProps<"hotkeysUpdate">) {
         this.configurable.value = hotkeys;
-
-        for(const id in hotkeys) {
-            this.emit("configurableUpdate", id, hotkeys[id]);
-        }
+        for(const id in hotkeys) this.emit("configurableUpdate", id, hotkeys[id]);
 
         this.emit("configurablesChange");
     }

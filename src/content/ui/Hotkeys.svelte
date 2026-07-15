@@ -6,12 +6,13 @@
     import Undo from "svelte-material-icons/Undo.svelte";
     import { SvelteSet } from "svelte/reactivity";
     import Hotkeys from "$core/hotkeys/hotkeys.svelte";
-
-    let hotkeys = Hotkeys.configurableHotkeys;
+    import Modals from "$core/modals.svelte";
+    import StateManager from "$shared/state";
+    import type { ConfigurableHotkeysState } from "$types/net/state";
 
     let categories = $derived.by(() => {
         let categories: Record<string, ConfigurableHotkey[]> = {};
-        for(let hotkey of hotkeys.values()) {
+        for(let hotkey of Hotkeys.configurableHotkeys) {
             if(!categories[hotkey.category]) {
                 categories[hotkey.category] = [];
             }
@@ -47,7 +48,7 @@
     function stopConfigure() {
         if(!configuring) return;
 
-        Hotkeys.saveConfigurable(configuring.id, configuring.trigger);
+        StateManager.apply("hotkeyUpdate", configuring);
         configuring = null;
     }
 
@@ -63,14 +64,24 @@
 
     function reset(hotkey: ConfigurableHotkey) {
         hotkey.reset();
-        Hotkeys.saveConfigurable(hotkey.id, hotkey.trigger);
+        StateManager.apply("hotkeyUpdate", hotkey);
     }
 
-    function resetAll() {
-        if(!confirm("Are you sure you want to reset all hotkeys?")) return;
+    async function resetAll() {
+        const confirmed = await Modals.open("confirm", {
+            text: "Are you sure you want to reset all hotkeys to their default state?",
+            title: "Reset All Hotkeys"
+        });
 
-        for(let hotkey of hotkeys.values()) hotkey.reset();
-        Hotkeys.saveAllConfigurable();
+        if(!confirmed) return;
+
+        let newHotkeys: ConfigurableHotkeysState = {};
+        for(let hotkey of Hotkeys.configurableHotkeys) {
+            hotkey.reset();
+            newHotkeys[hotkey.id] = hotkey.trigger;
+        }
+
+        StateManager.apply("hotkeysUpdate", { hotkeys: newHotkeys });
     }
 
     function formatTrigger(trigger: HotkeyTrigger | null) {

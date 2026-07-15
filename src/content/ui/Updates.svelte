@@ -12,10 +12,13 @@
     import { changelog } from "$content/utils";
 
     async function checkAll() {
-        if(!confirm("Do you want to try to update all plugins and all libraries?")) return;
-        let names: string[] = await Port.sendAndRecieve("updateAll", undefined);
+        const text = "Are you sure you want to try to update all plugins and all libraries?";
+        const confirmed = await Modals.open("confirm", { text, title: "Update All Scripts" });
+        if(!confirmed) return;
 
+        let names: string[] = await Port.sendAndRecieve("updateAll", undefined);
         if(names.length === 0) return toast.success("All scripts are up to date!");
+
         toast.success(`Updated ${englishList(names)}`);
     }
 </script>

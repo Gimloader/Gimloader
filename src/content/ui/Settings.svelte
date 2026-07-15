@@ -8,6 +8,23 @@
     import { readUserFile } from "$content/utils";
     import { toast } from "svelte-sonner";
     import Port from "$shared/net/port.svelte";
+    import Modals from "$core/modals.svelte";
+
+    async function onShowButtonsChange(shown: boolean) {
+        // Show a confirmation screen if they are trying to hide the buttons
+        if(!shown) {
+            const text = "Are you sure you want to hide the buttons that open the Gimloader menu? "
+                + "The menu is still accessible by pressing Alt+P.";
+
+            const confirmed = await Modals.open("confirm", { text, title: "Hide Gimloader Menu Buttons" });
+            if(!confirmed) return;
+        }
+
+        StateManager.apply("settingUpdate", {
+            key: "showPluginButtons",
+            value: shown
+        });
+    }
 
     function saveKey(key: keyof Settings) {
         StateManager.apply("settingUpdate", { key, value: Storage.settings[key] });
@@ -17,13 +34,13 @@
         downloadJson(StateManager.getSavedState(), "gimloader_config.json");
     }
 
-    function loadState(e: MouseEvent) {
+    async function loadState(e: MouseEvent) {
         if(!e.isTrusted) return;
-        if(
-            !confirm(
-                "Do you want to load a new config? You will lose everything, including plugins, libraries, settings, and hotkeys."
-            )
-        ) return;
+
+        const text =
+            "Do you want to import a new config? You will lose everything, including plugins, libraries, settings, and hotkeys.";
+        const confirmed = await Modals.open("confirm", { text, title: "Import Config" });
+        if(!confirmed) return;
 
         readUserFile(".json", (text) => {
             try {
@@ -62,25 +79,7 @@
     Automatically check for plugin updates
 </div>
 <div class="flex items-center gap-2 mt-2!">
-    <Switch
-        bind:checked={Storage.settings.showPluginButtons}
-        onCheckedChange={() => {
-            if(!Storage.settings.showPluginButtons) {
-                let conf = confirm(
-                    "Are you sure you want to hide the buttons that open the Gimloader menu? "
-                        + "The menu is still accessible by pressing Alt+P."
-                );
-                if(!conf) {
-                    Storage.settings.showPluginButtons = true;
-                    return;
-                }
-            }
-            StateManager.apply("settingUpdate", {
-                key: "showPluginButtons",
-                value: Storage.settings.showPluginButtons
-            });
-        }}
-    />
+    <Switch bind:checked={() => Storage.settings.showPluginButtons, onShowButtonsChange} />
     Show buttons to open Gimloader menu
 </div>
 <div class="flex items-center gap-2 mt-2!">

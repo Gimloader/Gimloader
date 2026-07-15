@@ -45,8 +45,11 @@
         });
     }
 
-    function deleteAll() {
-        if(!confirm("Are you sure you want to delete all plugins?")) return;
+    async function deleteAll() {
+        const text = `Are you sure you want to delete all plugins?`;
+        const confirmed = await Modals.open("confirm", { text, title: "Delete All Plugins" });
+        if(!confirmed) return;
+
         StateManager.apply("pluginDeleteAll", undefined);
     }
 

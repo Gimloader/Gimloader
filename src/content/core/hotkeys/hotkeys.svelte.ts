@@ -103,14 +103,4 @@ export default new class Hotkeys {
             && (trigger.alt === undefined || trigger.alt === e.altKey)
         );
     }
-
-    saveConfigurable(id: string, trigger: HotkeyTrigger | null) {
-        StateManager.apply("hotkeyUpdate", { id, trigger });
-    }
-
-    saveAllConfigurable() {
-        StateManager.apply("hotkeysUpdate", {
-            hotkeys: StateManager.hotkeys.configurable.value
-        });
-    }
 }();

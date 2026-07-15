@@ -18,7 +18,10 @@
     }
 
     function deleteAll() {
-        if(!confirm("Are you sure you want to delete all libraries?")) return;
+        const text = `Are you sure you want to delete all libraries?`;
+        const confirmed = Modals.open("confirm", { text, title: "Delete All Libraries" });
+        if(!confirmed) return;
+
         LibManager.deleteAllConfirm();
     }
 

@@ -56,8 +56,11 @@
         manager.viewFolder(id);
     }
 
-    function deleteFolder() {
-        if(!confirm(`Are you sure you want to delete ${name} and everything in it?`)) return;
+    async function deleteFolder() {
+        const text = `Are you sure you want to delete ${name} and everything in it?`;
+        const confirmed = await Modals.open("confirm", { text, title: "Delete Folder" });
+        if(!confirmed) return;
+
         manager.folderTryDelete(id);
     }
 
@@ -90,8 +93,11 @@
         });
     }
 
-    function downloadFolder() {
-        if(!confirm(`Are you sure you want to download ${name}?`)) return;
+    async function downloadFolder() {
+        const text = `Are you sure you want to download ${name} and everything in it?`;
+        const confirmed = await Modals.open("confirm", { text, title: "Download Folder" });
+        if(!confirmed) return;
+
         manager.exportFolder(id);
     }
 </script>
