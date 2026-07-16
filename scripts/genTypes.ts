@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { ModuleResolutionKind } from "typescript";
 import { readFile, writeFile, exists, rm } from "node:fs/promises";
 
+const isNpmPackage = process.argv.includes("--npm");
 const forceRegenerate = process.argv.includes("--force");
 
 const declarationDir = "./dist/declarations";
@@ -37,9 +38,10 @@ const includeExternal = [
     "tailwind-variants",
     "svelte-toolbelt",
     "tailwind-merge",
-    "eventemitter2",
-    "@dimforge/rapier2d-compat"
+    "eventemitter2"
 ];
+
+if(!isNpmPackage) includeExternal.push("@dimforge/rapier2d-compat");
 
 console.log("Creating type bundle...");
 const bundle = await rollup({
@@ -77,6 +79,16 @@ typeContent = typeContent.replace("csstype.Properties", "CSSStyleProperties");
 typeContent = typeContent.replace("Scene", "Scene as BaseScene");
 typeContent = typeContent.replace("extends Scene", "extends BaseScene");
 
+// Fix the weird aliasing stuff we did for rapier
+if(isNpmPackage) {
+    const rapierRegex = /\nimport { (.+) } from 'rapier.*';/g;
+    const imports = typeContent.matchAll(rapierRegex).flatMap((match) => match[1].split(", "));
+    const importString = `\nimport { ${[...imports].join(", ")} } from '@dimforge/rapier2d-compat';`;
+    const index = typeContent.search(rapierRegex);
+    typeContent = typeContent.replace(rapierRegex, "");
+    typeContent = typeContent.slice(0, index) + importString + typeContent.slice(index);
+}
+
 // Wrap everything in a namespace
 const insertAt = typeContent.indexOf("\n", typeContent.lastIndexOf("\nimport ") + 1);
 typeContent = typeContent.slice(0, insertAt) + "\nexport {};\n\ndeclare global {\nnamespace Gimloader {" + typeContent.slice(insertAt + 1);
@@ -107,5 +119,5 @@ interface Window {
 }
 }\n`;
 
-await writeFile("./types/index.d.ts", typeContent);
-await writeFile("./src/editor/gimloaderTypes.txt", typeContent);
+if(isNpmPackage) await writeFile("./types/index.d.ts", typeContent);
+else await writeFile("./src/editor/gimloaderTypes.txt", typeContent);

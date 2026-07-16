@@ -28,7 +28,7 @@ jobs:
         run: bun i --frozen-lockfile
 
       - name: Build types
-        run: bun run scripts/genTypes
+        run: bun run scripts/genTypes --npm
 
       - name: Publish package
         run: npm publish ./types --provenance

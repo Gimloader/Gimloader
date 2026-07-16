@@ -1585,7 +1585,7 @@ export namespace Stores {
         removing: boolean;
     }
 
-    export type CharacterType = "character" | "sentry";
+    export type CharacterType = "player" | "character" | "sentry";
 
     export interface CharacterInfo {
         allowWeaponFire: boolean;

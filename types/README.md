@@ -16,4 +16,6 @@ Install the package with `npm install -D @gimloader/types`. Then, add the follow
 
 ## Dependencies
 
-This package will install `@types/react`, `@types/react-dom`, and `phaser` for the `api.React`, `api.ReactDOM`, and `api.stores.phaser` variables respectively. It also has an optional peer dependency on `svelte@5.43.0` (exact version), which will give types to `api.Components`.
+This package will install `@types/react`, `@types/react-dom`, and `phaser` for the `api.React`, `api.ReactDOM`, and `api.stores.phaser` variables respectively.
+
+There is also an optional peer dependency on `svelte@5.43.0` (exact version), which will give types to `api.Components`.

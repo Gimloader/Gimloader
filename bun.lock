@@ -26,7 +26,7 @@
       },
       "devDependencies": {
         "@biomejs/biome": "^2.3.5",
-        "@dimforge/rapier2d-compat": "^0.19.1",
+        "@dimforge/rapier2d-compat": "~0.17.3",
         "@internationalized/date": "^3.12.0",
         "@lucide/svelte": "^1.17.0",
         "@tailwindcss/postcss": "^4.1.16",
@@ -105,7 +105,7 @@
 
     "@codemirror/view": ["@codemirror/view@6.36.5", "", { "dependencies": { "@codemirror/state": "^6.5.0", "style-mod": "^4.1.0", "w3c-keyname": "^2.2.4" } }, "sha512-cd+FZEUlu3GQCYnguYm3EkhJ8KJVisqqUsCOKedBoAt/d9c76JUUap6U0UrpElln5k6VyrEOYliMuDAKIeDQLg=="],
 
-    "@dimforge/rapier2d-compat": ["@dimforge/rapier2d-compat@0.19.1", "", {}, "sha512-lK1d4NgS451qeT9vQ8C01VIzKy23NV0kBAyOflvyUFeeyCPPJkdG16V3jglM+H6ZfwjxUF9/EeOdhg06wo4/gA=="],
+    "@dimforge/rapier2d-compat": ["@dimforge/rapier2d-compat@0.17.3", "", {}, "sha512-d/twATjykQ3M92vReq8G4Vph40H6GQV9B9NiZbq6+Nr8z7ippLiisrfssb9x417cWG7bj8Hyz1flF4ChPKVH6w=="],
 
     "@dprint/darwin-arm64": ["@dprint/darwin-arm64@0.50.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-4d08INZlTxbPW9LK9W8+93viN543/qA2Kxn4azVnPW/xCb2Im03UqJBz8mMm3nJZdtNnK3uTVG3ib1VW+XJisw=="],
 
