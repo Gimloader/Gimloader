@@ -1,8 +1,8 @@
-import { parseScriptHeaders } from "$shared/parseHeader";
 import type { ScriptType } from "$types/net/messages";
+import type StateManager from ".";
+import { parseScriptHeaders } from "$shared/parseHeader";
 import { apply } from "./events";
 import { scriptMap } from "./script";
-import type StateManager from ".";
 
 export default class AllScripts {
     stateManager: typeof StateManager;

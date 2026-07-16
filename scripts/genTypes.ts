@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { ModuleResolutionKind } from "typescript";
 import { readFile, writeFile, exists, rm } from "node:fs/promises";
 
-const isDT = process.argv.includes("--dt");
 const forceRegenerate = process.argv.includes("--force");
 
 const declarationDir = "./dist/declarations";
@@ -38,9 +37,9 @@ const includeExternal = [
     "tailwind-variants",
     "svelte-toolbelt",
     "tailwind-merge",
-    "eventemitter2"
+    "eventemitter2",
+    "@dimforge/rapier2d-compat"
 ];
-if(!isDT) includeExternal.push("@dimforge/rapier2d-compat")
 
 console.log("Creating type bundle...");
 const bundle = await rollup({
@@ -78,15 +77,6 @@ typeContent = typeContent.replace("csstype.Properties", "CSSStyleProperties");
 typeContent = typeContent.replace("Scene", "Scene as BaseScene");
 typeContent = typeContent.replace("extends Scene", "extends BaseScene");
 
-// Merge the rapier imports since rollup remains dumb
-if(isDT) {
-    const startIndex = typeContent.lastIndexOf("\n", typeContent.indexOf("from 'rapier"));
-    const endIndex = typeContent.indexOf("\n", typeContent.lastIndexOf("from 'rapier"));
-    typeContent = typeContent.slice(0, startIndex + 1) +
-        "import { Collider, ColliderDesc, KinematicCharacterController, RigidBody, RigidBodyDesc, World, Vector } from '@dimforge/rapier2d-compat';\n" +
-        typeContent.slice(endIndex + 1);
-}
-
 // Wrap everything in a namespace
 const insertAt = typeContent.indexOf("\n", typeContent.lastIndexOf("\nimport ") + 1);
 typeContent = typeContent.slice(0, insertAt) + "\nexport {};\n\ndeclare global {\nnamespace Gimloader {" + typeContent.slice(insertAt + 1);
@@ -117,9 +107,5 @@ interface Window {
 }
 }\n`;
 
-// Write the file
-if(isDT) {
-    await writeFile("./dist/gimloader.d.ts", typeContent);
-} else {
-    await writeFile("./src/editor/gimloaderTypes.txt", typeContent);
-}
+await writeFile("./types/index.d.ts", typeContent);
+await writeFile("./src/editor/gimloaderTypes.txt", typeContent);

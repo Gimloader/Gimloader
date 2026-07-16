@@ -12,7 +12,7 @@ type StateMessageEvents = {
 export const stateMessageEvents = new TypedEventEmitter<StateMessageEvents>();
 const broadcastFilters: Record<string, (message: any) => boolean> = {};
 
-interface StateEvents {
+export interface StateEvents {
     init: [state: State];
     broadcast: [type: any, props: any];
     error: [message: string];

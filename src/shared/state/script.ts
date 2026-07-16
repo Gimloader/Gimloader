@@ -13,7 +13,7 @@ interface BaseData {
     dependencies: Dependency[];
 }
 
-interface GenericData extends BaseData {
+export interface GenericData extends BaseData {
     type: ScriptType;
     info: ScriptInfo;
 }

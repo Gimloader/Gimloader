@@ -2,3 +2,4 @@ node_modules
 extension/build
 tmp
 dist
+types/index.d.ts
