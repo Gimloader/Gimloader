@@ -93,28 +93,17 @@
         {script?.headers.description}
     {/snippet}
     {#snippet buttons()}
-        <button title="Delete" onclick={deleteScript}>
-            <Delete size={28} />
-        </button>
-        <button title="Open plugin editor" onclick={showEditor}>
-            <Pencil size={28} />
-        </button>
-        {@render scriptButtons?.()}
-        {#if script?.headers.downloadUrl}
-            <button title="Check for updates" onclick={() => checkUpdate(script)}>
-                <Update size={28} />
-            </button>
-        {/if}
-        {#if script?.headers.needsLib?.length || script?.headers.optionalLib?.length
-            || script?.headers.needsPlugin?.length}
-            <button title="View dependencies" onclick={showDependencies}>
-                <BookSettings size={24} />
-            </button>
-        {/if}
-        {#if script?.headers.webpage}
-            <a title="Open webpage for plugin" href={script.headers.webpage} target="_blank">
-                <ScriptTextOutline size={28} />
-            </a>
+        {#if script?.errored}
+            <Tooltip.Provider>
+                <Tooltip.Root delayDuration={100}>
+                    <Tooltip.Trigger>
+                        <AlertCircleOutline size={28} color="#f05252" />
+                    </Tooltip.Trigger>
+                    <Tooltip.Content class="text-base">
+                        An error occured when this {script?.type} was enabling.
+                    </Tooltip.Content>
+                </Tooltip.Root>
+            </Tooltip.Provider>
         {/if}
         {#if script?.headers.deprecated !== null}
             <Tooltip.Provider>
@@ -133,17 +122,28 @@
                 </Tooltip.Root>
             </Tooltip.Provider>
         {/if}
-        {#if script?.errored}
-            <Tooltip.Provider>
-                <Tooltip.Root delayDuration={100}>
-                    <Tooltip.Trigger>
-                        <AlertCircleOutline size={28} color="#f05252" />
-                    </Tooltip.Trigger>
-                    <Tooltip.Content class="text-base">
-                        An error occured when this {script?.type} was enabling.
-                    </Tooltip.Content>
-                </Tooltip.Root>
-            </Tooltip.Provider>
+        {#if script?.headers.webpage}
+            <a title="Open webpage for plugin" href={script.headers.webpage} target="_blank">
+                <ScriptTextOutline size={28} />
+            </a>
         {/if}
+        {#if script?.headers.needsLib?.length || script?.headers.optionalLib?.length
+            || script?.headers.needsPlugin?.length}
+            <button title="View dependencies" onclick={showDependencies}>
+                <BookSettings size={24} />
+            </button>
+        {/if}
+        {#if script?.headers.downloadUrl}
+            <button title="Check for updates" onclick={() => checkUpdate(script)}>
+                <Update size={28} />
+            </button>
+        {/if}
+        {@render scriptButtons?.()}
+        <button title="Open plugin editor" onclick={showEditor}>
+            <Pencil size={28} />
+        </button>
+        <button title="Delete" onclick={deleteScript}>
+            <Delete size={28} />
+        </button>
     {/snippet}
 </Component>

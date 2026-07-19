@@ -62,7 +62,7 @@
     <div class="grow text-sm pr-7 overflow-hidden overflow-ellipsis line-clamp-6">
         {@render description?.()}
     </div>
-    <div class="flex flex-row-reverse items-end">
+    <div class="flex justify-end items-end">
         {@render buttons?.()}
     </div>
     {#if hasDrag}

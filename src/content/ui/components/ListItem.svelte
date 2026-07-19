@@ -65,8 +65,7 @@
         <div class="grow leading-3 ml-2 min-w-0">
             {@render header?.()}
         </div>
-
-        <div class="flex flex-row-reverse items-end">
+        <div class="flex content-end items-end">
             {@render buttons?.()}
         </div>
         {#if hasDrag}

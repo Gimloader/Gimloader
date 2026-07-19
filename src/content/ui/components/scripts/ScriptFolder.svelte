@@ -137,14 +137,14 @@
         {contentSummary}
     {/snippet}
     {#snippet buttons()}
-        <button title="Delete" onclick={deleteFolder}>
-            <Delete size={28} />
+        <button title="Download" onclick={downloadFolder}>
+            <ArrowDownToLine size={28} />
         </button>
         <button title="Change folder name" onclick={editFolder}>
             <Pencil size={28} />
         </button>
-        <button title="Download" onclick={downloadFolder}>
-            <ArrowDownToLine size={28} />
+        <button title="Delete" onclick={deleteFolder}>
+            <Delete size={28} />
         </button>
     {/snippet}
 </Component>
