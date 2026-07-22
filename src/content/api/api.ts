@@ -1,4 +1,5 @@
 import type { PluginSettings } from "$types/api/settings";
+import type { ScriptHeaders } from "$types/scripts";
 import { Plugin } from "$core/scripts/plugin.svelte";
 import { HotkeysApi, ScopedHotkeysApi } from "./hotkeys";
 import { ParcelApi, ScopedParcelApi } from "./parcel";
@@ -24,8 +25,6 @@ import createSettingsApi from "./settings";
 import Commands from "$core/commands.svelte";
 import { nop } from "$shared/utils";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
-import type { ScriptHeaders } from "$types/scripts";
-import { deepFreeze } from "$content/utils";
 
 class Api {
     /** Functions to edit Gimkit's code */
