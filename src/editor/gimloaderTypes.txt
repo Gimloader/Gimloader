@@ -2708,16 +2708,6 @@ enum RawShapeType {
 class RawBroadPhase {
   free(): void;
   constructor();
-  castRay(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawRayColliderHit | undefined;
-  castRayAndGetNormal(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawRayColliderIntersection | undefined;
-  intersectionsWithRay(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
-  intersectionWithShape(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shape: RawShape, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): number | undefined;
-  projectPoint(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawPointColliderProjection | undefined;
-  projectPointAndGetFeature(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawPointColliderProjection | undefined;
-  intersectionsWithPoint(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
-  castShape(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shapeVel: RawVector, shape: RawShape, target_distance: number, maxToi: number, stop_at_penetration: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawColliderShapeCastHit | undefined;
-  intersectionsWithShape(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shape: RawShape, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
-  collidersWithAabbIntersectingAabb(narrow_phase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, aabbCenter: RawVector, aabbHalfExtents: RawVector, callback: Function): void;
 }
 class RawCCDSolver {
   free(): void;
@@ -2733,18 +2723,6 @@ class RawColliderSet {
    * The world-space orientation of this collider.
    */
   coRotation(handle: number): RawRotation;
-  /**
-   * The translation of this collider relative to its parent rigid-body.
-   *
-   * Returns the `None` if it doesn’t have a parent.
-   */
-  coTranslationWrtParent(handle: number): RawVector | undefined;
-  /**
-   * The orientation of this collider relative to its parent rigid-body.
-   *
-   * Returns the `None` if it doesn’t have a parent.
-   */
-  coRotationWrtParent(handle: number): RawRotation | undefined;
   /**
    * Sets the translation of this collider.
    *
@@ -3177,11 +3155,15 @@ class RawImpulseJointSet {
 class RawIntegrationParameters {
   free(): void;
   constructor();
+  switchToStandardPgsSolver(): void;
+  switchToSmallStepsPgsSolver(): void;
+  switchToSmallStepsPgsSolverWithoutWarmstart(): void;
   dt: number;
   readonly contact_erp: number;
   normalizedAllowedLinearError: number;
   normalizedPredictionDistance: number;
   numSolverIterations: number;
+  numAdditionalFrictionIterations: number;
   numInternalPgsIterations: number;
   minIslandSize: number;
   maxCcdSubsteps: number;
@@ -3283,24 +3265,6 @@ class RawNarrowPhase {
 class RawPhysicsPipeline {
   free(): void;
   constructor();
-  set_profiler_enabled(enabled: boolean): void;
-  is_profiler_enabled(): boolean;
-  timing_step(): number;
-  timing_collision_detection(): number;
-  timing_broad_phase(): number;
-  timing_narrow_phase(): number;
-  timing_solver(): number;
-  timing_velocity_assembly(): number;
-  timing_velocity_resolution(): number;
-  timing_velocity_update(): number;
-  timing_velocity_writeback(): number;
-  timing_ccd(): number;
-  timing_ccd_toi_computation(): number;
-  timing_ccd_broad_phase(): number;
-  timing_ccd_narrow_phase(): number;
-  timing_ccd_solver(): number;
-  timing_island_construction(): number;
-  timing_user_changes(): number;
   step(gravity: RawVector, integrationParameters: RawIntegrationParameters, islands: RawIslandManager, broadPhase: RawBroadPhase, narrowPhase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, joints: RawImpulseJointSet, articulations: RawMultibodyJointSet, ccd_solver: RawCCDSolver): void;
   stepWithEvents(gravity: RawVector, integrationParameters: RawIntegrationParameters, islands: RawIslandManager, broadPhase: RawBroadPhase, narrowPhase: RawNarrowPhase, bodies: RawRigidBodySet, colliders: RawColliderSet, joints: RawImpulseJointSet, articulations: RawMultibodyJointSet, ccd_solver: RawCCDSolver, eventQueue: RawEventQueue, hookObject: object, hookFilterContactPair: Function, hookFilterIntersectionPair: Function): void;
 }
@@ -3318,6 +3282,21 @@ class RawPointProjection {
   free(): void;
   point(): RawVector;
   isInside(): boolean;
+}
+class RawQueryPipeline {
+  free(): void;
+  constructor();
+  update(colliders: RawColliderSet): void;
+  castRay(bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawRayColliderHit | undefined;
+  castRayAndGetNormal(bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawRayColliderIntersection | undefined;
+  intersectionsWithRay(bodies: RawRigidBodySet, colliders: RawColliderSet, rayOrig: RawVector, rayDir: RawVector, maxToi: number, solid: boolean, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
+  intersectionWithShape(bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shape: RawShape, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): number | undefined;
+  projectPoint(bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, solid: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawPointColliderProjection | undefined;
+  projectPointAndGetFeature(bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawPointColliderProjection | undefined;
+  intersectionsWithPoint(bodies: RawRigidBodySet, colliders: RawColliderSet, point: RawVector, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
+  castShape(bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shapeVel: RawVector, shape: RawShape, target_distance: number, maxToi: number, stop_at_penetration: boolean, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): RawColliderShapeCastHit | undefined;
+  intersectionsWithShape(bodies: RawRigidBodySet, colliders: RawColliderSet, shapePos: RawVector, shapeRot: RawRotation, shape: RawShape, callback: Function, filter_flags: number, filter_groups: number | null | undefined, filter_exclude_collider: number | null | undefined, filter_exclude_rigid_body: number | null | undefined, filter_predicate: Function): void;
+  collidersWithAabbIntersectingAabb(aabbCenter: RawVector, aabbHalfExtents: RawVector, callback: Function): void;
 }
 class RawRayColliderHit {
   private constructor();
@@ -3483,16 +3462,16 @@ class RawRigidBodySet {
    *
    * Components set to zero are assumed to be infinite along the corresponding principal axis.
    */
-  rbInvPrincipalInertia(handle: number): number;
+  rbInvPrincipalInertiaSqrt(handle: number): number;
   /**
    * The angular inertia along the principal inertia axes of the rigid-body.
    */
   rbPrincipalInertia(handle: number): number;
   /**
-   * The world-space inverse angular inertia tensor of the rigid-body,
+   * The square-root of the world-space inverse angular inertia tensor of the rigid-body,
    * taking into account rotation locking.
    */
-  rbEffectiveWorldInvInertia(handle: number): number;
+  rbEffectiveWorldInvInertiaSqrt(handle: number): number;
   /**
    * The effective world-space angular inertia (that takes the potential rotation locking into account) of
    * this rigid-body.
@@ -3775,6 +3754,21 @@ class RawVector {
   y: number;
 }
 
+/**
+ * The broad-phase used for coarse collision-detection.
+ *
+ * To avoid leaking WASM resources, this MUST be freed manually with `broadPhase.free()`
+ * once you are done using it.
+ */
+class BroadPhase {
+    raw: RawBroadPhase;
+    /**
+     * Release the WASM memory occupied by this broad-phase.
+     */
+    free(): void;
+    constructor(raw?: RawBroadPhase);
+}
+
 interface Vector {
     x: number;
     y: number;
@@ -4048,16 +4042,16 @@ class RigidBody {
      *
      * Components set to zero are assumed to be infinite along the corresponding principal axis.
      */
-    invPrincipalInertia(): number;
+    invPrincipalInertiaSqrt(): number;
     /**
      * The angular inertia along the principal inertia axes of the rigid-body.
      */
     principalInertia(): number;
     /**
-     * The world-space inverse angular inertia tensor of the rigid-body,
+     * The square-root of the world-space inverse angular inertia tensor of the rigid-body,
      * taking into account rotation locking.
      */
-    effectiveWorldInvInertia(): number;
+    effectiveWorldInvInertiaSqrt(): number;
     /**
      * The effective world-space angular inertia (that takes the potential rotation locking into account) of
      * this rigid-body.
@@ -4952,6 +4946,10 @@ class IntegrationParameters {
      */
     get numSolverIterations(): number;
     /**
+     * Number of addition friction resolution iteration run during the last solver sub-step (default: `4`).
+     */
+    get numAdditionalFrictionIterations(): number;
+    /**
      * Number of internal Project Gauss Seidel (PGS) iterations run at each solver iteration (default: `1`).
      */
     get numInternalPgsIterations(): number;
@@ -4973,11 +4971,18 @@ class IntegrationParameters {
      */
     set numSolverIterations(value: number);
     /**
+     * Sets the number of addition friction resolution iteration run during the last solver sub-step (default: `4`).
+     */
+    set numAdditionalFrictionIterations(value: number);
+    /**
      * Sets the number of internal Project Gauss Seidel (PGS) iterations run at each solver iteration (default: `1`).
      */
     set numInternalPgsIterations(value: number);
     set minIslandSize(value: number);
     set maxCcdSubsteps(value: number);
+    switchToStandardPgsSolver(): void;
+    switchToSmallStepsPgsSolver(): void;
+    switchToSmallStepsPgsSolverWithoutWarmstart(): void;
 }
 
 /**
@@ -5191,11 +5196,160 @@ enum QueryFilterFlags {
      */
     ONLY_FIXED = 6
 }
+/**
+ * A pipeline for performing queries on all the colliders of a scene.
+ *
+ * To avoid leaking WASM resources, this MUST be freed manually with `queryPipeline.free()`
+ * once you are done using it (and all the rigid-bodies it created).
+ */
+class QueryPipeline {
+    raw: RawQueryPipeline;
+    /**
+     * Release the WASM memory occupied by this query pipeline.
+     */
+    free(): void;
+    constructor(raw?: RawQueryPipeline);
+    /**
+     * Updates the acceleration structure of the query pipeline.
+     * @param colliders - The set of colliders taking part in this pipeline.
+     */
+    update(colliders: ColliderSet): void;
+    /**
+     * Find the closest intersection between a ray and a set of collider.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param ray - The ray to cast.
+     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
+     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
+     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
+     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
+     *   whereas `false` implies that all shapes are hollow for this ray-cast.
+     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
+     * @param filter - The callback to filter out which collider will be hit.
+     */
+    castRay(bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): RayColliderHit | null;
+    /**
+     * Find the closest intersection between a ray and a set of collider.
+     *
+     * This also computes the normal at the hit point.
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param ray - The ray to cast.
+     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
+     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
+     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
+     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
+     *   whereas `false` implies that all shapes are hollow for this ray-cast.
+     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
+     */
+    castRayAndGetNormal(bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): RayColliderIntersection | null;
+    /**
+     * Cast a ray and collects all the intersections between a ray and the scene.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param ray - The ray to cast.
+     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
+     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
+     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
+     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
+     *   whereas `false` implies that all shapes are hollow for this ray-cast.
+     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
+     * @param callback - The callback called once per hit (in no particular order) between a ray and a collider.
+     *   If this callback returns `false`, then the cast will stop and no further hits will be detected/reported.
+     */
+    intersectionsWithRay(bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, callback: (intersect: RayColliderIntersection) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
+    /**
+     * Gets the handle of up to one collider intersecting the given shape.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param shapePos - The position of the shape used for the intersection test.
+     * @param shapeRot - The orientation of the shape used for the intersection test.
+     * @param shape - The shape used for the intersection test.
+     * @param groups - The bit groups and filter associated to the ray, in order to only
+     *   hit the colliders with collision groups compatible with the ray's group.
+     */
+    intersectionWithShape(bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shape: Shape, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): ColliderHandle | null;
+    /**
+     * Find the projection of a point on the closest collider.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param point - The point to project.
+     * @param solid - If this is set to `true` then the collider shapes are considered to
+     *   be plain (if the point is located inside of a plain shape, its projection is the point
+     *   itself). If it is set to `false` the collider shapes are considered to be hollow
+     *   (if the point is located inside of an hollow shape, it is projected on the shape's
+     *   boundary).
+     * @param groups - The bit groups and filter associated to the point to project, in order to only
+     *   project on colliders with collision groups compatible with the ray's group.
+     */
+    projectPoint(bodies: RigidBodySet, colliders: ColliderSet, point: Vector, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): PointColliderProjection | null;
+    /**
+     * Find the projection of a point on the closest collider.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param point - The point to project.
+     * @param groups - The bit groups and filter associated to the point to project, in order to only
+     *   project on colliders with collision groups compatible with the ray's group.
+     */
+    projectPointAndGetFeature(bodies: RigidBodySet, colliders: ColliderSet, point: Vector, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): PointColliderProjection | null;
+    /**
+     * Find all the colliders containing the given point.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param point - The point used for the containment test.
+     * @param groups - The bit groups and filter associated to the point to test, in order to only
+     *   test on colliders with collision groups compatible with the ray's group.
+     * @param callback - A function called with the handles of each collider with a shape
+     *   containing the `point`.
+     */
+    intersectionsWithPoint(bodies: RigidBodySet, colliders: ColliderSet, point: Vector, callback: (handle: ColliderHandle) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
+    /**
+     * Casts a shape at a constant linear velocity and retrieve the first collider it hits.
+     * This is similar to ray-casting except that we are casting a whole shape instead of
+     * just a point (the ray origin).
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param shapePos - The initial position of the shape to cast.
+     * @param shapeRot - The initial rotation of the shape to cast.
+     * @param shapeVel - The constant velocity of the shape to cast (i.e. the cast direction).
+     * @param shape - The shape to cast.
+     * @param targetDistance − If the shape moves closer to this distance from a collider, a hit
+     *                       will be returned.
+     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
+     *   limits the distance traveled by the shape to `shapeVel.norm() * maxToi`.
+     * @param stopAtPenetration - If set to `false`, the linear shape-cast won’t immediately stop if
+     *   the shape is penetrating another shape at its starting point **and** its trajectory is such
+     *   that it’s on a path to exit that penetration state.
+     * @param groups - The bit groups and filter associated to the shape to cast, in order to only
+     *   test on colliders with collision groups compatible with this group.
+     */
+    castShape(bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shapeVel: Vector, shape: Shape, targetDistance: number, maxToi: number, stopAtPenetration: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): ColliderShapeCastHit | null;
+    /**
+     * Retrieve all the colliders intersecting the given shape.
+     *
+     * @param colliders - The set of colliders taking part in this pipeline.
+     * @param shapePos - The position of the shape to test.
+     * @param shapeRot - The orientation of the shape to test.
+     * @param shape - The shape to test.
+     * @param groups - The bit groups and filter associated to the shape to test, in order to only
+     *   test on colliders with collision groups compatible with this group.
+     * @param callback - A function called with the handles of each collider intersecting the `shape`.
+     */
+    intersectionsWithShape(bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shape: Shape, callback: (handle: ColliderHandle) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
+    /**
+     * Finds the handles of all the colliders with an AABB intersecting the given AABB.
+     *
+     * @param aabbCenter - The center of the AABB to test.
+     * @param aabbHalfExtents - The half-extents of the AABB to test.
+     * @param callback - The callback that will be called with the handles of all the colliders
+     *                   currently intersecting the given AABB.
+     */
+    collidersWithAabbIntersectingAabb(aabbCenter: Vector, aabbHalfExtents: Vector, callback: (handle: ColliderHandle) => boolean): void;
+}
 
 /**
  * A pipeline for serializing the physics scene.
  *
- * To avoid leaking WASM resources, this MUST be freed manually with `serializationPipeline.free()`
+ * To avoid leaking WASM resources, this MUST be freed manually with `queryPipeline.free()`
  * once you are done using it (and all the rigid-bodies it created).
  */
 class SerializationPipeline {
@@ -5291,13 +5445,12 @@ class KinematicCharacterController {
     private raw;
     private rawCharacterCollision;
     private params;
-    private broadPhase;
-    private narrowPhase;
     private bodies;
     private colliders;
+    private queries;
     private _applyImpulsesToDynamicBodies;
     private _characterMass;
-    constructor(offset: number, params: IntegrationParameters, broadPhase: BroadPhase, narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet);
+    constructor(offset: number, params: IntegrationParameters, bodies: RigidBodySet, colliders: ColliderSet, queries: QueryPipeline);
     /** @internal */
     free(): void;
     /**
@@ -5514,6 +5667,7 @@ class World {
     impulseJoints: ImpulseJointSet;
     multibodyJoints: MultibodyJointSet;
     ccdSolver: CCDSolver;
+    queryPipeline: QueryPipeline;
     physicsPipeline: PhysicsPipeline;
     serializationPipeline: SerializationPipeline;
     debugRenderPipeline: DebugRenderPipeline;
@@ -5526,7 +5680,7 @@ class World {
      * so there is no need to call their `.free()` methods individually.
      */
     free(): void;
-    constructor(gravity: Vector, rawIntegrationParameters?: RawIntegrationParameters, rawIslands?: RawIslandManager, rawBroadPhase?: RawBroadPhase, rawNarrowPhase?: RawNarrowPhase, rawBodies?: RawRigidBodySet, rawColliders?: RawColliderSet, rawImpulseJoints?: RawImpulseJointSet, rawMultibodyJoints?: RawMultibodyJointSet, rawCCDSolver?: RawCCDSolver, rawPhysicsPipeline?: RawPhysicsPipeline, rawSerializationPipeline?: RawSerializationPipeline, rawDebugRenderPipeline?: RawDebugRenderPipeline);
+    constructor(gravity: Vector, rawIntegrationParameters?: RawIntegrationParameters, rawIslands?: RawIslandManager, rawBroadPhase?: RawBroadPhase, rawNarrowPhase?: RawNarrowPhase, rawBodies?: RawRigidBodySet, rawColliders?: RawColliderSet, rawImpulseJoints?: RawImpulseJointSet, rawMultibodyJoints?: RawMultibodyJointSet, rawCCDSolver?: RawCCDSolver, rawQueryPipeline?: RawQueryPipeline, rawPhysicsPipeline?: RawPhysicsPipeline, rawSerializationPipeline?: RawSerializationPipeline, rawDebugRenderPipeline?: RawDebugRenderPipeline);
     static fromRaw(raw: RawDeserializedWorld): World;
     /**
      * Takes a snapshot of this world.
@@ -5566,6 +5720,12 @@ class World {
      * If the positions need to be updated without running a simulation step this method can be called manually.
      */
     propagateModifiedBodyPositionsToColliders(): void;
+    /**
+     * Ensure subsequent scene queries take into account the collider positions set before this method is called.
+     *
+     * This does not step the physics simulation forward.
+     */
+    updateSceneQueries(): void;
     /**
      * The current simulation timestep.
      */
@@ -5619,6 +5779,19 @@ class World {
      */
     set numSolverIterations(niter: number);
     /**
+     * Number of addition friction resolution iteration run during the last solver sub-step (default: `4`).
+     */
+    get numAdditionalFrictionIterations(): number;
+    /**
+     * Sets the number of addition friction resolution iteration run during the last solver sub-step (default: `4`).
+     *
+     * The greater this value is, the most realistic friction will be.
+     * However a greater number of iterations is more computationally intensive.
+     *
+     * @param niter - The new number of additional friction iterations.
+     */
+    set numAdditionalFrictionIterations(niter: number);
+    /**
      * Number of internal Project Gauss Seidel (PGS) iterations run at each solver iteration (default: `1`).
      */
     get numInternalPgsIterations(): number;
@@ -5631,21 +5804,9 @@ class World {
      * @param niter - The new number of internal PGS iterations.
      */
     set numInternalPgsIterations(niter: number);
-    /**
-     * The number of substeps continuous collision-detection can run (default: `1`).
-     */
-    get maxCcdSubsteps(): number;
-    /**
-     * Sets the number of substeps continuous collision-detection can run (default: `1`).
-     *
-     * CCD operates using a "motion clamping" mechanism where all fast-moving object trajectories will
-     * be truncated to their first impact on their path. The number of CCD substeps beyond 1 indicate how
-     * many times that trajectory will be updated and continued after a hit. This can results in smoother
-     * paths, but at a significant computational cost.
-     *
-     * @param niter - The new maximum number of CCD substeps. Setting to `0` disables CCD entirely.
-     */
-    set maxCcdSubsteps(substeps: number);
+    switchToStandardPgsSolver(): void;
+    switchToSmallStepsPgsSolver(): void;
+    switchToSmallStepsPgsSolverWithoutWarmstart(): void;
     /**
      * Creates a new rigid-body from the given rigid-body descriptor.
      *
@@ -5936,129 +6097,6 @@ class World {
      * @param collider2 − The second collider involved in the intersection.
      */
     intersectionPair(collider1: Collider, collider2: Collider): boolean;
-    /**
-     * Sets whether internal performance profiling is enabled (default: false).
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    set profilerEnabled(enabled: boolean);
-    /**
-     * Indicates if the internal performance profiling is enabled.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    get profilerEnabled(): boolean;
-    /**
-     * The time spent in milliseconds by the last step to run the entire simulation step.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingStep(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the collision-detection
-     * (broad-phase + narrow-phase).
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCollisionDetection(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the broad-phase.
-     *
-     * This timing is included in `timingCollisionDetection`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingBroadPhase(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the narrow-phase.
-     *
-     * This timing is included in `timingCollisionDetection`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingNarrowPhase(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the constraint solver.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingSolver(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the constraint
-     * initialization.
-     *
-     * This timing is included in `timingSolver`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingVelocityAssembly(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the constraint
-     * resolution.
-     *
-     * This timing is included in `timingSolver`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingVelocityResolution(): number;
-    /**
-     * The time spent in milliseconds by the last step to run the rigid-body
-     * velocity update.
-     *
-     * This timing is included in `timingSolver`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingVelocityUpdate(): number;
-    /**
-     * The time spent in milliseconds by writing rigid-body velocities
-     * calculated by the solver back into the rigid-bodies.
-     *
-     * This timing is included in `timingSolver`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingVelocityWriteback(): number;
-    /**
-     * The total time spent in CCD detection and resolution.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCcd(): number;
-    /**
-     * The total time spent searching for the continuous hits during CCD.
-     *
-     * This timing is included in `timingCcd`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCcdToiComputation(): number;
-    /**
-     * The total time spent in the broad-phase during CCD.
-     *
-     * This timing is included in `timingCcd`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCcdBroadPhase(): number;
-    /**
-     * The total time spent in the narrow-phase during CCD.
-     *
-     * This timing is included in `timingCcd`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCcdNarrowPhase(): number;
-    /**
-     * The total time spent in the constraints resolution during CCD.
-     *
-     * This timing is included in `timingCcd`.
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingCcdSolver(): number;
-    /**
-     * The total time spent in the islands calculation during CCD.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingIslandConstruction(): number;
-    /**
-     * The total time spent propagating detected user changes.
-     *
-     * Only works if the internal profiler is enabled with `World.profilerEnabled = true`.
-     */
-    timingUserChanges(): number;
 }
 
 /**
@@ -6114,6 +6152,75 @@ enum FeatureType {
     Vertex = 0,
     Face = 1,
     Unknown = 2
+}
+
+/**
+ * A set of rigid bodies that can be handled by a physics pipeline.
+ *
+ * To avoid leaking WASM resources, this MUST be freed manually with `colliderSet.free()`
+ * once you are done using it (and all the rigid-bodies it created).
+ */
+class ColliderSet {
+    raw: RawColliderSet;
+    private map;
+    /**
+     * Release the WASM memory occupied by this collider set.
+     */
+    free(): void;
+    constructor(raw?: RawColliderSet);
+    /** @internal */
+    castClosure<Res>(f?: (collider: Collider) => Res): (handle: ColliderHandle) => Res | undefined;
+    /** @internal */
+    finalizeDeserialization(bodies: RigidBodySet): void;
+    /**
+     * Creates a new collider and return its integer handle.
+     *
+     * @param bodies - The set of bodies where the collider's parent can be found.
+     * @param desc - The collider's description.
+     * @param parentHandle - The integer handle of the rigid-body this collider is attached to.
+     */
+    createCollider(bodies: RigidBodySet, desc: ColliderDesc, parentHandle: RigidBodyHandle): Collider;
+    /**
+     * Remove a collider from this set.
+     *
+     * @param handle - The integer handle of the collider to remove.
+     * @param bodies - The set of rigid-body containing the rigid-body the collider is attached to.
+     * @param wakeUp - If `true`, the rigid-body the removed collider is attached to will be woken-up automatically.
+     */
+    remove(handle: ColliderHandle, islands: IslandManager, bodies: RigidBodySet, wakeUp: boolean): void;
+    /**
+     * Internal function, do not call directly.
+     * @param handle
+     */
+    unmap(handle: ImpulseJointHandle): void;
+    /**
+     * Gets the rigid-body with the given handle.
+     *
+     * @param handle - The handle of the rigid-body to retrieve.
+     */
+    get(handle: ColliderHandle): Collider | null;
+    /**
+     * The number of colliders on this set.
+     */
+    len(): number;
+    /**
+     * Does this set contain a collider with the given handle?
+     *
+     * @param handle - The collider handle to check.
+     */
+    contains(handle: ColliderHandle): boolean;
+    /**
+     * Applies the given closure to each collider contained by this set.
+     *
+     * @param f - The closure to apply.
+     */
+    forEach(f: (collider: Collider) => void): void;
+    /**
+     * Gets all colliders in the list.
+     *
+     * @returns collider list.
+     */
+    getAll(): Collider[];
 }
 
 /**
@@ -6507,25 +6614,13 @@ class Collider {
      */
     isValid(): boolean;
     /**
-     * The world-space translation of this collider.
+     * The world-space translation of this rigid-body.
      */
     translation(): Vector;
     /**
-     * The translation of this collider relative to its parent rigid-body.
-     *
-     * Returns `null` if the collider doesn’t have a parent rigid-body.
-     */
-    translationWrtParent(): Vector | null;
-    /**
-     * The world-space orientation of this collider.
+     * The world-space orientation of this rigid-body.
      */
     rotation(): Rotation;
-    /**
-     * The orientation of this collider relative to its parent rigid-body.
-     *
-     * Returns `null` if the collider doesn’t have a parent rigid-body.
-     */
-    rotationWrtParent(): Rotation | null;
     /**
      * Is this collider a sensor?
      */
@@ -6727,10 +6822,12 @@ class Collider {
     setRotationWrtParent(angle: number): void;
     /**
      * The type of the shape of this collider.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     shapeType(): ShapeType;
     /**
      * The half-extents of this collider if it is a cuboid shape.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     halfExtents(): Vector;
     /**
@@ -6741,6 +6838,7 @@ class Collider {
     setHalfExtents(newHalfExtents: Vector): void;
     /**
      * The radius of this collider if it is a ball, cylinder, capsule, or cone shape.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     radius(): number;
     /**
@@ -6751,6 +6849,7 @@ class Collider {
     setRadius(newRadius: number): void;
     /**
      * The radius of the round edges of this collider if it is a round cylinder.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     roundRadius(): number;
     /**
@@ -6761,6 +6860,7 @@ class Collider {
     setRoundRadius(newBorderRadius: number): void;
     /**
      * The half height of this collider if it is a cylinder, capsule, or cone shape.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     halfHeight(): number;
     /**
@@ -6820,22 +6920,26 @@ class Collider {
     /**
      * If this collider has a triangle mesh, polyline, convex polygon, or convex polyhedron shape,
      * this returns the vertex buffer of said shape.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     vertices(): Float32Array;
     /**
      * If this collider has a triangle mesh, polyline, or convex polyhedron shape,
      * this returns the index buffer of said shape.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     indices(): Uint32Array | undefined;
     /**
      * If this collider has a heightfield shape, this returns the heights buffer of
      * the heightfield.
      * In 3D, the returned height matrix is provided in column-major order.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     heightfieldHeights(): Float32Array;
     /**
      * If this collider has a heightfield shape, this returns the scale
      * applied to it.
+     * @deprecated this field will be removed in the future, please access this field on `shape` member instead.
      */
     heightfieldScale(): Vector;
     /**
@@ -7245,75 +7349,6 @@ class ColliderDesc {
 }
 
 /**
- * A set of rigid bodies that can be handled by a physics pipeline.
- *
- * To avoid leaking WASM resources, this MUST be freed manually with `colliderSet.free()`
- * once you are done using it (and all the rigid-bodies it created).
- */
-class ColliderSet {
-    raw: RawColliderSet;
-    private map;
-    /**
-     * Release the WASM memory occupied by this collider set.
-     */
-    free(): void;
-    constructor(raw?: RawColliderSet);
-    /** @internal */
-    castClosure<Res>(f?: (collider: Collider) => Res): (handle: ColliderHandle) => Res | undefined;
-    /** @internal */
-    finalizeDeserialization(bodies: RigidBodySet): void;
-    /**
-     * Creates a new collider and return its integer handle.
-     *
-     * @param bodies - The set of bodies where the collider's parent can be found.
-     * @param desc - The collider's description.
-     * @param parentHandle - The integer handle of the rigid-body this collider is attached to.
-     */
-    createCollider(bodies: RigidBodySet, desc: ColliderDesc, parentHandle: RigidBodyHandle): Collider;
-    /**
-     * Remove a collider from this set.
-     *
-     * @param handle - The integer handle of the collider to remove.
-     * @param bodies - The set of rigid-body containing the rigid-body the collider is attached to.
-     * @param wakeUp - If `true`, the rigid-body the removed collider is attached to will be woken-up automatically.
-     */
-    remove(handle: ColliderHandle, islands: IslandManager, bodies: RigidBodySet, wakeUp: boolean): void;
-    /**
-     * Internal function, do not call directly.
-     * @param handle
-     */
-    unmap(handle: ImpulseJointHandle): void;
-    /**
-     * Gets the rigid-body with the given handle.
-     *
-     * @param handle - The handle of the rigid-body to retrieve.
-     */
-    get(handle: ColliderHandle): Collider | null;
-    /**
-     * The number of colliders on this set.
-     */
-    len(): number;
-    /**
-     * Does this set contain a collider with the given handle?
-     *
-     * @param handle - The collider handle to check.
-     */
-    contains(handle: ColliderHandle): boolean;
-    /**
-     * Applies the given closure to each collider contained by this set.
-     *
-     * @param f - The closure to apply.
-     */
-    forEach(f: (collider: Collider) => void): void;
-    /**
-     * Gets all colliders in the list.
-     *
-     * @returns collider list.
-     */
-    getAll(): Collider[];
-}
-
-/**
  * The narrow-phase used for precise collision-detection.
  *
  * To avoid leaking WASM resources, this MUST be freed manually with `narrowPhase.free()`
@@ -7379,151 +7414,6 @@ class TempContactManifold {
     solverContactFriction(i: number): number;
     solverContactRestitution(i: number): number;
     solverContactTangentVelocity(i: number): Vector;
-}
-
-/**
- * The broad-phase used for coarse collision-detection.
- *
- * To avoid leaking WASM resources, this MUST be freed manually with `broadPhase.free()`
- * once you are done using it.
- */
-class BroadPhase {
-    raw: RawBroadPhase;
-    /**
-     * Release the WASM memory occupied by this broad-phase.
-     */
-    free(): void;
-    constructor(raw?: RawBroadPhase);
-    /**
-     * Find the closest intersection between a ray and a set of collider.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param ray - The ray to cast.
-     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
-     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
-     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
-     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
-     *   whereas `false` implies that all shapes are hollow for this ray-cast.
-     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
-     * @param filter - The callback to filter out which collider will be hit.
-     */
-    castRay(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): RayColliderHit | null;
-    /**
-     * Find the closest intersection between a ray and a set of collider.
-     *
-     * This also computes the normal at the hit point.
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param ray - The ray to cast.
-     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
-     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
-     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
-     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
-     *   whereas `false` implies that all shapes are hollow for this ray-cast.
-     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
-     */
-    castRayAndGetNormal(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): RayColliderIntersection | null;
-    /**
-     * Cast a ray and collects all the intersections between a ray and the scene.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param ray - The ray to cast.
-     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
-     *   limits the length of the ray to `ray.dir.norm() * maxToi`.
-     * @param solid - If `false` then the ray will attempt to hit the boundary of a shape, even if its
-     *   origin already lies inside of a shape. In other terms, `true` implies that all shapes are plain,
-     *   whereas `false` implies that all shapes are hollow for this ray-cast.
-     * @param groups - Used to filter the colliders that can or cannot be hit by the ray.
-     * @param callback - The callback called once per hit (in no particular order) between a ray and a collider.
-     *   If this callback returns `false`, then the cast will stop and no further hits will be detected/reported.
-     */
-    intersectionsWithRay(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, ray: Ray, maxToi: number, solid: boolean, callback: (intersect: RayColliderIntersection) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
-    /**
-     * Gets the handle of up to one collider intersecting the given shape.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param shapePos - The position of the shape used for the intersection test.
-     * @param shapeRot - The orientation of the shape used for the intersection test.
-     * @param shape - The shape used for the intersection test.
-     * @param groups - The bit groups and filter associated to the ray, in order to only
-     *   hit the colliders with collision groups compatible with the ray's group.
-     */
-    intersectionWithShape(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shape: Shape, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): ColliderHandle | null;
-    /**
-     * Find the projection of a point on the closest collider.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param point - The point to project.
-     * @param solid - If this is set to `true` then the collider shapes are considered to
-     *   be plain (if the point is located inside of a plain shape, its projection is the point
-     *   itself). If it is set to `false` the collider shapes are considered to be hollow
-     *   (if the point is located inside of an hollow shape, it is projected on the shape's
-     *   boundary).
-     * @param groups - The bit groups and filter associated to the point to project, in order to only
-     *   project on colliders with collision groups compatible with the ray's group.
-     */
-    projectPoint(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, point: Vector, solid: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): PointColliderProjection | null;
-    /**
-     * Find the projection of a point on the closest collider.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param point - The point to project.
-     * @param groups - The bit groups and filter associated to the point to project, in order to only
-     *   project on colliders with collision groups compatible with the ray's group.
-     */
-    projectPointAndGetFeature(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, point: Vector, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): PointColliderProjection | null;
-    /**
-     * Find all the colliders containing the given point.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param point - The point used for the containment test.
-     * @param groups - The bit groups and filter associated to the point to test, in order to only
-     *   test on colliders with collision groups compatible with the ray's group.
-     * @param callback - A function called with the handles of each collider with a shape
-     *   containing the `point`.
-     */
-    intersectionsWithPoint(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, point: Vector, callback: (handle: ColliderHandle) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
-    /**
-     * Casts a shape at a constant linear velocity and retrieve the first collider it hits.
-     * This is similar to ray-casting except that we are casting a whole shape instead of
-     * just a point (the ray origin).
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param shapePos - The initial position of the shape to cast.
-     * @param shapeRot - The initial rotation of the shape to cast.
-     * @param shapeVel - The constant velocity of the shape to cast (i.e. the cast direction).
-     * @param shape - The shape to cast.
-     * @param targetDistance − If the shape moves closer to this distance from a collider, a hit
-     *                       will be returned.
-     * @param maxToi - The maximum time-of-impact that can be reported by this cast. This effectively
-     *   limits the distance traveled by the shape to `shapeVel.norm() * maxToi`.
-     * @param stopAtPenetration - If set to `false`, the linear shape-cast won’t immediately stop if
-     *   the shape is penetrating another shape at its starting point **and** its trajectory is such
-     *   that it’s on a path to exit that penetration state.
-     * @param groups - The bit groups and filter associated to the shape to cast, in order to only
-     *   test on colliders with collision groups compatible with this group.
-     */
-    castShape(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shapeVel: Vector, shape: Shape, targetDistance: number, maxToi: number, stopAtPenetration: boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): ColliderShapeCastHit | null;
-    /**
-     * Retrieve all the colliders intersecting the given shape.
-     *
-     * @param colliders - The set of colliders taking part in this pipeline.
-     * @param shapePos - The position of the shape to test.
-     * @param shapeRot - The orientation of the shape to test.
-     * @param shape - The shape to test.
-     * @param groups - The bit groups and filter associated to the shape to test, in order to only
-     *   test on colliders with collision groups compatible with this group.
-     * @param callback - A function called with the handles of each collider intersecting the `shape`.
-     */
-    intersectionsWithShape(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, shapePos: Vector, shapeRot: Rotation, shape: Shape, callback: (handle: ColliderHandle) => boolean, filterFlags?: QueryFilterFlags, filterGroups?: InteractionGroups, filterExcludeCollider?: ColliderHandle, filterExcludeRigidBody?: RigidBodyHandle, filterPredicate?: (collider: ColliderHandle) => boolean): void;
-    /**
-     * Finds the handles of all the colliders with an AABB intersecting the given AABB.
-     *
-     * @param aabbCenter - The center of the AABB to test.
-     * @param aabbHalfExtents - The half-extents of the AABB to test.
-     * @param callback - The callback that will be called with the handles of all the colliders
-     *                   currently intersecting the given AABB.
-     */
-    collidersWithAabbIntersectingAabb(narrowPhase: NarrowPhase, bodies: RigidBodySet, colliders: ColliderSet, aabbCenter: Vector, aabbHalfExtents: Vector, callback: (handle: ColliderHandle) => boolean): void;
 }
 
 namespace Stores {
@@ -8993,7 +8883,7 @@ namespace Stores {
         manageCodeGrids: boolean;
         removing: boolean;
     }
-    type CharacterType = "character" | "sentry";
+    type CharacterType = "player" | "character" | "sentry";
     interface CharacterInfo {
         allowWeaponFire: boolean;
         existsBeforeReconnect: boolean;

@@ -24,6 +24,8 @@ import createSettingsApi from "./settings";
 import Commands from "$core/commands.svelte";
 import { nop } from "$shared/utils";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
+import type { ScriptHeaders } from "$types/scripts";
+import { deepFreeze } from "$content/utils";
 
 class Api {
     /** Functions to edit Gimkit's code */
@@ -233,6 +235,8 @@ class Api {
             this.settings = createSettingsApi(scoped.script);
         }
 
+        this.headers = scoped.script.getHeaders();
+
         // Patch append_styles to automatically clean up
         const styleCleanups = new Map<string, () => void>();
         this.svelte_5_43_0.Client.append_styles = (_: any, css: any) => {
@@ -286,6 +290,9 @@ class Api {
 
     /** Display a modal to the user indicating that the script requires a reload */
     requestReload = () => addReloadNeeded(this.#id);
+
+    /** The headers containing the script's metadata */
+    headers: ScriptHeaders;
 }
 
 Object.freeze(Api);

@@ -10,6 +10,7 @@ import { signaturePublicKey } from "$shared/consts";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import { scriptInstanceMap } from "./map";
 import StateManager from "$shared/state";
+import { deepFreeze } from "$content/utils";
 
 const apiCreatedRegex = /new\s+GL\s*\(/;
 
@@ -37,6 +38,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     updateHeaders(headers?: ScriptHeaders) {
         if(headers) this.headers = headers;
         else this.headers = parseScriptHeaders(this.code);
+    }
+
+    getHeaders() {
+        return deepFreeze($state.snapshot(this.headers));
     }
 
     started = false;

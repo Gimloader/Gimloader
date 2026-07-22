@@ -113,3 +113,16 @@ export function createTransformDragged(transform: string, disableFlip: boolean) 
         changeEl.style.transform = transform;
     };
 }
+
+export function deepFreeze<T>(object: T): T {
+    Object.freeze(object);
+
+    for(const key in object) {
+        const value = object[key as keyof typeof object];
+        if(value && typeof value === "object" && !Object.isFrozen(value)) {
+            deepFreeze(value);
+        }
+    }
+
+    return object;
+}
