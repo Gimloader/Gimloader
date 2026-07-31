@@ -79,7 +79,7 @@
     async function updateBundleHash() {
         if(bundleHash.length === 0) {
             if(!Rewriter.bundleHash) return;
-            
+
             Rewriter.clearBundleHash();
             return;
         }
@@ -92,9 +92,10 @@
             return;
         }
 
-        const text = "Are you absolutely sure you want to change the bundle hash? This WILL break Gimkit. If you don't know what this is you should not touch it.";
+        const text =
+            "Are you absolutely sure you want to change the bundle hash? This WILL break Gimkit. If you don't know what this is you should not touch it.";
         const confirmed = await Modals.open("confirm", { text, title: "Change bundle hash" });
-        
+
         if(!confirmed) {
             bundleHash = "";
             return;
@@ -147,8 +148,11 @@
             <div class="flex items-center gap-2">
                 <div class="w-11"></div>
                 Hash of Gimkit bundle to use
-                <input bind:value={bundleHash} onchange={updateBundleHash}
-                    class="not-focus:border-b border-b-gray-600 outline-primary px-2 py-1" />
+                <input
+                    bind:value={bundleHash}
+                    onchange={updateBundleHash}
+                    class="not-focus:border-b border-b-gray-600 outline-primary px-2 py-1"
+                />
             </div>
         </Accordion.Content>
     </Accordion.Item>
