@@ -2,10 +2,11 @@ import { clearId, splicer } from "$content/utils";
 import { domLoaded } from "$content/utils";
 import { clear, get, set } from "idb-keyval";
 import PluginManager from "./scripts/pluginManager.svelte";
-import { englishList, error, nop } from "$shared/utils";
+import { englishList, error, log, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
 import StateManager from "$shared/state";
+import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 
 interface Import {
     text: string;
@@ -55,6 +56,7 @@ export default class Rewriter {
     static scriptCode: Record<string, string> = {};
     static parseHooks: ParseHook[] = [];
     static runInScopes: RunInScope[] = [];
+    static bundleHash = localStorage.getItem("gl-bundleHash");
 
     static async init() {
         // Don't bother broadcasting when the cache is invalidated since we can handle it locally
@@ -98,8 +100,22 @@ export default class Rewriter {
             localStorage.setItem("gl-lastindex", name);
         }
 
+        if(this.bundleHash) log(`Loading old bundle ${this.bundleHash}`);
+
         this.base = new URL(index.src);
-        this.import(index.src, true);
+        this.import(this.bundleHash ? "https://gimkit.com/assets/_index.js" : index.src, true);
+    }
+
+    static setBundleHash(hash: string) {
+        localStorage.setItem("gl-bundleHash", hash);
+        this.invalidate();
+        addReloadNeeded("Gimloader");
+    }
+
+    static clearBundleHash() {
+        localStorage.removeItem("gl-bundleHash");
+        this.invalidate();
+        addReloadNeeded("Gimloader");
     }
 
     static getName(src: string) {
@@ -122,7 +138,11 @@ export default class Rewriter {
             if(!this.cleared && !skipPluginHooks) parsed = await get(name);
 
             if(!parsed) {
-                const resp = await fetch(`https://www.gimkit.com/gimloader/assets/${name}`);
+                const url = this.bundleHash
+                    ? `https://raw.githubusercontent.com/Gimloader/bundle-tracker/${this.bundleHash}/data/rawjs/${name}`
+                    : `https://www.gimkit.com/gimloader/assets/${name}`;
+
+                const resp = await fetch(url);
                 const js = await resp.text();
                 parsed = this.parse(js, name, root, skipPluginHooks);
 
@@ -194,7 +214,7 @@ export default class Rewriter {
         // Remove dependency preloading
         if(js.startsWith("const __vite__mapDeps")) {
             const start = js.indexOf(";");
-            js = "const __vite__mapDeps = () => [];" + js.slice(start + 1);
+            js = "const __vite__mapDeps=()=>[];" + js.slice(start + 1);
         }
 
         // Replace dynamic imports

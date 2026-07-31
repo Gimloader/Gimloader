@@ -9,6 +9,8 @@
     import { toast } from "svelte-sonner";
     import Port from "$shared/net/port.svelte";
     import Modals from "$core/modals.svelte";
+    import * as Accordion from "$shared/ui/accordion";
+    import Rewriter from "$core/rewriter";
 
     async function onShowButtonsChange(shown: boolean) {
         // Show a confirmation screen if they are trying to hide the buttons
@@ -71,6 +73,35 @@
             }
         });
     }
+
+    let bundleHash = $state(localStorage.getItem("gl-bundleHash") ?? "");
+
+    async function updateBundleHash() {
+        if(bundleHash.length === 0) {
+            if(!Rewriter.bundleHash) return;
+            
+            Rewriter.clearBundleHash();
+            return;
+        }
+
+        if(bundleHash === Rewriter.bundleHash) return;
+
+        if(!bundleHash.match(/^[0-9a-f]{40}$/)) {
+            toast.error("That does not appear to be a valid hash!");
+            bundleHash = "";
+            return;
+        }
+
+        const text = "Are you absolutely sure you want to change the bundle hash? This WILL break Gimkit. If you don't know what this is you should not touch it.";
+        const confirmed = await Modals.open("confirm", { text, title: "Change bundle hash" });
+        
+        if(!confirmed) {
+            bundleHash = "";
+            return;
+        }
+
+        Rewriter.setBundleHash(bundleHash);
+    }
 </script>
 
 <h2 class="text-xl font-bold! mb-0!">General Settings</h2>
@@ -97,16 +128,31 @@
     Attempt to automatically download missing plugins
 </div>
 
-<h2 class="text-xl font-bold! mt-3! mb-0!">Developer Settings</h2>
-<div class="flex items-center gap-2">
-    <Switch
-        bind:checked={Storage.settings.pollerEnabled}
-        onCheckedChange={() => {
-            StateManager.apply("settingUpdate", { key: "pollerEnabled", value: Storage.settings.pollerEnabled });
-        }}
-    />
-    Poll for plugins/libraries being served locally
-</div>
+<Accordion.Root type="single">
+    <Accordion.Item>
+        <Accordion.Trigger class="text-xl font-bold!">Developer Settings</Accordion.Trigger>
+        <Accordion.Content class="text-base">
+            <div class="flex items-center gap-2">
+                <Switch
+                    bind:checked={Storage.settings.pollerEnabled}
+                    onCheckedChange={() => {
+                        StateManager.apply("settingUpdate", {
+                            key: "pollerEnabled",
+                            value: Storage.settings.pollerEnabled
+                        });
+                    }}
+                />
+                Poll for plugins/libraries being served locally
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-11"></div>
+                Hash of Gimkit bundle to use
+                <input bind:value={bundleHash} onchange={updateBundleHash}
+                    class="not-focus:border-b border-b-gray-600 outline-primary px-2 py-1" />
+            </div>
+        </Accordion.Content>
+    </Accordion.Item>
+</Accordion.Root>
 
 <h2 class="text-xl font-bold! mt-3! mb-0!">Export/Import Config</h2>
 <div>Your config consists of plugins, plugin values, libraries, hotkeys, and settings.</div>

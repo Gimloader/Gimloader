@@ -1,1 +1,1 @@
-Hotfix for scripts disappearing when dragged
+Added developer option to change Gimkit's bundle
