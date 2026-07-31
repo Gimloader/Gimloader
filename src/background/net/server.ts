@@ -28,15 +28,15 @@ export default new class Server {
         chrome.runtime.onMessage.addListener(nop);
     }
 
-    onConnect(port: Port) {
+    async onConnect(port: Port) {
         this.open.add(port);
         port.onDisconnect.addListener(() => {
             chrome.runtime.lastError; // suppress error messages
             this.open.delete(port);
         });
 
+        await StateManager.initialized;
         port.postMessage(StateManager.getState());
-
         port.onMessage.addListener((message) => {
             this.onPortMessage(port, message);
         });

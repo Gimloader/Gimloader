@@ -1,7 +1,7 @@
 import type { PluginInfo } from "$types/net/state";
 import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
-import { Deferred } from "$content/utils";
+import { Deferred } from "$shared/utils";
 import Modals from "../modals.svelte";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";

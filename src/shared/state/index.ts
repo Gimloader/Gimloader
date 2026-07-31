@@ -10,6 +10,7 @@ import StorageState from "./storage";
 import SettingsState from "./settings";
 import HotkeysState from "./hotkeys";
 import UpdatesState from "./updates";
+import { Deferred } from "$shared/utils";
 
 interface Handlers {
     downloadDependencies: (deps: Dependency[]) => Promise<string[]> | string[];
@@ -22,6 +23,7 @@ export default class StateManager {
     static apply = apply;
     static filterBroadcast = filterBroadcast;
 
+    static initialized = Deferred.create();
     static handlers: Handlers;
 
     static allScripts = new AllScripts(this);
@@ -48,6 +50,7 @@ export default class StateManager {
         this.updates.init(state.availableUpdates);
 
         this.events.emit("init", state);
+        this.initialized.resolve();
     }
 
     static update(state: State) {

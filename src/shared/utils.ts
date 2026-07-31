@@ -38,3 +38,28 @@ export function downloadJson(json: any, name: string) {
 export const nop = () => {};
 
 export const TypedEventEmitter = EventEmitter2 as unknown as typeof EventEmitter;
+
+// Because of some nonsense with the spec subclassing promises is wonky
+export class Deferred<T = void> extends Promise<T> {
+    resolve: (value?: T) => void;
+    reject: (reason?: any) => void;
+
+    constructor(callback: any) {
+        let resolve: (value?: T) => void;
+        let reject: (reason?: any) => void;
+
+        super((res, rej) => {
+            // @ts-expect-error trust me bro
+            resolve = res;
+            reject = rej;
+            callback(res, rej);
+        });
+
+        this.resolve = resolve!;
+        this.reject = reject!;
+    }
+
+    static create<T = void>() {
+        return new Deferred<T>(nop);
+    }
+}

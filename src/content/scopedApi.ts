@@ -12,6 +12,7 @@ interface ScopedInfo {
 }
 
 export default function setupScoped(type?: string, name?: string): ScopedInfo {
+    // TODO: Remove in 2.0
     if(!type || !name) {
         const stack = new Error().stack;
         if(!stack) throw new Error("new GL() could not get stack trace, please provide type and name explicitly");

@@ -1,4 +1,3 @@
-import { nop } from "$shared/utils";
 import * as z from "zod";
 import rawChangelog from "../../release-notes.txt";
 import { dndZoneSettings } from "./stores.svelte";
@@ -66,31 +65,6 @@ export function readUserFile(accept: string, callback: (text: string) => void) {
     });
 
     input.click();
-}
-
-// Because of some nonsense with the spec subclassing promises is wonky
-export class Deferred<T = void> extends Promise<T> {
-    resolve: (value?: T) => void;
-    reject: (reason?: any) => void;
-
-    constructor(callback: any) {
-        let resolve: (value?: T) => void;
-        let reject: (reason?: any) => void;
-
-        super((res, rej) => {
-            // @ts-expect-error trust me bro
-            resolve = res;
-            reject = rej;
-            callback(res, rej);
-        });
-
-        this.resolve = resolve!;
-        this.reject = reject!;
-    }
-
-    static create<T = void>() {
-        return new Deferred<T>(nop);
-    }
 }
 
 export const domLoaded = new Promise<void>((res) => {

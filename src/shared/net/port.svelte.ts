@@ -2,7 +2,7 @@ import type { ExtractOnceMessage, Messages, OnceMessageProps, OnceMessages, Stat
 import EventEmitter2 from "eventemitter2";
 import { isFirefox, portCryptoAlgorithm } from "../consts";
 import { log } from "$shared/utils";
-import { Deferred } from "$content/utils";
+import { Deferred } from "$shared/utils";
 import StateManager from "$shared/state";
 
 const extensionId = "ngbhofnofkggjbpkpnogcdfdgjkpmgka";

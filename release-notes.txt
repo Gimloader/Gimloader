@@ -1,2 +1,5 @@
+Added folders which can be used to organize scripts
 Added developer option to change Gimkit's bundle
 Added logger api for scripts
+Un-deprecated platformerPhysics and added it to scoped api
+Deprecated global GL variable

@@ -120,10 +120,18 @@ class Api {
     static get classicStores() {
         return GimkitInternals.classicStores;
     }
-
     /** A variety of gimkit internal objects available in 1d gamemodes */
     get classicStores() {
         return GimkitInternals.classicStores;
+    }
+
+    /** Physics variables available in platformer gamemodes */
+    static get platformerPhysics() {
+        return GimkitInternals.platformerPhysics;
+    }
+    /** Physics variables available in platformer gamemodes */
+    get platformerPhysics() {
+        return GimkitInternals.platformerPhysics;
     }
 
     /**
@@ -174,14 +182,6 @@ class Api {
      */
     static get contextMenu() {
         return { showContextMenu: nop, createReactContextMenu: nop };
-    }
-
-    /**
-     * @deprecated No longer supported
-     * @hidden
-     */
-    static get platformerPhysics() {
-        return GimkitInternals.platformerPhysics;
     }
 
     /**
