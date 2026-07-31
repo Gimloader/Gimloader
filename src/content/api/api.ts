@@ -11,6 +11,7 @@ import { RewriterApi, ScopedRewriterApi } from "./rewriter";
 import { CommandsApi, ScopedCommandsApi } from "./commands";
 import { LibsApi, ScopedLibsApi } from "./libs";
 import { PluginsApi, ScopedPluginsApi } from "./plugins";
+import LoggerApi from "./logger";
 import Svelte from "./svelte";
 import Components from "./components";
 import GimkitInternals from "$core/internals";
@@ -234,6 +235,8 @@ class Api {
             this.settings = createSettingsApi(scoped.script);
         }
 
+        const color = scoped.script instanceof Plugin ? "#4287f5" : "#2ade42";
+        this.logger = Object.freeze(new LoggerApi(scoped.id, color));
         this.headers = scoped.script.getHeaders();
 
         // Patch append_styles to automatically clean up
@@ -277,21 +280,24 @@ class Api {
     /** A utility for creating persistent settings menus, only available to plugins */
     settings!: PluginSettings;
 
-    /** Run a callback when the script is disabled */
+    /** Utilities for pretty logs with a tag showing they are from this script */
+    logger: Readonly<LoggerApi>;
+
+    /** Run a callback when this script is disabled */
     onStop: (callback: () => void) => void;
 
     /**
-     * Run a callback when the plugin's settings menu button is clicked
+     * Run a callback when this plugin's settings menu button is clicked
      *
      * This function is not available for libraries
      */
     openSettingsMenu: (callback: () => void) => void;
 
-    /** Display a modal to the user indicating that the script requires a reload */
+    /** Display a modal to the user indicating that this script requires a reload */
     requestReload = () => addReloadNeeded(this.#id);
 
-    /** The headers containing the script's metadata */
-    headers: ScriptHeaders;
+    /** The headers containing this script's metadata */
+    headers: Readonly<ScriptHeaders>;
 }
 
 Object.freeze(Api);

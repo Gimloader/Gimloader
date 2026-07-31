@@ -9885,6 +9885,44 @@ interface SettingsMethods {
 }
 type PluginSettings = SettingsMethods & Record<string, any>;
 
+interface ScriptHeaders {
+    /** The name of this script */
+    name: string;
+    /** A description of this script */
+    description: string;
+    /** The authors who created this script */
+    author: string[];
+    /** The current version of this script, ideally in the format `x.y.z` */
+    version: string | null;
+    /**
+     * `true` if this script always requires a reload when enabled after startup.
+     * `ingame` if this script requires a reload when enabled while in a game.
+     */
+    reloadRequired: string;
+    /** Whether this script is a library */
+    isLibrary: string;
+    /** A URL which the raw code of this script can be downloaded from */
+    downloadUrl: string | null;
+    /** The URL of a webpage providing information about this script */
+    webpage: string | null;
+    /** Libraries which this script depends on */
+    needsLib: string[];
+    /** Libraries which this script may use, but does not require */
+    optionalLib: string[];
+    /** A message explaining why this script has been deprecated if it has been */
+    deprecated: string | null;
+    /** Gamemodes which this script's `net.onLoad` callbacks will fire when playing */
+    gamemode: string[];
+    /** Changes which have been made since the previous version */
+    changelog: string[];
+    /** Plugins which this script depends on. Only available to plugins. */
+    needsPlugin: string[];
+    /** Whether this script has a settings menu. Only available to plugins. */
+    hasSettings: string;
+    /** A signature included in official plugins to prove authenticity */
+    signature: string | null;
+}
+
 /** @inline */
 interface HotkeyTrigger {
     /** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
@@ -11193,26 +11231,6 @@ class ScopedCommandsApi {
     addCommand(options: CommandOptions, callback: CommandCallback): () => void;
 }
 
-interface ScriptHeaders {
-    name: string;
-    description: string;
-    author: string[];
-    version: string | null;
-    reloadRequired: string;
-    isLibrary: string;
-    downloadUrl: string | null;
-    webpage: string | null;
-    needsLib: string[];
-    optionalLib: string[];
-    deprecated: string | null;
-    gamemode: string[];
-    changelog: string[];
-    signature: string | null;
-    /** Only available for plugins */
-    needsPlugin: string[];
-    hasSettings: string;
-}
-
 class LibsApi {
     /** A list of all the libraries installed */
     get list(): string[];
@@ -11264,6 +11282,23 @@ class ScopedPluginsApi extends PluginsApi {
      * ```
      */
     require<T extends keyof Gimloader.Plugins>(name: T, downloadUrl?: string): Promise<Gimloader.Plugins[T]>;
+}
+
+class LoggerApi {
+    #private;
+    constructor(id: string, color: string);
+    /** Logs data with a script-specific tag */
+    log(...data: any[]): void;
+    /** Logs a warning with a script-specific tag */
+    warn(...data: any[]): void;
+    /** Logs an error with a script-specific tag */
+    error(...data: any[]): void;
+    /** Logs info with a script-specific tag */
+    info(...data: any[]): void;
+    /** Logs debug information with a script-specific tag */
+    debug(...data: any[]): void;
+    /** Logs a stack trace with a script-specific tag */
+    trace(...data: any[]): void;
 }
 
 class Api {
@@ -11399,16 +11434,20 @@ class Api {
     constructor(type?: string, name?: string);
     /** A utility for creating persistent settings menus, only available to plugins */
     settings: PluginSettings;
-    /** Run a callback when the script is disabled */
+    /** Utilities for pretty logs with a tag showing they are from this script */
+    logger: Readonly<LoggerApi>;
+    /** Run a callback when this script is disabled */
     onStop: (callback: () => void) => void;
     /**
-     * Run a callback when the plugin's settings menu button is clicked
+     * Run a callback when this plugin's settings menu button is clicked
      *
      * This function is not available for libraries
      */
     openSettingsMenu: (callback: () => void) => void;
-    /** Display a modal to the user indicating that the script requires a reload */
+    /** Display a modal to the user indicating that this script requires a reload */
     requestReload: () => void;
+    /** The headers containing this script's metadata */
+    headers: Readonly<ScriptHeaders>;
 }
 
 interface Plugins {

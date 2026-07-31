@@ -74,21 +74,23 @@
         });
     }
 
-    let bundleHash = $state(localStorage.getItem("gl-bundleHash") ?? "");
+    let initialHash = localStorage.getItem("gl-bundleHash") ?? "";
+    let bundleHash = $state(initialHash);
 
     async function updateBundleHash() {
         if(bundleHash.length === 0) {
-            if(!Rewriter.bundleHash) return;
+            if(!initialHash) return;
 
             Rewriter.clearBundleHash();
+            initialHash = "";
             return;
         }
 
-        if(bundleHash === Rewriter.bundleHash) return;
+        if(bundleHash === initialHash) return;
 
         if(!bundleHash.match(/^[0-9a-f]{40}$/)) {
             toast.error("That does not appear to be a valid hash!");
-            bundleHash = "";
+            bundleHash = initialHash;
             return;
         }
 
@@ -97,11 +99,12 @@
         const confirmed = await Modals.open("confirm", { text, title: "Change bundle hash" });
 
         if(!confirmed) {
-            bundleHash = "";
+            bundleHash = initialHash;
             return;
         }
 
         Rewriter.setBundleHash(bundleHash);
+        initialHash = bundleHash;
     }
 </script>
 
