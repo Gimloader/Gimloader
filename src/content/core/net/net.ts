@@ -1,20 +1,19 @@
+import type { WithSymbols } from "$types/util";
+import type { Stores } from "$types/stores";
 import Internals from "$core/internals";
 import EventEmitter2 from "eventemitter2";
-import { clearId, splicer } from "$content/utils";
 import { error, nop } from "$shared/utils";
 import { log } from "$shared/utils";
 import Patcher from "../patcher";
 import Rewriter from "../rewriter";
 import wildcardMatch from "wildcard-match";
 import { gameState } from "$content/stores.svelte";
-import type { WithSymbols } from "$types/util";
-import type { Stores } from "$types/stores";
+import Cleanup from "$core/scripts/cleanup";
 
 export type ConnectionType = "None" | "Colyseus" | "Blueboat";
 
 interface LoadCallback {
     callback: (type: ConnectionType, gamemode: string) => void;
-    id: string;
     gamemodes: string[];
 }
 
@@ -31,13 +30,11 @@ export interface RequesterOptions {
 type Requester = (options: RequesterOptions) => void;
 
 interface RequestCallback {
-    id: string | null;
     match: (url: string) => boolean;
     callback: (options: RequesterOptions) => any;
 }
 
 interface ResponseCallback {
-    id: string | null;
     match: (url: string) => boolean;
     callback: (response: any, url: string) => any;
 }
@@ -178,16 +175,14 @@ export default new class Net extends EventEmitter2 {
     }
 
     modifyFetchRequest(id: string | null, path: string, callback: RequestCallback["callback"]) {
-        return splicer(this.requestCallbacks, {
-            id,
+        return Cleanup.addCleanedUpItem(id, this.requestCallbacks, {
             match: wildcardMatch(path),
             callback
         });
     }
 
     modifyFetchResponse(id: string | null, path: string, callback: ResponseCallback["callback"]) {
-        return splicer(this.responseCallbacks, {
-            id,
+        return Cleanup.addCleanedUpItem(id, this.responseCallbacks, {
             match: wildcardMatch(path),
             callback
         });
@@ -375,22 +370,11 @@ export default new class Net extends EventEmitter2 {
             return nop;
         }
 
-        const obj = {
+        const obj: LoadCallback = {
             callback,
-            id,
             gamemodes: gamemode.map(g => g.toLowerCase())
         };
 
-        return splicer(this.loadCallbacks, obj);
-    }
-
-    pluginOffLoad(id: string) {
-        clearId(this.loadCallbacks, id);
-    }
-    stopModifyRequest(id: string) {
-        clearId(this.requestCallbacks, id);
-    }
-    stopModifyResponse(id: string) {
-        clearId(this.responseCallbacks, id);
+        return Cleanup.addCleanedUpItem(id, this.loadCallbacks, obj);
     }
 }();

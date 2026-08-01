@@ -19,10 +19,11 @@ import Hotkeys from "$core/hotkeys/hotkeys.svelte";
 import UpdateNotifier from "$core/updateNotifier.svelte";
 import Rewriter from "$core/rewriter";
 import Commands from "$core/commands.svelte";
+import { addPluginButtons } from "$core/ui/addPluginButtons";
 
 if(document.contentType === "text/html") {
     Object.defineProperty(window, "GL", {
-        value: Api,
+        value: new Api("Global"),
         writable: false,
         configurable: false
     });
@@ -33,6 +34,7 @@ if(document.contentType === "text/html") {
     GimkitInternals.init();
     setupModals();
     fixRDT();
+    addPluginButtons();
     domLoaded.then(createToaster);
 
     StateManager.events.on("error", toast.error);

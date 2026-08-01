@@ -1,8 +1,9 @@
 import type { Command, CommandAction, CommandCallback, CommandContext, CommandOptions } from "$types/api/commands";
 import Hotkeys from "./hotkeys/hotkeys.svelte";
-import { clearId, validate } from "$content/utils";
+import { validate } from "$content/utils";
 import * as z from "zod";
 import { isFirefox } from "$shared/consts";
+import Cleanup from "./scripts/cleanup";
 
 class CancelError extends Error {
     constructor() {
@@ -116,32 +117,18 @@ export default new class Commands {
         this.action = null;
     }
 
-    commandIdentifier = 0;
     addCommand(id: string | null, options: CommandOptions | string, callback: CommandCallback) {
-        const identifier = this.commandIdentifier++;
-
         if(typeof options === "string") {
-            this.commands.push({
+            return Cleanup.addCleanedUpItem(id, this.commands, {
                 text: options,
-                id,
-                identifier,
                 callback
             });
         } else {
-            this.commands.push({
+            return Cleanup.addCleanedUpItem(id, this.commands, {
                 ...options,
-                id,
-                identifier,
                 callback
             });
         }
-
-        return () => {
-            const index = this.commands.findIndex(c => c.identifier === identifier);
-            if(index === -1) return;
-
-            this.commands.splice(index, 1);
-        };
     }
 
     runCommand(callback: CommandCallback) {
@@ -154,9 +141,5 @@ export default new class Commands {
                 throw err;
             });
         }
-    }
-
-    removeCommands(id: string) {
-        clearId(this.commands, id);
     }
 }();

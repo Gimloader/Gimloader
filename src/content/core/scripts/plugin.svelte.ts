@@ -57,12 +57,6 @@ export class Plugin extends Script<PluginInfo> {
         this.openSettingsMenu = [];
     }
 
-    override onImport(exports: any) {
-        if(exports.openSettingsMenu && typeof exports.openSettingsMenu === "function") {
-            this.openSettingsMenu.push(exports.openSettingsMenu);
-        }
-    }
-
     async toggleConfirm(enabled: boolean) {
         if(enabled) await this.enableConfirm();
         else this.disableConfirm();

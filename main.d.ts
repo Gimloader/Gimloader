@@ -29,22 +29,6 @@ declare module '*.svelte' {
     export const showMenu;
 }
 
-/** @deprecated Use the api variable available to scripts */
-declare const GL: typeof import('./src/content/api/api').default;
-/** @deprecated Use GL.stores */
-declare const stores: Stores.Stores;
-/** @deprecated No longer supported */
-declare const platformerPhysics: any;
-
-interface Window {
-    /** @deprecated Use the api variable available to scripts */
-    GL: typeof import('./src/content/api/api').default;
-    /** @deprecated Use GL.stores */
-    stores: Stores.Stores;
-    /** @deprecated No longer supported */
-    platformerPhysics: any;
-}
-
 declare namespace Gimloader {
     interface Plugins {
         [name: string]: any;

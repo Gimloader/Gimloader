@@ -55,6 +55,7 @@
 				"noAssignInExpressions": "off",
 				"noExplicitAny": "off",
 				"noAsyncPromiseExecutor": "off",
+				"noNonNullAssertedOptionalChain": "off",
 				"noConsole": {
 					"level": "error",
 					"options": {
@@ -66,6 +67,7 @@
 			},
 			"correctness": {
 				"noUnusedVariables": {
+					"level": "error",
 					"options": {
 						"ignoreRestSiblings": true
 					}

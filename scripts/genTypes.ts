@@ -103,21 +103,9 @@ interface Libraries {
 }
 
 const api: Gimloader.Api;
-/** @deprecated Use the api variable available to scripts */
-const GL: typeof Gimloader.Api;
-/** @deprecated Use GL.stores */
-const stores: Gimloader.Stores.Stores;
-/** @deprecated No longer supported */
-const platformerPhysics: any;
 
 interface Window {
     api: Gimloader.Api;
-    /** @deprecated Use the api variable available to scripts */
-    GL: typeof Gimloader.Api;
-    /** @deprecated Use GL.stores */
-    stores: Gimloader.Stores.Stores;
-    /** @deprecated No longer supported */
-    platformerPhysics: any;
 }
 }\n`;
 

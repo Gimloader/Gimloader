@@ -11,8 +11,18 @@ import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import { scriptInstanceMap } from "./map";
 import StateManager from "$shared/state";
 import { deepFreeze } from "$content/utils";
+import Rewriter from "$core/rewriter";
+import Api from "$content/api/api";
+import Cleanup from "./cleanup";
 
-const apiCreatedRegex = /new\s+GL\s*\(/;
+const apis = new Map<string, Script>();
+const createApi = Rewriter.createShared(null, "createApi", (id: string) => {
+    const script = apis.get(id);
+    if(!script) throw new Error("Invalid api creation id");
+
+    apis.delete(id);
+    return new Api(script.headers.name, script);
+});
 
 export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     abstract type: ScriptType;
@@ -23,7 +33,6 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     optionalRequires: Script[] = [];
     requiredBy: Script[] = [];
     optionalBy: Script[] = [];
-    onStop: (() => void)[] = [];
     exported: any;
     errored: boolean = $state(false);
 
@@ -92,9 +101,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
                 const uri = encodeURIComponent(this.headers.name);
                 const sourceUrl = `\n//# sourceURL=gimloader://${this.type}/${uri}.js`;
+                const id = this.headers.name;
 
-                // Only create the api automatically if the plugin doesn't call new GL() itself for backwards compatibility
-                const apiDeclaration = this.code.match(apiCreatedRegex) ? "" : `const api = new GL("${this.type}", "${this.headers.name}");\n`;
+                apis.set(id, this);
+                const apiDeclaration = `const api = ${createApi}("${id}");\n`;
 
                 const blob = new Blob([apiDeclaration, this.code, sourceUrl], { type: "application/javascript" });
                 const url = URL.createObjectURL(blob);
@@ -103,20 +113,18 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
                     .then((exports) => {
                         if(!initial) this.checkReloadNeeded();
 
-                        if(exports.onStop && typeof exports.onStop === "function") {
-                            this.onStop.push(exports.onStop);
-                        }
-
                         if(exports.default) exports = exports.default;
                         this.exported = exports;
 
-                        this.onImport?.(exports);
                         const version = this.headers.version ? " v" + this.headers.version : "";
                         log(`Loaded ${this.type} ${this.headers.name}${version}`);
 
                         res();
                     })
-                    .catch(rej)
+                    .catch((e) => {
+                        apis.delete(id);
+                        rej(e);
+                    })
                     .finally(() => URL.revokeObjectURL(url));
             });
         });
@@ -128,8 +136,6 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
         return this.startPromise;
     }
-
-    onImport?(exports: any): void;
 
     get reloadNeeded() {
         return this.headers.reloadRequired === "true"
@@ -202,20 +208,12 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     stop() {
         if(!this.started) return;
 
-        try {
-            // Call onStop in reverse order
-            for(let i = this.onStop.length - 1; i >= 0; i--) {
-                this.onStop[i]?.();
-            }
-        } catch (e) {
-            error(`Error stopping ${this.headers.name}:`, e);
-        }
+        Cleanup.cleanup(this.headers.name, true);
 
         for(const used of this.requires) used.unrequire?.(this, true);
         for(const used of this.optionalRequires) used.unrequire?.(this, false);
 
         this.started = false;
-        this.onStop = [];
         this.startPromise = null;
         this.exported = null;
         this.errored = false;

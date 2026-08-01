@@ -6,8 +6,6 @@ export interface CommandOptions {
 }
 
 export interface Command extends CommandOptions {
-    id: string | null;
-    identifier: number;
     callback: CommandCallback;
 }
 

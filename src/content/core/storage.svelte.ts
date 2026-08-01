@@ -1,8 +1,8 @@
 import type { SettingsChangeCallback } from "$types/api/settings";
 import type { PluginStorage, Settings } from "$types/net/state";
-import { clearId, splicer } from "$content/utils";
 import { defaultSettings } from "$shared/consts";
 import StateManager from "$shared/state";
+import Cleanup from "./scripts/cleanup";
 
 /** @inline */
 export type ValueChangeCallback = (value: any, remote: boolean) => void;
@@ -69,27 +69,10 @@ export default new class Storage {
     }
 
     onPluginValueUpdate(id: string, key: string, callback: ValueChangeCallback) {
-        return splicer(this.valueListeners, { id, key, callback });
+        return Cleanup.addCleanedUpItem(id, this.valueListeners, { id, key, callback });
     }
 
     onPluginSettingUpdate(id: string, key: string, callback: SettingsChangeCallback) {
-        return splicer(this.settingsListeners, { id, key, callback });
-    }
-
-    offPluginValueUpdate(id: string, key: string, callback: ValueChangeCallback) {
-        for(let i = 0; i < this.valueListeners.length; i++) {
-            const listener = this.valueListeners[i];
-            if(listener.id === id && listener.key === key && listener.callback === callback) {
-                this.valueListeners.splice(i, 1);
-                return;
-            }
-        }
-    }
-
-    removeValueListeners(id: string) {
-        clearId(this.valueListeners, id);
-    }
-    removeSettingListeners(id: string) {
-        clearId(this.settingsListeners, id);
+        return Cleanup.addCleanedUpItem(id, this.settingsListeners, { id, key, callback });
     }
 }();

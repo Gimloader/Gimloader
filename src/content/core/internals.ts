@@ -1,9 +1,10 @@
+import { nop } from "$shared/utils";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
 import type { ClassicStores } from "$types/classicStores";
 import type { Stores } from "$types/stores";
 import type { Untyped } from "$types/util";
 import Rewriter from "./rewriter";
-import { clearId, splicer } from "$content/utils";
+import Cleanup from "./scripts/cleanup";
 
 export interface Internals {
     stores: Stores.Stores;
@@ -15,7 +16,6 @@ export interface Internals {
 }
 
 interface LoadCallback<K extends keyof Internals> {
-    id: string | null;
     type: K;
     callback: (value: Internals[K]) => void;
 }
@@ -31,15 +31,14 @@ export default class GimkitInternals {
     static loadCallbacks: LoadCallback<keyof Internals>[] = [];
 
     static init() {
-        // GL.stores
+        // stores
         Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores: Stores.Stores) => {
             this.stores = stores;
-            window.stores = stores;
 
             this.onLoaded("stores", stores);
         });
 
-        // GL.classicStores
+        // classicStores
         Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
             this.classicStores = classicStores;
 
@@ -67,10 +66,9 @@ export default class GimkitInternals {
             this.onLoaded("modal", modal);
         });
 
-        // GL.platformerPhysics
+        // platformerPhysics
         Rewriter.exposeObject("App", "platformerPhysics", "topDownBaseSpeed:", (phys) => {
             this.platformerPhysics = phys;
-            window.platformerPhysics = phys;
 
             this.onLoaded("platformerPhysics", phys);
         });
@@ -89,13 +87,9 @@ export default class GimkitInternals {
     static onLoad<K extends keyof Internals>(id: string | null, type: K, callback: (value: Internals[K]) => void) {
         if(this[type]) {
             callback(this[type] as Internals[K]);
-            return;
+            return nop;
         }
 
-        return splicer(this.loadCallbacks, { id, type, callback });
-    }
-
-    static offLoad(id: string) {
-        clearId(this.loadCallbacks, id);
+        return Cleanup.addCleanedUpItem(id, this.loadCallbacks, { type, callback });
     }
 }

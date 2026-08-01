@@ -26,7 +26,13 @@ const ModalOptionsSchema = z.object({
     onClosed: z.function().optional()
 });
 
-class BaseUIApi {
+class UIApi {
+    readonly #id: string;
+
+    constructor(id: string) {
+        this.#id = id;
+    }
+
     /**
      * Shows a customizable modal to the user
      * @example
@@ -34,7 +40,7 @@ class BaseUIApi {
      * const element = document.createElement("div");
      * element.textContent = "Hello, world!";
      *
-     * GL.UI.showModal(element, {
+     * api.UI.showModal(element, {
      *     id: "my-modal",
      *     title: "My Modal",
      *     style: "width: 300px;",
@@ -86,68 +92,6 @@ class BaseUIApi {
     get modal() {
         return GimkitInternals.modal;
     }
-}
-
-class UIApi extends BaseUIApi {
-    /**
-     * Adds a style to the DOM
-     * @returns A function to remove the styles
-     * @example
-     * ```js
-     * const styles = `#element {
-     *     color: red;
-     * }`;
-     *
-     * GL.UI.addStyles("MyPlugin", styles);
-     * ```
-     */
-    addStyles(id: string, style: string) {
-        validate("UI.addStyles", arguments, ["id", "string"], ["style", "string"]);
-
-        return UI.addStyles(id, style);
-    }
-
-    /** Remove all styles with a given id */
-    removeStyles(id: string) {
-        validate("UI.removeStyles", arguments, ["id", "string"]);
-
-        UI.removeStyles(id);
-    }
-
-    /**
-     * Waits for a component to load, and calls the callback with the component as an argument.
-     * If the component has already loaded the callback will be fired immediately.
-     * The available components are "notification", "message", and "modal".
-     * @returns A function that cancels waiting
-     * @example
-     * ```js
-     * GL.UI.onComponentLoad("MyPlugin", "message", (message) => {
-     *     message.success({ content: "This is a message!" });
-     * });
-     * ```
-     */
-    onComponentLoad<K extends keyof GimkitComponents>(id: string, type: K, callback: (component: GimkitComponents[K]) => void) {
-        validate("UI.onComponentLoad", arguments, ["id", "string"], ["type", ComponentsSchema], ["callback", "function"]);
-
-        return GimkitInternals.onLoad(id, type, callback);
-    }
-
-    /** Cancels any calls made to {@link onComponentLoad} with the same id */
-    offComponentLoad(id: string) {
-        validate("UI.offComponentLoad", arguments, ["id", "string"]);
-
-        GimkitInternals.offLoad(id);
-    }
-}
-
-class ScopedUIApi extends BaseUIApi {
-    readonly #id: string;
-
-    constructor(id: string) {
-        super();
-
-        this.#id = id;
-    }
 
     /**
      * Adds a style to the DOM
@@ -186,10 +130,6 @@ class ScopedUIApi extends BaseUIApi {
     }
 }
 
-Object.freeze(BaseUIApi);
-Object.freeze(BaseUIApi.prototype);
 Object.freeze(UIApi);
 Object.freeze(UIApi.prototype);
-Object.freeze(ScopedUIApi);
-Object.freeze(ScopedUIApi.prototype);
-export { ScopedUIApi, UIApi };
+export default UIApi;

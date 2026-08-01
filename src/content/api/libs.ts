@@ -2,6 +2,12 @@ import LibManager from "$core/scripts/libManager.svelte";
 import { validate } from "$content/utils";
 
 class LibsApi {
+    readonly #id: string;
+
+    constructor(id: string) {
+        this.#id = id;
+    }
+
     /** A list of all the libraries installed */
     get list() {
         return LibManager.getScriptNames();
@@ -27,15 +33,6 @@ class LibsApi {
 
         return LibManager.getExports(name as string);
     }
-}
-
-class ScopedLibsApi extends LibsApi {
-    readonly #id: string;
-
-    constructor(id: string) {
-        super();
-        this.#id = id;
-    }
 
     /**
      * Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports.
@@ -53,6 +50,4 @@ class ScopedLibsApi extends LibsApi {
 
 Object.freeze(LibsApi);
 Object.freeze(LibsApi.prototype);
-Object.freeze(ScopedLibsApi);
-Object.freeze(ScopedLibsApi.prototype);
-export { LibsApi, ScopedLibsApi };
+export default LibsApi;

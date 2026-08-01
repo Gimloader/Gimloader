@@ -1,13 +1,13 @@
-import { clearId, splicer } from "$content/utils";
 import { domLoaded } from "$content/utils";
 import { clear, get, set } from "idb-keyval";
-import PluginManager from "./scripts/pluginManager.svelte";
 import { englishList, error, log, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
 import StateManager from "$shared/state";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import { toast } from "svelte-sonner";
+import Cleanup from "./scripts/cleanup";
+import { pluginsLoaded } from "./scripts/map";
 
 interface Import {
     text: string;
@@ -52,7 +52,6 @@ export default class Rewriter {
     static shared: Record<string, any> = {
         onload: this.onload.bind(this)
     };
-    static sharedPluginNames: Record<string, string[]> = {};
     static rootScript = "";
     static scriptCode: Record<string, string> = {};
     static parseHooks: ParseHook[] = [];
@@ -172,7 +171,7 @@ export default class Rewriter {
         const blobUrl = await this.fetchScript(name, root);
 
         // Negligible impact on load time
-        await PluginManager.loaded;
+        await pluginsLoaded;
 
         try {
             const imported = await import(blobUrl);
@@ -305,34 +304,20 @@ export default class Rewriter {
         const object: ParseHook = { prefix, callback: modifier };
         if(pluginName) object.id = pluginName;
 
-        return splicer(this.parseHooks, object);
-    }
-
-    static removeParseHooks(pluginName: string) {
-        clearId(this.parseHooks, pluginName);
+        return Cleanup.addCleanedUpItem(pluginName, this.parseHooks, object);
     }
 
     static createShared(pluginName: string | null, id: string, value: any) {
-        let sharedId = id;
+        const sharedId = pluginName ? `${pluginName}-${id}` : id;
 
         if(pluginName !== null) {
-            sharedId = `${pluginName}-${id}`;
-            this.sharedPluginNames[pluginName] ??= [];
-            this.sharedPluginNames[pluginName].push(sharedId);
+            Cleanup.on(pluginName, () => {
+                delete this.shared[sharedId];
+            });
         }
 
         this.shared[sharedId] = value;
         return `GLShared["${sharedId}"]`;
-    }
-
-    static removeShared(pluginName: string) {
-        if(!this.sharedPluginNames[pluginName]) return;
-
-        for(const id of this.sharedPluginNames[pluginName]) {
-            delete this.shared[id];
-        }
-
-        delete this.sharedPluginNames[pluginName];
     }
 
     static removeSharedById(pluginName: string, id: string) {
@@ -355,11 +340,7 @@ export default class Rewriter {
         const object: RunInScope = { prefix, callback };
         if(pluginName) object.id = pluginName;
 
-        return splicer(this.runInScopes, object);
-    }
-
-    static removeRunInScope(pluginName: string) {
-        clearId(this.runInScopes, pluginName);
+        return Cleanup.addCleanedUpItem(pluginName, this.runInScopes, object);
     }
 
     static exposeVar(pluginName: string | null, prefix: Prefix, exposer: Exposer) {

@@ -24,7 +24,7 @@ export interface ScriptHeaders {
     optionalLib: string[];
     /** A message explaining why this script has been deprecated if it has been */
     deprecated: string | null;
-    /** Gamemodes which this script's `net.onLoad` callbacks will fire when playing */
+    /** Gamemodes in which this script's `net.onLoad` callbacks will fire when playing */
     gamemode: string[];
     /** Changes which have been made since the previous version */
     changelog: string[];

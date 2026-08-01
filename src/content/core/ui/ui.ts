@@ -1,17 +1,15 @@
 import type * as React from "react";
 import type * as ReactDOM from "react-dom/client";
-import { addPluginButtons } from "./addPluginButtons";
 import styles from "$content/css/styles.css";
 import tailwindStyles from "$content/css/tailwind.css";
 import { domLoaded } from "$content/utils";
 import Rewriter from "../rewriter";
-import { nop } from "$shared/utils";
 import fixCanvasCrash from "./fixCanvasCrash";
+import Cleanup from "$core/scripts/cleanup";
 
 export default class UI {
     static React: typeof React;
     static ReactDOM: typeof ReactDOM;
-    static styles: Map<string, HTMLStyleElement[]> = new Map();
 
     static init() {
         Rewriter.exposeObjectBefore(true, "React", ".useDebugValue=", (react) => {
@@ -22,7 +20,6 @@ export default class UI {
             this.ReactDOM = reactDOM;
         });
 
-        addPluginButtons();
         fixCanvasCrash();
         this.addCoreStyles();
     }
@@ -34,32 +31,7 @@ export default class UI {
         // wait for document to be ready
         domLoaded.then(() => document.head.appendChild(style));
 
-        if(id === null) return nop;
-
-        // add to map
-        if(!this.styles.has(id)) this.styles.set(id, []);
-        this.styles.get(id)?.push(style);
-
-        return () => {
-            const styles = this.styles.get(id);
-            if(styles) {
-                const index = styles.indexOf(style);
-                if(index !== -1) {
-                    styles.splice(index, 1);
-                    style.remove();
-                }
-            }
-        };
-    }
-
-    static removeStyles(id: string) {
-        if(!this.styles.has(id)) return;
-
-        for(const style of this.styles.get(id)!) {
-            style.remove();
-        }
-
-        this.styles.delete(id);
+        return Cleanup.manualOrAutoCleanup(id, () => style.remove());
     }
 
     static addCoreStyles() {

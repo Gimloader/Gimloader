@@ -1,17 +1,15 @@
 import type { PluginInfo } from "$types/net/state";
 import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
-import { Deferred } from "$shared/utils";
 import Modals from "../modals.svelte";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
 import StateManager from "$shared/state";
-import { scriptInstanceMap } from "./map";
+import { pluginsLoaded, scriptInstanceMap } from "./map";
 
 export default new class PluginManager extends ScriptManager<PluginInfo, Plugin> {
     singular = "plugin";
     plural = "plugins";
-    loaded = Deferred.create();
 
     constructor() {
         super(Plugin, "plugin");
@@ -21,7 +19,7 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
             const toRun = this.scripts.filter(p => p.enabled);
             await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
 
-            this.loaded.resolve();
+            pluginsLoaded.resolve();
         });
     }
 

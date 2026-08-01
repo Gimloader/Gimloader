@@ -1,9 +1,9 @@
 import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyOptions, HotkeyTrigger } from "$types/api/hotkeys";
 import ConfigurableHotkey from "./configurable.svelte";
-import { clearId, splicer } from "$content/utils";
 import StateManager from "$shared/state";
+import Cleanup from "$core/scripts/cleanup";
 
-type DefaultHotkey = HotkeyOptions & { callback: HotkeyCallback; id: string };
+type DefaultHotkey = HotkeyOptions & { callback: HotkeyCallback };
 
 export default new class Hotkeys {
     hotkeys: DefaultHotkey[] = [];
@@ -33,36 +33,14 @@ export default new class Hotkeys {
         });
     }
 
-    addHotkey(id: any, options: HotkeyOptions, callback: HotkeyCallback) {
-        return splicer(this.hotkeys, { ...options, id, callback });
-    }
-
-    removeHotkeys(id: any) {
-        clearId(this.hotkeys, id);
+    addHotkey(id: string | null, options: HotkeyOptions, callback: HotkeyCallback) {
+        return Cleanup.addCleanedUpItem(id, this.hotkeys, { ...options, callback });
     }
 
     addConfigurableHotkey(id: string, options: ConfigurableHotkeyOptions, callback: HotkeyCallback, pluginName?: string) {
         const obj = new ConfigurableHotkey(id, callback, options, pluginName);
 
-        return splicer(this.configurableHotkeys, obj);
-    }
-
-    removeConfigurableHotkey(id: string) {
-        for(let i = 0; i < this.configurableHotkeys.length; i++) {
-            if(this.configurableHotkeys[i].id === id) {
-                this.configurableHotkeys.splice(i, 1);
-                i--;
-            }
-        }
-    }
-
-    removeConfigurableFromPlugin(pluginName: string) {
-        for(let i = 0; i < this.configurableHotkeys.length; i++) {
-            if(this.configurableHotkeys[i].pluginName === pluginName) {
-                this.configurableHotkeys.splice(i, 1);
-                i--;
-            }
-        }
+        return Cleanup.addCleanedUpItem(id, this.configurableHotkeys, obj);
     }
 
     releaseAll() {
