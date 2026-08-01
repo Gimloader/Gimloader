@@ -20,53 +20,54 @@ import UpdateNotifier from "$core/updateNotifier.svelte";
 import Rewriter from "$core/rewriter";
 import Commands from "$core/commands.svelte";
 
-Object.defineProperty(window, "GL", {
-    value: Api,
-    writable: false,
-    configurable: false
-});
+if(document.contentType === "text/html") {
+    Object.defineProperty(window, "GL", {
+        value: Api,
+        writable: false,
+        configurable: false
+    });
 
-disableConsoleWarning();
-UI.init();
-Net.init();
-GimkitInternals.init();
-setupModals();
-domLoaded.then(createToaster);
+    disableConsoleWarning();
+    UI.init();
+    Net.init();
+    GimkitInternals.init();
+    setupModals();
+    fixRDT();
+    domLoaded.then(createToaster);
 
-StateManager.events.on("error", toast.error);
-StateManager.events.on("init", () => {
-    const lastVersion = localStorage.getItem("gl-version");
-    localStorage.setItem("gl-version", version);
+    StateManager.events.on("error", toast.error);
+    StateManager.events.on("init", () => {
+        const lastVersion = localStorage.getItem("gl-version");
+        localStorage.setItem("gl-version", version);
 
-    const versionChanged = version !== lastVersion;
-    const updated = lastVersion && versionChanged;
-    if(updated) addUpdated("Gimloader", version, changelog);
+        const versionChanged = version !== lastVersion;
+        const updated = lastVersion && versionChanged;
+        if(updated) addUpdated("Gimloader", version, changelog);
 
-    Storage.init();
-    LibManager.init();
-    PluginManager.init();
-    Hotkeys.init();
-    UpdateNotifier.init();
-    Rewriter.init();
-    Commands.init();
+        Storage.init();
+        LibManager.init();
+        PluginManager.init();
+        Hotkeys.init();
+        UpdateNotifier.init();
+        Rewriter.init();
+        Commands.init();
 
-    if(updated) Rewriter.invalidate();
-});
+        if(updated) Rewriter.invalidate();
+    });
 
-Port.on("toast", (msg) => {
-    if(msg.type === "success") toast.success(msg.message);
-    else if(msg.type === "error") toast.error(msg.message);
-    else if(msg.type === "warning") toast.warning(msg.message);
-    else toast(msg.message);
-});
+    Port.on("toast", (msg) => {
+        if(msg.type === "success") toast.success(msg.message);
+        else if(msg.type === "error") toast.error(msg.message);
+        else if(msg.type === "warning") toast.warning(msg.message);
+        else toast(msg.message);
+    });
 
-Port.on("setState", (state) => {
-    StateManager.update(state);
-    toast.success("New config applied");
-});
+    Port.on("setState", (state) => {
+        StateManager.update(state);
+        toast.success("New config applied");
+    });
 
-Port.init("game");
+    Port.init("game");
 
-fixRDT();
-
-log(`Gimloader v${version} loaded`);
+    log(`Gimloader v${version} loaded`);
+}

@@ -7,6 +7,7 @@ import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
 import StateManager from "$shared/state";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
+import { toast } from "svelte-sonner";
 
 interface Import {
     text: string;
@@ -90,6 +91,7 @@ export default class Rewriter {
                 + "This error is likely caused by Gimloader itself. Please try reloading the page. "
                 + "If this issue persists open an issue at https://github.com/Gimloader/Gimloader.";
             Modals.open("error", { text, title: "Error loading Gimkit" });
+
             return;
         }
 
@@ -100,7 +102,10 @@ export default class Rewriter {
             localStorage.setItem("gl-lastindex", name);
         }
 
-        if(this.bundleHash) log(`Loading old bundle ${this.bundleHash}`);
+        if(this.bundleHash) {
+            toast.warning("Using old Gimkit bundle");
+            log(`Loading old bundle ${this.bundleHash}`);
+        }
 
         this.base = new URL(index.src);
         this.import(this.bundleHash ? "https://gimkit.com/assets/_index.js" : index.src, true);
