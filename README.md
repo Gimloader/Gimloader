@@ -26,7 +26,7 @@ Documentation for the Gimloader api as well as some basics on making plugins can
 2. Make sure you have [bun](https://bun.sh/) installed
 3. Install dependencies: `bun i --frozen-lockfile`
 4. Build the extension: `bun run buildAll` for Chromium, and `bun run buildAllFirefox` for Firefox.
-5. The extension will be output in `./extension/build`. You can load this in `chrome://extensions` (or equivalent) by enabling developer mode in the top right, on on `about:debugging` on Firefox with the `Load Temporary Add-on` button.
+5. The extension will be output in `./extension/build`. You can load this in `chrome://extensions` (or equivalent) by enabling developer mode in the top right, on `about:debugging` on Firefox with the `Load Temporary Add-on` button.
 6. If you want to watch for changes and quickly rebuild the extension, run `bun run watch` or `bun run watchFirefox`.
 
 ### Before Committing
