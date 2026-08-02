@@ -129,6 +129,8 @@ export default class PluginState extends ScriptState<"plugin"> {
                 apply("pluginToggled", { name, enabled: false });
             }
 
+            apply("cacheInvalid", { invalid: true });
+
             return { status: "success" };
         }
     }

@@ -1,6 +1,1 @@
-Added folders which can be used to organize scripts
-Fixed error message appearing when viewing asset pages
-Added developer option to change Gimkit's bundle
-Added logger api for scripts
-Un-deprecated platformerPhysics and added it to scoped api
-Deprecated global GL variable
+Fixed cache not invalidating in a few situations

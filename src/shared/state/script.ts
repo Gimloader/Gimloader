@@ -367,6 +367,7 @@ export default abstract class ScriptState<
         }
 
         apply(`${this.type}Delete`, { name });
+        apply("cacheInvalid", { invalid: true });
         return { status: "success" };
     }
 
