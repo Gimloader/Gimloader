@@ -134,7 +134,7 @@ export default abstract class ScriptState<
         return this.scripts.value.find(s => s.name === name) ?? null;
     }
 
-    initDependencies(headers: ScriptHeaders, includePlugins: boolean) {
+    initDependencies(headers: ScriptHeaders) {
         const dependencies: Dependency[] = [];
 
         for(const lib of headers.needsLib) {
@@ -143,7 +143,7 @@ export default abstract class ScriptState<
         }
 
         // Libraries cannot depend on plugins
-        if(includePlugins) {
+        if(this.type === "plugin") {
             for(const plugin of headers.needsPlugin) {
                 const [name, url] = parseDep(plugin);
                 dependencies.push({ name, type: "plugin", url });
@@ -159,9 +159,18 @@ export default abstract class ScriptState<
         return dependencies;
     }
 
+    clearDependencies(name: string) {
+        const script = scriptMap.get(name);
+        if(!script) return;
+
+        for(const dep of script.dependencies) {
+            dependents[dep.name] = dependents[dep.name].filter(d => d !== name);
+        }
+    }
+
     createScript(info: I, folder: string, initial = false) {
         const headers = parseScriptHeaders(info.code);
-        const dependencies = this.initDependencies(headers, this.type === "plugin");
+        const dependencies = this.initDependencies(headers);
 
         scriptMap.set(info.name, {
             type: this.type,
@@ -174,8 +183,9 @@ export default abstract class ScriptState<
     }
 
     deleteScript(name: string) {
-        scriptMap.delete(name);
+        this.clearDependencies(name);
         delete dependents[name];
+        scriptMap.delete(name);
 
         this.emit("scriptDelete", name);
         this.emit("scriptUpdate");
@@ -238,6 +248,10 @@ export default abstract class ScriptState<
 
         script.info.code = code;
         script.info.name = newName;
+
+        const headers = parseScriptHeaders(code);
+        this.clearDependencies(newName);
+        script.dependencies = this.initDependencies(headers);
 
         this.emit("scriptEdit", name, newName, code, updated);
         this.emit("scriptUpdate");
@@ -454,7 +468,8 @@ export default abstract class ScriptState<
             const entry = scriptMap.get(dependent);
             if(!entry) continue;
 
-            if(entry.type === "plugin" && (entry as PluginData).info.enabled) {
+            if(entry.type === "plugin") {
+                if(!(entry as PluginData).info.enabled) continue;
                 willDisable.add(dependent);
             }
 

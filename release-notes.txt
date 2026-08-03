@@ -1,1 +1,1 @@
-Fixed cache not invalidating in a few situations
+Fixed editing scripts not correctly updating dependency warnings
