@@ -1,7 +1,6 @@
 import type { Dependency } from "$types/net/downloads";
 import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
 import Server from "$bg/net/server";
-import { formatDownloadUrl } from "$shared/net/util";
 import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
 import { englishList } from "$shared/utils";
 import StateManager from "$shared/state";
@@ -111,7 +110,7 @@ export default class Downloader {
         let text = this.fetchCache.get(url);
 
         if(!text) {
-            const response = await fetch(formatDownloadUrl(url));
+            const response = await fetch(url);
             if(!response.ok) throw new Error("Response not OK");
 
             text = await response.text();
