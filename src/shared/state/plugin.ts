@@ -64,16 +64,16 @@ export default class PluginState extends ScriptState<"plugin"> {
         }
     }
 
-    override create(code: string, folder: string) {
-        const name = super.create(code, folder);
-        this.tryTogglePlugin(name, true);
+    override async create(code: string, folder: string) {
+        const name = await super.create(code, folder);
+        await this.tryTogglePlugin(name, true);
 
         return name;
     }
 
     async tryTogglePlugin(name: string, enabled: boolean, confirmed = false): Promise<ToggleResult> {
         if(enabled) {
-            const { error, willDownload, willEnable } = this.checkDependencies(name);
+            const { error, willDownload, willEnable } = this.checkDependenciesOf(name);
             if(error) return { status: "dependencyError", message: error };
 
             const warnAbout = willDownload.filter((dep) => this.shouldWarnAbout(dep));
@@ -162,7 +162,7 @@ export default class PluginState extends ScriptState<"plugin"> {
 
         const checks = names.map((name) => ({
             name,
-            outcome: this.checkDependencies(name)
+            outcome: this.checkDependenciesOf(name)
         }));
 
         // Check if any failed

@@ -23,8 +23,9 @@
         "noEmit": true
     },
     "include": [
-        "./scripts/**/*.*",
-        "./src/**/*.*",
+        "./scripts/**/*",
+        "./src/**/*",
+        "./tests/**/*",
         "main.d.ts",
         "./extension/scripts/*.ts"
     ]

@@ -43,6 +43,6 @@ export default class Poller {
         const headers = parseScriptHeaders(code);
         Server.send("toast", { type: "success", message: `Hot reloaded ${headers.name}` });
 
-        StateManager.allScripts.editOrCreate(code, headers.name);
+        await StateManager.allScripts.editOrCreate(code, headers.name);
     }
 }

@@ -178,7 +178,7 @@ export default class Downloader {
                 errors.push(...childRes.errors);
             }
 
-            StateManager.allScripts.editOrCreate(text, headers.name, folder, false);
+            await StateManager.allScripts.editOrCreate(text, headers.name, folder, false);
 
             return { errors, name: headers.name };
         } catch (e) {

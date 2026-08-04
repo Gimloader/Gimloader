@@ -26,7 +26,10 @@ export function handle(type: string, props: any, remote = false) {
 
 export function apply<Type extends StateMessages["type"]>(type: Type, message: StateMessageProps<Type>) {
     handle(type, message);
+    broadcast(type, message);
+}
 
+export function broadcast<Type extends StateMessages["type"]>(type: Type, message: StateMessageProps<Type>) {
     if(broadcastFilters[type]?.(message)) return;
     stateEvents.emit("broadcast", type, message);
 }

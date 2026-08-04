@@ -49,7 +49,7 @@
         });
     });
 
-    function save() {
+    async function save() {
         let code = editor.getValue();
         let headers = parseScriptHeaders(code);
         const isLibrary = headers.isLibrary !== "false";
@@ -66,7 +66,7 @@
             }
         }
 
-        StateManager.allScripts.editOrCreate(code, name, params.get("folder") ?? undefined);
+        await StateManager.allScripts.editOrCreate(code, name, params.get("folder") ?? undefined);
 
         name = headers.name;
         saved = true;

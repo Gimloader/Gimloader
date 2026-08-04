@@ -1,1 +1,2 @@
 Fixed editing scripts not correctly updating dependency warnings
+Fixed more edge cases in script handling
