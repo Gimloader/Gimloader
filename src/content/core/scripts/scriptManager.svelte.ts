@@ -11,6 +11,7 @@ import Modals from "$core/modals.svelte";
 import { amountWithS, downloadJson } from "$shared/utils";
 import { readUserFile } from "$content/utils";
 import StateManager from "$shared/state";
+import Port from "$shared/net/port.svelte";
 
 export default abstract class ScriptManager<I extends ScriptInfo = any, T extends Script<I> = any> {
     abstract singular: string;
@@ -110,7 +111,6 @@ export default abstract class ScriptManager<I extends ScriptInfo = any, T extend
     }
 
     addCommands() {
-        // Add a command for deleting a script
         Commands.addCommand(null, {
             text: `Delete ${this.singular}`,
             keywords: ["remove", "uninstall"],
@@ -118,6 +118,19 @@ export default abstract class ScriptManager<I extends ScriptInfo = any, T extend
         }, async (context) => {
             const script = await this.selectScript(context, `Select ${this.singular} to delete`);
             script?.deleteConfirm();
+        });
+
+        Commands.addCommand(null, {
+            text: `Edit ${this.singular}`,
+            hidden: () => this.scripts.length === 0
+        }, async (context) => {
+            const script = await this.selectScript(context, `Select ${this.singular} to edit`);
+            if(!script) return;
+
+            Port.sendAndRecieve("showEditor", {
+                type: this.type,
+                name: script.headers.name
+            });
         });
     }
 
