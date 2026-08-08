@@ -5,7 +5,7 @@ import GimkitInternals from "$core/internals";
 import { log } from "$shared/utils";
 import Port from "$shared/net/port.svelte";
 import { version } from "../../package.json";
-import { disableConsoleWarning, fixRDT } from "$core/qol";
+import { disableConsoleWarning, fixRDT, setupLogSuppression } from "$core/qol";
 import setupModals from "./core/ui/setupModals";
 import { toast } from "svelte-sonner";
 import { createToaster } from "$shared/toast/create";
@@ -28,6 +28,7 @@ if(document.contentType === "text/html") {
     });
 
     disableConsoleWarning();
+    setupLogSuppression();
     UI.init();
     Net.init();
     GimkitInternals.init();
