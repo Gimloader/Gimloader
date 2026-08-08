@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noConsole: Used to disable other console logs
 import StateManager from "$shared/state";
 import { nop } from "$shared/utils";
 import Rewriter from "./rewriter";
@@ -22,7 +23,6 @@ function makeHookUnenumerable() {
 }
 
 export function disableConsoleWarning() {
-    // biome-ignore lint/suspicious/noConsole: Used to disable other console logs
     const log = console.log;
     let remainingIgnores = 2;
 
