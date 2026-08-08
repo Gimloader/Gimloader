@@ -7,8 +7,8 @@ const scriptRegex = /gimloader:\/\/(plugins|libraries)\/(.+?)\.js:\d+:\d+/g;
 interface ScopedInfo {
     id: string;
     script: Script;
-    onStop: (cb: () => void) => void;
-    openSettingsMenu?: (cb: () => void) => void;
+    onStop: (...callbacks: (() => void)[]) => void;
+    openSettingsMenu?: (...callbacks: (() => void)[]) => void;
 }
 
 export default function setupScoped(type?: string, name?: string): ScopedInfo {
@@ -34,8 +34,8 @@ export default function setupScoped(type?: string, name?: string): ScopedInfo {
         return {
             id: plugin.headers.name,
             script: plugin,
-            onStop: (cb: () => void) => plugin.onStop.push(cb),
-            openSettingsMenu: (cb: () => void) => plugin.openSettingsMenu.push(cb)
+            onStop: (...callbacks: (() => void)[]) => plugin.onStop.push(...callbacks),
+            openSettingsMenu: (...callbacks: (() => void)[]) => plugin.openSettingsMenu.push(...callbacks)
         };
     } else {
         const library = LibManager.getScript(name);
@@ -44,7 +44,7 @@ export default function setupScoped(type?: string, name?: string): ScopedInfo {
         return {
             id: library.headers.name,
             script: library,
-            onStop: (cb: () => void) => library.onStop.push(cb)
+            onStop: (...callbacks: (() => void)[]) => library.onStop.push(...callbacks)
         };
     }
 }

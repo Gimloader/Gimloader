@@ -11369,6 +11369,10 @@ class Api {
     static get classicStores(): ClassicStores.ClassicStores;
     /** A variety of gimkit internal objects available in 1d gamemodes */
     get classicStores(): ClassicStores.ClassicStores;
+    /** Physics variables available in platformer gamemodes */
+    static get platformerPhysics(): any;
+    /** Physics variables available in platformer gamemodes */
+    get platformerPhysics(): any;
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.
@@ -11412,11 +11416,6 @@ class Api {
         createReactContextMenu: () => void;
     };
     /**
-     * @deprecated No longer supported
-     * @hidden
-     */
-    static get platformerPhysics(): any;
-    /**
      * @deprecated The api no longer emits events. Use GL.net.loaded to listen to load events
      * @hidden
      */
@@ -11437,13 +11436,13 @@ class Api {
     /** Utilities for pretty logs with a tag showing they are from this script */
     logger: Readonly<LoggerApi>;
     /** Run a callback when this script is disabled */
-    onStop: (callback: () => void) => void;
+    onStop: (...callbacks: (() => void)[]) => void;
     /**
      * Run a callback when this plugin's settings menu button is clicked
      *
      * This function is not available for libraries
      */
-    openSettingsMenu: (callback: () => void) => void;
+    openSettingsMenu: (...callbacks: (() => void)[]) => void;
     /** Display a modal to the user indicating that this script requires a reload */
     requestReload: () => void;
     /** The headers containing this script's metadata */
