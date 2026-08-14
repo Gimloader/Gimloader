@@ -35,6 +35,7 @@ export default new class Commands {
     action: CommandAction | null = $state(null);
     context: CommandContext;
     open = $state(false);
+    openedAt = 0;
 
     constructor() {
         const createAction = <T extends CommandAction, R>(type: T["type"], options: T["options"]) => {
@@ -107,6 +108,7 @@ export default new class Commands {
         }
 
         this.open = true;
+        this.openedAt = Date.now();
     }
 
     onClosed() {
