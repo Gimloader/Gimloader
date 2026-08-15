@@ -1,4 +1,6 @@
+Added api.cleanup function 
 Fixed editing scripts not correctly updating dependency warnings
 Fixed more edge cases in script handling
 Fixed mouse selecting things in command palette without moving
 Made error modals disappear when script is edited
+Replaced GL variable with scoped api

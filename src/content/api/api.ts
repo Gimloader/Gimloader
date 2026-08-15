@@ -98,9 +98,6 @@ class Api {
     constructor(id: string, script?: Script) {
         this.#id = id;
 
-        if(script?.type === "plugin") {
-        }
-
         this.rewriter = Object.freeze(new RewriterApi(id));
         this.hotkeys = Object.freeze(new HotkeysApi(id));
         this.net = Object.freeze(new NetApi(id, script?.headers.gamemode ?? []));
@@ -142,7 +139,7 @@ class Api {
     /** Run a callback when this script is disabled */
     onStop = (...callbacks: (() => void)[]) => {
         for(const cb of callbacks) Cleanup.on(this.#id, cb);
-    }
+    };
 
     /**
      * Run a callback when this plugin's settings menu button is clicked
