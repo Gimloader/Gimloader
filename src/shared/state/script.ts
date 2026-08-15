@@ -45,6 +45,12 @@ interface ScriptEvents<I extends ScriptInfo> {
     pluginToggled: [name: string, enabled: boolean];
 }
 
+interface DependencyCheckResult {
+    error: string | null;
+    willDownload: Dependency[];
+    willEnable: string[];
+}
+
 export default abstract class ScriptState<
     T extends ScriptType,
     I extends ScriptInfoTypes[T] = ScriptInfoTypes[T]
@@ -134,7 +140,7 @@ export default abstract class ScriptState<
         return this.scripts.value.find(s => s.name === name) ?? null;
     }
 
-    initDependencies(headers: ScriptHeaders, includePlugins: boolean) {
+    getDependencies(headers: ScriptHeaders) {
         const dependencies: Dependency[] = [];
 
         for(const lib of headers.needsLib) {
@@ -143,12 +149,18 @@ export default abstract class ScriptState<
         }
 
         // Libraries cannot depend on plugins
-        if(includePlugins) {
+        if(this.type === "plugin") {
             for(const plugin of headers.needsPlugin) {
                 const [name, url] = parseDep(plugin);
                 dependencies.push({ name, type: "plugin", url });
             }
         }
+
+        return dependencies;
+    }
+
+    initDependencies(headers: ScriptHeaders) {
+        const dependencies = this.getDependencies(headers);
 
         // Set dependents for each dependency
         for(const dep of dependencies) {
@@ -159,9 +171,18 @@ export default abstract class ScriptState<
         return dependencies;
     }
 
+    clearDependencies(name: string) {
+        const script = scriptMap.get(name);
+        if(!script) return;
+
+        for(const dep of script.dependencies) {
+            dependents[dep.name] = dependents[dep.name].filter(d => d !== name);
+        }
+    }
+
     createScript(info: I, folder: string, initial = false) {
         const headers = parseScriptHeaders(info.code);
-        const dependencies = this.initDependencies(headers, this.type === "plugin");
+        const dependencies = this.initDependencies(headers);
 
         scriptMap.set(info.name, {
             type: this.type,
@@ -174,8 +195,9 @@ export default abstract class ScriptState<
     }
 
     deleteScript(name: string) {
-        scriptMap.delete(name);
+        this.clearDependencies(name);
         delete dependents[name];
+        scriptMap.delete(name);
 
         this.emit("scriptDelete", name);
         this.emit("scriptUpdate");
@@ -238,6 +260,10 @@ export default abstract class ScriptState<
 
         script.info.code = code;
         script.info.name = newName;
+
+        const headers = parseScriptHeaders(code);
+        this.clearDependencies(newName);
+        script.dependencies = this.initDependencies(headers);
 
         this.emit("scriptEdit", name, newName, code, updated);
         this.emit("scriptUpdate");
@@ -339,7 +365,7 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    create(code: string, folder: string) {
+    async create(code: string, folder: string) {
         const headers = parseScriptHeaders(code);
         if((headers.isLibrary === "true") !== (this.type === "library")) {
             stateEvents.emit("error", `A ${this.type} must ${this.type === "library" ? "" : "not "}have @isLibrary set`);
@@ -350,6 +376,29 @@ export default abstract class ScriptState<
         apply(`${this.type}Create`, { folder, info });
 
         return headers.name;
+    }
+
+    async edit(name: string, newName: string, code: string, updated?: boolean) {
+        const willDisable = this.checkDependents(name);
+        const headers = parseScriptHeaders(code);
+        const dependencies = this.getDependencies(headers);
+        const { error, willDownload, willEnable } = this.checkDependencies(newName, dependencies);
+        let wontLoad = error || willDownload.some((dep) => this.shouldWarnAbout(dep)) || willEnable.length > 0;
+
+        if(!wontLoad) {
+            const errors = await this.stateManager.handlers.downloadDependencies(willDownload);
+            if(errors.length > 0) wontLoad = true;
+        }
+
+        if(wontLoad || name !== newName) {
+            for(const name of willDisable) {
+                apply("pluginToggled", { name, enabled: false });
+            }
+        }
+
+        if(wontLoad && this.type === "plugin") apply("pluginToggled", { name, enabled: false });
+
+        apply(`${this.type}Edit`, { name, code, newName, updated });
     }
 
     tryDelete(name: string, confirmed = false): DeleteResult {
@@ -367,6 +416,7 @@ export default abstract class ScriptState<
         }
 
         apply(`${this.type}Delete`, { name });
+        apply("cacheInvalid", { invalid: true });
         return { status: "success" };
     }
 
@@ -453,7 +503,8 @@ export default abstract class ScriptState<
             const entry = scriptMap.get(dependent);
             if(!entry) continue;
 
-            if(entry.type === "plugin" && (entry as PluginData).info.enabled) {
+            if(entry.type === "plugin") {
+                if(!(entry as PluginData).info.enabled) continue;
                 willDisable.add(dependent);
             }
 
@@ -470,19 +521,23 @@ export default abstract class ScriptState<
         );
     }
 
-    checkDependencies(name: string) {
+    checkDependenciesOf(name: string): DependencyCheckResult {
+        const script = scriptMap.get(name);
+        if(!script) return { error: `Could not find script ${name}`, willDownload: [], willEnable: [] };
+
+        return this.checkDependencies(name, script.dependencies);
+    }
+
+    checkDependencies(name: string, dependencies: Dependency[]): DependencyCheckResult {
         let error: string | null = null;
         const willDownload: Dependency[] = [];
         const willEnable: string[] = [];
 
         // Confirm there are no missing undownloadable scripts or circular dependencies
-        const check = (checkName: string, stack: string[]) => {
+        const check = (name: string, dependencies: Dependency[], stack: string[]) => {
             if(error) return;
 
-            const script = scriptMap.get(checkName);
-            if(!script) return;
-
-            for(const dep of script.dependencies) {
+            for(const dep of dependencies) {
                 if(stack.includes(dep.name)) {
                     error = `Circular dependency found: ${[...stack, dep.name].join(" -> ")}`;
                     return;
@@ -497,7 +552,7 @@ export default abstract class ScriptState<
                         }
                     }
 
-                    check(dep.name, [...stack, dep.name]);
+                    check(dep.name, entry.dependencies, [...stack, dep.name]);
                 } else if(dep.url) {
                     if(!willDownload.some(d => d.name === dep.name)) {
                         willDownload.push(dep);
@@ -508,7 +563,7 @@ export default abstract class ScriptState<
                 }
             }
         };
-        check(name, [name]);
+        check(name, dependencies, [name]);
 
         return { error, willDownload, willEnable };
     }

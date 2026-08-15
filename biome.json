@@ -1,7 +1,10 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
 	"files": {
-		"includes": ["./src/**/*"]
+		"includes": [
+			"./src/**/*",
+			"./tests/**/*"
+		]
 	},
 	"overrides": [
 		{

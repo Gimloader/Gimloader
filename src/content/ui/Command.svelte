@@ -1,18 +1,18 @@
 <script lang="ts">
+    import type { CommandCallback } from "$types/api/commands";
+    import type { Action } from "svelte/action";
     import Commands from "$core/commands.svelte";
     import * as Dialog from "$shared/ui/dialog";
-    import type { CommandCallback } from "$types/api/commands";
     import Search from "@lucide/svelte/icons/search";
     import { computeCommandScore } from "bits-ui";
     import { watch } from "runed";
-    import type { Action } from "svelte/action";
 
     let selectedIndex = $state(0);
     let searched = $state("");
     let selectSearch = $state("");
     let textInput = $state("");
     let numberInput: number | undefined = $state();
-    watch([() => searched, () => selectSearch], () => {
+    watch([() => searched, () => selectSearch, () => Commands.open], () => {
         selectedIndex = 0;
     });
 
@@ -105,6 +105,13 @@
         Commands.runCommand(command.callback);
     }
 
+    function selectIfDoneOpening(index: number) {
+        const sinceOpened = Date.now() - Commands.openedAt;
+        if(sinceOpened < 200) return;
+
+        selectedIndex = index;
+    }
+
     function onOpenChange(open: boolean) {
         if(open) return;
 
@@ -133,7 +140,7 @@
         use:makeVisible={index === selectedIndex}
         data-selected={index === selectedIndex ? true : null}
         onclick={() => onSelect(index)}
-        onmouseover={() => selectedIndex = index}
+        onmousemove={() => selectIfDoneOpening(index)}
         onfocus={() => selectedIndex = index}
         class="
             data-selected:bg-accent data-selected:text-accent-foreground w-full outline-hidden

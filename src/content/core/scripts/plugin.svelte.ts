@@ -41,13 +41,12 @@ export class Plugin extends Script<PluginInfo> {
 
     override edit(code: string, headers?: ScriptHeaders) {
         super.edit(code, headers);
+        Modals.resolveAll(`${this.headers.name}-error`, undefined);
+
         if(this.started) this.stop();
         if(this.enabled) {
             this.start(false).catch((e) => {
-                Modals.open("error", {
-                    text: e,
-                    title: `Error starting ${this.headers.name}`
-                });
+                this.showEnableError(e);
             });
         }
     }
@@ -67,10 +66,7 @@ export class Plugin extends Script<PluginInfo> {
 
         if(enabled) {
             await this.start(initial).catch((e) => {
-                Modals.open("error", {
-                    text: e,
-                    title: `Error starting ${this.headers.name}`
-                });
+                this.showEnableError(e);
             });
         } else {
             this.stop();
@@ -125,5 +121,12 @@ export class Plugin extends Script<PluginInfo> {
 
             this.disableConfirm(true);
         }
+    }
+
+    showEnableError(text: string) {
+        Modals.open("error", {
+            text,
+            title: `Error starting ${this.headers.name}`
+        }, `${this.headers.name}-error`);
     }
 }

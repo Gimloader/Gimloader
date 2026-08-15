@@ -139,14 +139,16 @@
             <div class="flex items-center gap-2">
                 <Switch
                     bind:checked={Storage.settings.pollerEnabled}
-                    onCheckedChange={() => {
-                        StateManager.apply("settingUpdate", {
-                            key: "pollerEnabled",
-                            value: Storage.settings.pollerEnabled
-                        });
-                    }}
+                    onCheckedChange={() => saveKey("pollerEnabled")}
                 />
                 Poll for plugins/libraries being served locally
+            </div>
+            <div class="flex items-center gap-2">
+                <Switch
+                    bind:checked={Storage.settings.suppressGimkitLogs}
+                    onCheckedChange={() => saveKey("suppressGimkitLogs")}
+                />
+                Suppress Gimkit's logs in the console
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-11"></div>

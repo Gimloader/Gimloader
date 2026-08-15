@@ -151,7 +151,7 @@ export default class Updater {
     }
 
     static async applyUpdate(name: string, code: string, dependencies: Dependency[]) {
-        StateManager.allScripts.editOrCreate(code, name, undefined, true);
+        await StateManager.allScripts.editOrCreate(code, name, undefined, true);
 
         for(const dep of dependencies) {
             // TODO: Some kind of confirmation

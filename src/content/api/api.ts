@@ -140,14 +140,16 @@ class Api {
     settings!: PluginSettings;
 
     /** Run a callback when this script is disabled */
-    onStop = (cb: () => void) => Cleanup.on(this.#id, cb);
+    onStop = (...callbacks: (() => void)[]) => {
+        for(const cb of callbacks) Cleanup.on(this.#id, cb);
+    }
 
     /**
      * Run a callback when this plugin's settings menu button is clicked
      *
      * This function is not available for libraries
      */
-    openSettingsMenu!: (callback: () => void) => void;
+    openSettingsMenu!: (...callbacks: (() => void)[]) => void;
 
     /** Display a modal to the user indicating that this script requires a reload */
     requestReload = () => addReloadNeeded(this.#id);

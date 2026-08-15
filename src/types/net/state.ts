@@ -39,6 +39,7 @@ export interface Settings {
     autoDownloadMissingPlugins: boolean;
     menuView: "grid" | "list";
     showPluginButtons: boolean;
+    suppressGimkitLogs: boolean;
 }
 
 export interface SavedState {

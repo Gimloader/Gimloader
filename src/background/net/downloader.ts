@@ -177,18 +177,7 @@ export default class Downloader {
                 errors.push(...childRes.errors);
             }
 
-            // Create the script after dependencies are installed
-            if(type === "library") {
-                StateManager.apply("libraryCreate", {
-                    folder,
-                    info: { name: headers.name, code: text }
-                });
-            } else {
-                StateManager.apply("pluginCreate", {
-                    folder,
-                    info: { name: headers.name, code: text, enabled: true }
-                });
-            }
+            await StateManager.allScripts.editOrCreate(text, headers.name, folder, false);
 
             return { errors, name: headers.name };
         } catch (e) {

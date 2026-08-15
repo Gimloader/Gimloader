@@ -11,7 +11,7 @@ export default class AllScripts {
         this.stateManager = stateManager;
     }
 
-    editOrCreate(code: string, name: string | null, folder?: string, updated?: boolean) {
+    async editOrCreate(code: string, name: string | null, folder?: string, updated?: boolean) {
         const headers = parseScriptHeaders(code);
         const type: ScriptType = headers.isLibrary !== "false" ? "library" : "plugin";
 
@@ -21,17 +21,12 @@ export default class AllScripts {
             // Delete and recreate the script if it changed types
             if(type !== old.type) {
                 apply(`${old.type}Delete`, { name });
-                this.stateManager[type].create(code, folder ?? "root");
+                await this.stateManager[type].create(code, folder ?? "root");
             } else {
-                apply(`${type}Edit`, {
-                    name: name,
-                    newName: headers.name,
-                    code: code,
-                    updated: updated
-                });
+                await this.stateManager[type].edit(name, headers.name, code, updated);
             }
         } else {
-            this.stateManager[type].create(code, folder ?? "root");
+            await this.stateManager[type].create(code, folder ?? "root");
         }
 
         apply("cacheInvalid", { invalid: true });
