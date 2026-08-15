@@ -68,15 +68,15 @@ export default new class Modals {
             const onClose = (result: ExtractModal<T>["result"]) => {
                 res(result);
                 unmount(instance);
-                
-                const openedIndex = this.opened.findIndex(i => i === opened);
+
+                const openedIndex = this.opened.indexOf(opened);
                 if(openedIndex !== -1) this.opened.splice(openedIndex, 1);
-            }
+            };
 
             const opened: OpenedModal = {
                 tag,
                 onClose
-            }
+            };
 
             this.opened.push(opened);
 
