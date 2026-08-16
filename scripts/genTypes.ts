@@ -7,12 +7,12 @@ import { ModuleResolutionKind } from "typescript";
 import { readFile, writeFile, exists, rm } from "node:fs/promises";
 
 const isNpmPackage = process.argv.includes("--npm");
-const forceRegenerate = process.argv.includes("--force");
+const noRegenerate = process.argv.includes("--no-regenerate");
 
 const declarationDir = "./dist/declarations";
 const declarationsExist = await exists(declarationDir);
 
-if(!declarationsExist || forceRegenerate) {
+if(!declarationsExist || !noRegenerate) {
     if(declarationsExist) {
         await rm(declarationDir, { recursive: true, force: true });
     }

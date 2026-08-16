@@ -1,7 +1,6 @@
-import * as React from 'react';
 import * as svelte from 'svelte';
 import { Snippet, ComponentProps, Component } from 'svelte';
-import { HTMLAttributes, HTMLButtonAttributes, HTMLAnchorAttributes, SVGAttributes } from 'svelte/elements';
+import { HTMLAttributes, HTMLButtonAttributes, HTMLAnchorAttributes, SVGAttributes, MouseEventHandler } from 'svelte/elements';
 import * as Animate from 'svelte/animate';
 import * as Attachments from 'svelte/attachments';
 import * as Easing from 'svelte/easing';
@@ -13,316 +12,11 @@ import * as Store from 'svelte/store';
 import * as Transition from 'svelte/transition';
 import { Tweens, GameObjects, Types, Input, Scene as BaseScene } from 'phaser';
 import * as react_dom_client from 'react-dom/client';
+import * as React from 'react';
 export {};
 
 declare global {
 namespace Gimloader {
-type NoticeType = "info" | "success" | "error" | "warning" | "loading";
-interface MessageSemanticClassNames {
-    root?: string;
-    icon?: string;
-    content?: string;
-}
-interface MessageSemanticStyles {
-    root?: React.CSSProperties;
-    icon?: React.CSSProperties;
-    content?: React.CSSProperties;
-}
-type ArgsClassNamesType = MessageSemanticClassNames;
-type ArgsStylesType = MessageSemanticStyles;
-interface MessageConfigOptions {
-    top?: string | number;
-    duration?: number;
-    prefixCls?: string;
-    getContainer?(): HTMLElement;
-    transitionName?: string;
-    maxCount?: number;
-    rtl?: boolean;
-    pauseOnHover?: boolean;
-    classNames?: ArgsClassNamesType;
-    styles?: ArgsStylesType;
-}
-interface MessageArgsProps {
-    content: React.ReactNode;
-    duration?: number;
-    type?: NoticeType;
-    onClose?(): void;
-    icon?: React.ReactNode;
-    key?: string | number;
-    style?: React.CSSProperties;
-    className?: string;
-    classNames?: ArgsClassNamesType;
-    styles?: ArgsStylesType;
-    onClick?(e: React.MouseEvent<HTMLDivElement>): void;
-    pauseOnHover?: boolean;
-}
-type MessageJointContent = React.ReactNode | MessageArgsProps;
-interface MessageType extends PromiseLike<boolean> {
-    (): void;
-}
-type MessageTypeOpen = (content: MessageJointContent, duration?: number | VoidFunction, onClose?: VoidFunction) => MessageType;
-interface MessageInstance {
-    info: MessageTypeOpen;
-    success: MessageTypeOpen;
-    error: MessageTypeOpen;
-    warning: MessageTypeOpen;
-    loading: MessageTypeOpen;
-    open(args: MessageArgsProps): MessageType;
-    destroy(key?: React.Key): void;
-}
-interface MessageBaseMethods {
-    open(config: MessageArgsProps): MessageType;
-    destroy(key?: React.Key): void;
-    config(config: MessageConfigOptions): void;
-    useMessage(): MessageInstance;
-    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
-}
-interface MessageMethods {
-    info: MessageTypeOpen;
-    success: MessageTypeOpen;
-    error: MessageTypeOpen;
-    warning: MessageTypeOpen;
-    loading: MessageTypeOpen;
-}
-const NotificationPlacements: readonly ["top", "topLeft", "topRight", "bottom", "bottomLeft", "bottomRight"];
-type NotificationPlacement = (typeof NotificationPlacements)[number];
-type NotificationIconType = "success" | "info" | "error" | "warning";
-interface NotificationSemanticClassNames {
-    root?: string;
-    title?: string;
-    description?: string;
-    actions?: string;
-    icon?: string;
-}
-interface NotificationSemanticStyles {
-    root?: React.CSSProperties;
-    title?: React.CSSProperties;
-    description?: React.CSSProperties;
-    actions?: React.CSSProperties;
-    icon?: React.CSSProperties;
-}
-type NotificationClassNamesType = NotificationSemanticClassNames;
-type NotificationStylesType = NotificationSemanticStyles;
-interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
-    "data-testid"?: string;
-}
-interface NotificationArgsProps {
-    message?: React.ReactNode;
-    title?: React.ReactNode;
-    description?: React.ReactNode;
-    btn?: React.ReactNode;
-    actions?: React.ReactNode;
-    key?: React.Key;
-    onClose?(): void;
-    duration?: number | false;
-    showProgress?: boolean;
-    pauseOnHover?: boolean;
-    icon?: React.ReactNode;
-    placement?: NotificationPlacement;
-    style?: React.CSSProperties;
-    className?: string;
-    classNames?: NotificationClassNamesType;
-    styles?: NotificationStylesType;
-    readonly type?: NotificationIconType;
-    onClick?(): void;
-    closeIcon?: React.ReactNode;
-    closable?: boolean | {
-        onClose?(): void;
-    };
-    props?: NotificationDivProps;
-    role?: "alert" | "status";
-}
-type NotificationStaticFn = (args: NotificationArgsProps) => void;
-interface NotificationInstance {
-    success: NotificationStaticFn;
-    error: NotificationStaticFn;
-    info: NotificationStaticFn;
-    warning: NotificationStaticFn;
-    open: NotificationStaticFn;
-    destroy(key?: React.Key): void;
-}
-interface NotificationGlobalConfigProps {
-    top?: number;
-    bottom?: number;
-    duration?: number | false;
-    showProgress?: boolean;
-    pauseOnHover?: boolean;
-    prefixCls?: string;
-    getContainer?(): HTMLElement | ShadowRoot;
-    placement?: NotificationPlacement;
-    closeIcon?: React.ReactNode;
-    closable?: boolean | {
-        onClose?(): void;
-    };
-    rtl?: boolean;
-    maxCount?: number;
-    props?: NotificationDivProps;
-}
-interface NotificationBaseMethods {
-    open(config: NotificationArgsProps): void;
-    destroy(key?: React.Key): void;
-    config(config: NotificationGlobalConfigProps): void;
-    useNotification(): NotificationInstance;
-    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
-}
-interface NotificationNoticeMethods {
-    success: NotificationStaticFn;
-    info: NotificationStaticFn;
-    warning: NotificationStaticFn;
-    error: NotificationStaticFn;
-}
-interface ModalSemanticClassNames {
-    root?: string;
-    header?: string;
-    body?: string;
-    footer?: string;
-    container?: string;
-    title?: string;
-    wrapper?: string;
-    mask?: string;
-}
-interface ModalSemanticStyles {
-    root?: React.CSSProperties;
-    header?: React.CSSProperties;
-    body?: React.CSSProperties;
-    footer?: React.CSSProperties;
-    container?: React.CSSProperties;
-    title?: React.CSSProperties;
-    wrapper?: React.CSSProperties;
-    mask?: React.CSSProperties;
-}
-type ModalClassNamesType = ModalSemanticClassNames;
-type ModalStylesType = ModalSemanticStyles;
-type ModalMousePosition = {
-    x: number;
-    y: number;
-} | null;
-type ModalGetContainerFunc = () => HTMLElement;
-type ModalLegacyButtonType = "primary" | "dashed" | "default" | "text" | "link";
-interface ModalCommonProps {
-    footer?: React.ReactNode | ((originNode: React.ReactNode, extra: {
-        OkBtn: React.FC;
-        CancelBtn: React.FC;
-    }) => React.ReactNode);
-    closable?: boolean | {
-        onClose?(): void;
-        afterClose?(): void;
-    };
-    classNames?: ModalClassNamesType;
-    styles?: ModalStylesType;
-}
-interface ModalProps extends ModalCommonProps {
-    open?: boolean;
-    confirmLoading?: boolean;
-    title?: React.ReactNode;
-    onOk?(e: React.MouseEvent<HTMLButtonElement>): void;
-    onCancel?(e: React.MouseEvent<HTMLButtonElement>): void;
-    afterClose?(): void;
-    afterOpenChange?(open: boolean): void;
-    centered?: boolean;
-    width?: string | number;
-    okText?: React.ReactNode;
-    okType?: ModalLegacyButtonType;
-    cancelText?: React.ReactNode;
-    maskClosable?: boolean;
-    forceRender?: boolean;
-    okButtonProps?: Record<string, any>;
-    cancelButtonProps?: Record<string, any>;
-    destroyOnClose?: boolean;
-    destroyOnHidden?: boolean;
-    style?: React.CSSProperties;
-    wrapClassName?: string;
-    maskTransitionName?: string;
-    transitionName?: string;
-    className?: string;
-    rootClassName?: string;
-    rootStyle?: React.CSSProperties;
-    getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
-    zIndex?: number;
-    bodyStyle?: React.CSSProperties;
-    maskStyle?: React.CSSProperties;
-    mask?: boolean | "static";
-    keyboard?: boolean;
-    wrapProps?: any;
-    prefixCls?: string;
-    closeIcon?: React.ReactNode;
-    modalRender?(node: React.ReactNode): React.ReactNode;
-    children?: React.ReactNode;
-    mousePosition?: ModalMousePosition;
-    loading?: boolean;
-    focusTriggerAfterClose?: boolean;
-    focusable?: {
-        focusTriggerAfterClose?: boolean;
-    };
-}
-interface ModalFuncProps extends ModalCommonProps {
-    prefixCls?: string;
-    className?: string;
-    rootClassName?: string;
-    open?: boolean;
-    title?: React.ReactNode;
-    content?: React.ReactNode;
-    onOk?(...args: any[]): any;
-    onCancel?(...args: any[]): any;
-    afterClose?(): void;
-    okButtonProps?: Record<string, any>;
-    cancelButtonProps?: Record<string, any>;
-    centered?: boolean;
-    width?: string | number;
-    okText?: React.ReactNode;
-    okType?: ModalLegacyButtonType;
-    cancelText?: React.ReactNode;
-    icon?: React.ReactNode;
-    mask?: boolean | "static";
-    maskClosable?: boolean;
-    zIndex?: number;
-    okCancel?: boolean;
-    style?: React.CSSProperties;
-    wrapClassName?: string;
-    maskStyle?: React.CSSProperties;
-    type?: "info" | "success" | "error" | "warn" | "warning" | "confirm";
-    keyboard?: boolean;
-    getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
-    transitionName?: string;
-    maskTransitionName?: string;
-    direction?: "ltr" | "rtl";
-    bodyStyle?: React.CSSProperties;
-    closeIcon?: React.ReactNode;
-    footer?: ModalProps["footer"];
-    modalRender?(node: React.ReactNode): React.ReactNode;
-    focusTriggerAfterClose?: boolean;
-    autoFocusButton?: null | "ok" | "cancel";
-    focusable?: {
-        focusTriggerAfterClose?: boolean;
-        autoFocusButton?: null | "ok" | "cancel";
-    };
-}
-type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
-interface ModalFuncReturn {
-    destroy(): void;
-    update(configUpdate: ModalConfigUpdate): void;
-}
-type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
-interface ModalStaticFunctions {
-    info: ModalFunc;
-    success: ModalFunc;
-    error: ModalFunc;
-    warning: ModalFunc;
-    confirm: ModalFunc;
-    warn: ModalFunc;
-}
-interface ModalBaseMethods {
-    useModal(): [api: any, contextHolder: React.ReactNode];
-    destroyAll(): void;
-    config(config: {
-        rootPrefixCls: string;
-    }): void;
-    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
-}
-type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
-type AntdMessage = MessageMethods & MessageBaseMethods;
-type AntdModal = React.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
-
 type Expand<T> = T extends infer U ? {
     [K in keyof U]: U[K];
 } : never;
@@ -2054,6 +1748,80 @@ interface SvelteExport {
     Reactivity: typeof Reactivity;
     Store: typeof Store;
     Transition: typeof Transition;
+}
+
+type AnyComponent = Component<any, any, string>;
+type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
+interface ToastAction {
+    label: string | AnyComponent;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+    actionButtonStyle?: string;
+}
+interface ToastOptions {
+    id?: number | string;
+    icon?: AnyComponent | null;
+    component?: AnyComponent;
+    componentProps?: any;
+    richColors?: boolean;
+    invert?: boolean;
+    closeButton?: boolean;
+    dismissable?: boolean;
+    description?: string | AnyComponent;
+    duration?: number;
+    delete?: boolean;
+    action?: ToastAction | AnyComponent;
+    cancel?: ToastAction | AnyComponent;
+    onDismiss?: (toast: ToastT) => void;
+    onAutoClose?: (toast: ToastT) => void;
+    cancelButtonStyle?: string;
+    actionButtonStyle?: string;
+    style?: string;
+    unstyled?: boolean;
+    class?: string;
+    classes?: string;
+    descriptionClass?: string;
+    position?: Position;
+    dismiss?: boolean;
+}
+type ToastT = ToastOptions & {
+    id: number | string;
+    type: string;
+    title?: string | AnyComponent;
+    promise?: PromiseT;
+};
+type PromiseData<ToastData> = ToastOptions & {
+    /**
+     * The loading message or a function that returns the message or
+     * a custom toast component.
+     */
+    loading?: string | (() => AnyComponent | string);
+    /**
+     * The success message or a function that returns the message or
+     * a custom toast component.
+     */
+    success?: string | ((data: ToastData) => AnyComponent | string);
+    /**
+     * The error message or a function that returns the message or
+     * a custom toast component.
+     */
+    error?: string | ((error: unknown) => AnyComponent | string);
+    /**
+     * A function that is called when the promise is finally resolved or rejected.
+     */
+    finally?: () => void | Promise<void>;
+};
+interface ToastType {
+    (message: string | AnyComponent, data?: ToastOptions): string | number;
+    success: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    info: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    warning: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    error: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    custom: (component: AnyComponent, data?: ToastOptions) => string | number;
+    message: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    promise: <ToastData>(promise: PromiseT<ToastData>, data?: PromiseData<ToastData>) => string | number | undefined;
+    dismiss: (id?: number | string) => string | number | undefined;
+    loading: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    getActiveToasts: () => ToastT[];
 }
 
 type Untyped = any;
@@ -9911,7 +9679,7 @@ interface ScriptHeaders {
     optionalLib: string[];
     /** A message explaining why this script has been deprecated if it has been */
     deprecated: string | null;
-    /** Gamemodes which this script's `net.onLoad` callbacks will fire when playing */
+    /** Gamemodes in which this script's `net.onLoad` callbacks will fire when playing */
     gamemode: string[];
     /** Changes which have been made since the previous version */
     changelog: string[];
@@ -9946,15 +9714,73 @@ interface ConfigurableHotkeyOptions {
     default?: HotkeyTrigger;
 }
 
-interface OldConfigurableOptions {
-    category: string;
-    title: string;
-    preventDefault?: boolean;
-    defaultKeys?: Set<string>;
+interface ScriptInfo {
+    code: string;
+    name: string;
 }
+
+type ScriptType = "plugin" | "library";
+
+abstract class Script<T extends ScriptInfo = ScriptInfo> {
+    abstract type: ScriptType;
+    abstract warnAbout: boolean;
+    code: string;
+    headers: ScriptHeaders;
+    requires: Script[];
+    optionalRequires: Script[];
+    requiredBy: Script[];
+    optionalBy: Script[];
+    exported: any;
+    errored: boolean;
+    constructor(info: T, headers?: ScriptHeaders);
+    abstract getInfo(): T;
+    updateHeaders(headers?: ScriptHeaders): void;
+    getHeaders(): {
+        name: string;
+        description: string;
+        author: string[];
+        version: string | null;
+        reloadRequired: string;
+        isLibrary: string;
+        downloadUrl: string | null;
+        webpage: string | null;
+        needsLib: string[];
+        optionalLib: string[];
+        deprecated: string | null;
+        gamemode: string[];
+        changelog: string[];
+        needsPlugin: string[];
+        hasSettings: string;
+        signature: string | null;
+    };
+    started: boolean;
+    startPromise: Promise<void> | null;
+    start(initial: boolean, loaded?: string[]): Promise<void>;
+    get reloadNeeded(): boolean;
+    checkReloadNeeded(): void;
+    require(by: Script, required: boolean, initial: boolean, loaded: string[]): Promise<void>;
+    unrequire(by: Script, required: boolean): void;
+    abstract getDependencyStrings(): Partial<Record<ScriptType, {
+        required?: string[];
+        optional?: string[];
+    }>>;
+    getDependencies(): {
+        required: Script<ScriptInfo>[];
+        optional: Script<ScriptInfo>[];
+    };
+    stop(): void;
+    edit(code: string, headers?: ScriptHeaders): void;
+    deleteConfirm(confirmed?: boolean): Promise<void>;
+    delete(): void;
+    signatureRegex: RegExp;
+    verifySignature(): Promise<boolean>;
+}
+
 /** @inline */
 type KeyboardCallback = (e: KeyboardEvent) => void;
-class BaseHotkeysApi {
+class HotkeysApi {
+    #private;
+    constructor(id: string);
     /**
      * Releases all keys, needed if a hotkey opens something that will
      * prevent keyup events from being registered, such as an alert
@@ -9962,78 +9788,6 @@ class BaseHotkeysApi {
     releaseAll(): void;
     /** Which key codes are currently being pressed */
     get pressed(): Set<string>;
-    /**
-     * @deprecated Use {@link pressed} instead
-     * @hidden
-     */
-    get pressedKeys(): Set<string>;
-}
-class HotkeysApi extends BaseHotkeysApi {
-    /**
-     * Adds a hotkey with a given id
-     * @returns A function to remove the hotkey
-     * @example
-     * ```js
-     * GL.hotkeys.addHotkey("MyPlugin", {
-     *     key: "Digit1",
-     *     ctrl: true,
-     *     shift: true,
-     *     preventDefault: true
-     * }, (e) => {
-     *     console.log("Hotkey pressed", e.key);
-     * });
-     * ```
-     */
-    addHotkey(id: string, options: HotkeyOptions, callback: KeyboardCallback): () => void;
-    /** Removes all hotkeys with a given id */
-    removeHotkeys(id: string): void;
-    /**
-     * Adds a hotkey which can be changed by the user
-     * @param id A unique id for the hotkey, such as `myplugin-myhotkey`
-     * @returns A function to remove the hotkey
-     * @example
-     * ```js
-     * GL.hotkeys.addConfigurableHotkey("MyPlugin-MyHotkey", {
-     *     category: "My Plugin",
-     *     title: "Do a thing",
-     *     preventDefault: true,
-     *     default: {
-     *         key: "Digit1",
-     *         ctrl: true,
-     *         shift: true
-     *     }
-     * }, (e) => {
-     *     console.log("Configurable hotkey pressed", e.key);
-     * });
-     * ```
-     */
-    addConfigurableHotkey(id: string, options: ConfigurableHotkeyOptions, callback: KeyboardCallback): () => void;
-    /** Removes a configurable hotkey with a given id */
-    removeConfigurableHotkey(id: string): void;
-    /**
-     * @deprecated Use {@link addHotkey} instead
-     * @hidden
-     */
-    add(keys: Set<string>, callback: KeyboardCallback, preventDefault?: boolean): void;
-    /**
-     * @deprecated Use {@link removeHotkeys} instead
-     * @hidden
-     */
-    remove(keys: Set<string>): void;
-    /**
-     * @deprecated Use {@link addConfigurableHotkey} instead
-     * @hidden
-     */
-    addConfigurable(pluginName: string, hotkeyId: string, callback: KeyboardCallback, options: OldConfigurableOptions): void;
-    /**
-     * @deprecated Use {@link removeConfigurableHotkeys} instead
-     * @hidden
-     */
-    removeConfigurable(pluginName: string, hotkeyId: string): void;
-}
-class ScopedHotkeysApi extends BaseHotkeysApi {
-    #private;
-    constructor(id: string);
     /**
      * Adds a hotkey which will fire when certain keys are pressed
      * @returns A function to remove the hotkey
@@ -10072,18 +9826,88 @@ class ScopedHotkeysApi extends BaseHotkeysApi {
     addConfigurableHotkey(options: ConfigurableHotkeyOptions, callback: KeyboardCallback): () => void;
 }
 
-class BaseParcelApi {
-    query(): any;
-    queryAll(): any[];
+/** @inline */
+type RunInScopeCallback = (code: string, run: (evalCode: string) => any, initial: boolean) => true | void;
+/** @inline */
+interface Exposer {
+    check?: string;
+    find: RegExp;
+    callback: (val: any) => void;
+    multiple?: boolean;
 }
-class ParcelApi extends BaseParcelApi {
-    getLazy(): () => void;
-    stopLazy(): void;
-    get interceptRequire(): () => () => void;
-    get stopIntercepts(): () => void;
-}
-class ScopedParcelApi extends BaseParcelApi {
-    getLazy(): () => void;
+
+/**
+ * The rewriter API allows you to modify the bundled code of Gimkit in order to expose values
+ * or change certain behaviors. Due to the unpredictable nature of bundling, you cannot assume that variable names
+ * will remain the same beteen updates.
+ */
+class RewriterApi {
+    #private;
+    constructor(id: string);
+    /**
+     * Creates a hook that will modify the code of a script before it is run.
+     * This value is cached, so this hook may not run on subsequent page loads.
+     * addParseHook should always be called in the top level of a script.
+     * @param prefix Limits the hook to only running on scripts beginning with this prefix.
+     * Passing `true` will only run on the index script, and passing `false` will run on all scripts.
+     * @param modifier A function that will modify the code, which should return the modified code.
+     * @returns A function that removes the hook when called
+     * @example
+     * ```js
+     * api.rewriter.addParseHook("App", (code) => {
+     *     let index = code.indexOf("something");
+     *     code = code.slice(0, index) + `console.log("something else")` + code.slice(index);
+     *     code += "console.log(someVar)";
+     *     return code;
+     * });
+     * ```
+     */
+    addParseHook(prefix: string | boolean, modifier: (code: string) => string): () => void;
+    /**
+     * Creates a shared value that can be accessed from any script.
+     * @param id A unique identifier for the shared value.
+     * @param value The value to be shared.
+     * @returns A string representing the code to access the shared value.
+     * @example
+     * ```js
+     * const callback = api.rewriter.createShared("uniqueId", (val) => {
+     *     console.log(val);
+     * });
+     *
+     * eval(`${callback}("15")`); // Don't actually do this, but it logs 15
+     * ```
+     */
+    createShared(id: string, value: any): string;
+    /** Removes the shared value with a certain id created by {@link createShared} */
+    removeSharedById(id: string): void;
+    /**
+     * Runs code in the scope of modules when they are loaded, or when runInScope is called with them already loaded.
+     * Returning true from the callback will remove the hook.
+     * @returns A function that removes the hook when called
+     * @example
+     * ```js
+     * api.rewriter.runInScope("App", (code, run, initial) => {
+     *     if(code.includes("something")) {
+     *         run(`someVar=15`);
+     *     }
+     * });
+     * ```
+     */
+    runInScope(prefix: string | boolean, callback: RunInScopeCallback): () => void;
+    /**
+     * A utility function that exposes a variable based on regex to get its name.
+     * @returns A function that removes the hook when called
+     * @example
+     * ```js
+     * api.rewriter.exposeVar("App", {
+     *     check: "StringThatMustExistInFile",
+     *     find: /let (\w+) = something/g,
+     *     multiple: false,
+     *     callback: (var) => console.log(var)
+     * });
+     * ```
+     */
+    exposeVar(prefix: string | boolean, exposer: Exposer): () => void;
 }
 
 type event = (symbol|string);
@@ -10453,8 +10277,27 @@ namespace Schema {
     type GimkitSchema = ObjectSchema<GimkitState>;
 }
 
-class BaseNetApi {
+/**
+ * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ * and uses wildcards with ":" as a delimiter.
+ * ```js
+ * // fired when data is recieved on a certain channel
+ * api.net.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
+ *
+ * // fired when data is sent on a certain channel
+ * api.net.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
+ *
+ * // you can also use wildcards, eg
+ * api.net.on("send:*", () => {});
+ * ```
+ */
+class NetApi {
     #private;
+    constructor(id: string, defaultGamemode: string[]);
     /** Which type of server the client is currently connected to */
     get type(): ConnectionType;
     /** The id of the gamemode the player is currently playing */
@@ -10497,108 +10340,6 @@ class BaseNetApi {
     listenTo(target: GeneralEventEmitter, events: Record<string, string>, options?: ListenToOptions): EventEmitter2;
     stopListeningTo(target: GeneralEventEmitter, event?: string | string[]): Boolean;
     hasListeners(event: string | string[]): Boolean;
-}
-/**
- * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
- * ```js
- * // fired when data is recieved on a certain channel
- * GL.net.on("CHANNEL", (data, editFn) => {
- *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
- * });
- *
- * // fired when data is sent on a certain channel
- * GL.net.on("send:CHANNEL", (data, editFn) => {
- *     editFn(null); // Cancel the data being sent
- * });
- *
- * // you can also use wildcards, eg
- * GL.net.on("send:*", () => {});
- * ```
- */
-class NetApi extends BaseNetApi {
-    constructor();
-    /**
-     * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded
-     * @returns A function to cancel waiting for load
-     */
-    onLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode?: string | ReadonlyArray<string>): () => void;
-    /** Cancels any calls to {@link onLoad} with the same id */
-    offLoad(id: string): void;
-    /**
-     * Runs a callback when a request is made that matches a certain path (can have wildcards)
-     * @returns A function to stop the modification
-     * @example
-     * ```js
-     * GL.net.modifyFetchRequest("MyPlugin", "/api/experiences", (request) => {
-     *     console.log(request.data);
-     *     request.data.modified = true;
-     *
-     *     return null; // Cancel the request
-     * });
-     * ```
-     */
-    modifyFetchRequest(id: string, path: string, callback: (options: RequesterOptions) => any): () => void;
-    /**
-     * Runs a callback when a response is recieved for a request under a certain path (can have wildcards)
-     * @returns A function to stop the modification
-     * @example
-     * ```js
-     * GL.net.modifyFetchResponse("MyPlugin", "/api/experience/map/hooks", (data) => {
-     *     console.log(data);
-     *     return "modified data";
-     * });
-     * ```
-     */
-    modifyFetchResponse(id: string, path: string, callback: (response: any) => any): () => void;
-    /** Stops any modifications made by {@link modifyFetchRequest} with the same id */
-    stopModifyRequest(id: string): void;
-    /** Stops any modifications made by {@link modifyFetchResponse} with the same id */
-    stopModifyResponse(id: string): void;
-    /**
-     * @deprecated Methods for both transports are now on the base net api
-     * @hidden
-     */
-    get colyseus(): this;
-    /**
-     * @deprecated Methods for both transports are now on the base net api
-     * @hidden
-     */
-    get blueboat(): this;
-    /** @hidden */
-    private wrappedListeners;
-    /**
-     * @deprecated use net.on
-     * @hidden
-     */
-    addEventListener(channel: string, callback: (...args: any[]) => void): void;
-    /**
-     * @deprecated use net.off
-     * @hidden
-     */
-    removeEventListener(channel: string, callback: (...args: any[]) => void): void;
-}
-/**
- * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
- * ```js
- * // fired when data is recieved on a certain channel
- * api.net.on("CHANNEL", (data, editFn) => {
- *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
- * });
- *
- * // fired when data is sent on a certain channel
- * api.net.on("send:CHANNEL", (data, editFn) => {
- *     editFn(null); // Cancel the data being sent
- * });
- *
- * // you can also use wildcards, eg
- * api.net.on("send:*", () => {});
- * ```
- */
-class ScopedNetApi extends BaseNetApi {
-    #private;
-    constructor(id: string, defaultGamemode: string[]);
     /**
      * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded.
      * If the \@gamemode header is set the callback will only fire if the gamemode matches one of the provided gamemodes.
@@ -10633,6 +10374,312 @@ class ScopedNetApi extends BaseNetApi {
     modifyFetchResponse(path: string, callback: (response: any) => any): () => void;
 }
 
+type NoticeType = "info" | "success" | "error" | "warning" | "loading";
+interface MessageSemanticClassNames {
+    root?: string;
+    icon?: string;
+    content?: string;
+}
+interface MessageSemanticStyles {
+    root?: React.CSSProperties;
+    icon?: React.CSSProperties;
+    content?: React.CSSProperties;
+}
+type ArgsClassNamesType = MessageSemanticClassNames;
+type ArgsStylesType = MessageSemanticStyles;
+interface MessageConfigOptions {
+    top?: string | number;
+    duration?: number;
+    prefixCls?: string;
+    getContainer?(): HTMLElement;
+    transitionName?: string;
+    maxCount?: number;
+    rtl?: boolean;
+    pauseOnHover?: boolean;
+    classNames?: ArgsClassNamesType;
+    styles?: ArgsStylesType;
+}
+interface MessageArgsProps {
+    content: React.ReactNode;
+    duration?: number;
+    type?: NoticeType;
+    onClose?(): void;
+    icon?: React.ReactNode;
+    key?: string | number;
+    style?: React.CSSProperties;
+    className?: string;
+    classNames?: ArgsClassNamesType;
+    styles?: ArgsStylesType;
+    onClick?(e: React.MouseEvent<HTMLDivElement>): void;
+    pauseOnHover?: boolean;
+}
+type MessageJointContent = React.ReactNode | MessageArgsProps;
+interface MessageType extends PromiseLike<boolean> {
+    (): void;
+}
+type MessageTypeOpen = (content: MessageJointContent, duration?: number | VoidFunction, onClose?: VoidFunction) => MessageType;
+interface MessageInstance {
+    info: MessageTypeOpen;
+    success: MessageTypeOpen;
+    error: MessageTypeOpen;
+    warning: MessageTypeOpen;
+    loading: MessageTypeOpen;
+    open(args: MessageArgsProps): MessageType;
+    destroy(key?: React.Key): void;
+}
+interface MessageBaseMethods {
+    open(config: MessageArgsProps): MessageType;
+    destroy(key?: React.Key): void;
+    config(config: MessageConfigOptions): void;
+    useMessage(): MessageInstance;
+    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
+}
+interface MessageMethods {
+    info: MessageTypeOpen;
+    success: MessageTypeOpen;
+    error: MessageTypeOpen;
+    warning: MessageTypeOpen;
+    loading: MessageTypeOpen;
+}
+const NotificationPlacements: readonly ["top", "topLeft", "topRight", "bottom", "bottomLeft", "bottomRight"];
+type NotificationPlacement = (typeof NotificationPlacements)[number];
+type NotificationIconType = "success" | "info" | "error" | "warning";
+interface NotificationSemanticClassNames {
+    root?: string;
+    title?: string;
+    description?: string;
+    actions?: string;
+    icon?: string;
+}
+interface NotificationSemanticStyles {
+    root?: React.CSSProperties;
+    title?: React.CSSProperties;
+    description?: React.CSSProperties;
+    actions?: React.CSSProperties;
+    icon?: React.CSSProperties;
+}
+type NotificationClassNamesType = NotificationSemanticClassNames;
+type NotificationStylesType = NotificationSemanticStyles;
+interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
+    "data-testid"?: string;
+}
+interface NotificationArgsProps {
+    message?: React.ReactNode;
+    title?: React.ReactNode;
+    description?: React.ReactNode;
+    btn?: React.ReactNode;
+    actions?: React.ReactNode;
+    key?: React.Key;
+    onClose?(): void;
+    duration?: number | false;
+    showProgress?: boolean;
+    pauseOnHover?: boolean;
+    icon?: React.ReactNode;
+    placement?: NotificationPlacement;
+    style?: React.CSSProperties;
+    className?: string;
+    classNames?: NotificationClassNamesType;
+    styles?: NotificationStylesType;
+    readonly type?: NotificationIconType;
+    onClick?(): void;
+    closeIcon?: React.ReactNode;
+    closable?: boolean | {
+        onClose?(): void;
+    };
+    props?: NotificationDivProps;
+    role?: "alert" | "status";
+}
+type NotificationStaticFn = (args: NotificationArgsProps) => void;
+interface NotificationInstance {
+    success: NotificationStaticFn;
+    error: NotificationStaticFn;
+    info: NotificationStaticFn;
+    warning: NotificationStaticFn;
+    open: NotificationStaticFn;
+    destroy(key?: React.Key): void;
+}
+interface NotificationGlobalConfigProps {
+    top?: number;
+    bottom?: number;
+    duration?: number | false;
+    showProgress?: boolean;
+    pauseOnHover?: boolean;
+    prefixCls?: string;
+    getContainer?(): HTMLElement | ShadowRoot;
+    placement?: NotificationPlacement;
+    closeIcon?: React.ReactNode;
+    closable?: boolean | {
+        onClose?(): void;
+    };
+    rtl?: boolean;
+    maxCount?: number;
+    props?: NotificationDivProps;
+}
+interface NotificationBaseMethods {
+    open(config: NotificationArgsProps): void;
+    destroy(key?: React.Key): void;
+    config(config: NotificationGlobalConfigProps): void;
+    useNotification(): NotificationInstance;
+    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
+}
+interface NotificationNoticeMethods {
+    success: NotificationStaticFn;
+    info: NotificationStaticFn;
+    warning: NotificationStaticFn;
+    error: NotificationStaticFn;
+}
+interface ModalSemanticClassNames {
+    root?: string;
+    header?: string;
+    body?: string;
+    footer?: string;
+    container?: string;
+    title?: string;
+    wrapper?: string;
+    mask?: string;
+}
+interface ModalSemanticStyles {
+    root?: React.CSSProperties;
+    header?: React.CSSProperties;
+    body?: React.CSSProperties;
+    footer?: React.CSSProperties;
+    container?: React.CSSProperties;
+    title?: React.CSSProperties;
+    wrapper?: React.CSSProperties;
+    mask?: React.CSSProperties;
+}
+type ModalClassNamesType = ModalSemanticClassNames;
+type ModalStylesType = ModalSemanticStyles;
+type ModalMousePosition = {
+    x: number;
+    y: number;
+} | null;
+type ModalGetContainerFunc = () => HTMLElement;
+type ModalLegacyButtonType = "primary" | "dashed" | "default" | "text" | "link";
+interface ModalCommonProps {
+    footer?: React.ReactNode | ((originNode: React.ReactNode, extra: {
+        OkBtn: React.FC;
+        CancelBtn: React.FC;
+    }) => React.ReactNode);
+    closable?: boolean | {
+        onClose?(): void;
+        afterClose?(): void;
+    };
+    classNames?: ModalClassNamesType;
+    styles?: ModalStylesType;
+}
+interface ModalProps extends ModalCommonProps {
+    open?: boolean;
+    confirmLoading?: boolean;
+    title?: React.ReactNode;
+    onOk?(e: React.MouseEvent<HTMLButtonElement>): void;
+    onCancel?(e: React.MouseEvent<HTMLButtonElement>): void;
+    afterClose?(): void;
+    afterOpenChange?(open: boolean): void;
+    centered?: boolean;
+    width?: string | number;
+    okText?: React.ReactNode;
+    okType?: ModalLegacyButtonType;
+    cancelText?: React.ReactNode;
+    maskClosable?: boolean;
+    forceRender?: boolean;
+    okButtonProps?: Record<string, any>;
+    cancelButtonProps?: Record<string, any>;
+    destroyOnClose?: boolean;
+    destroyOnHidden?: boolean;
+    style?: React.CSSProperties;
+    wrapClassName?: string;
+    maskTransitionName?: string;
+    transitionName?: string;
+    className?: string;
+    rootClassName?: string;
+    rootStyle?: React.CSSProperties;
+    getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
+    zIndex?: number;
+    bodyStyle?: React.CSSProperties;
+    maskStyle?: React.CSSProperties;
+    mask?: boolean | "static";
+    keyboard?: boolean;
+    wrapProps?: any;
+    prefixCls?: string;
+    closeIcon?: React.ReactNode;
+    modalRender?(node: React.ReactNode): React.ReactNode;
+    children?: React.ReactNode;
+    mousePosition?: ModalMousePosition;
+    loading?: boolean;
+    focusTriggerAfterClose?: boolean;
+    focusable?: {
+        focusTriggerAfterClose?: boolean;
+    };
+}
+interface ModalFuncProps extends ModalCommonProps {
+    prefixCls?: string;
+    className?: string;
+    rootClassName?: string;
+    open?: boolean;
+    title?: React.ReactNode;
+    content?: React.ReactNode;
+    onOk?(...args: any[]): any;
+    onCancel?(...args: any[]): any;
+    afterClose?(): void;
+    okButtonProps?: Record<string, any>;
+    cancelButtonProps?: Record<string, any>;
+    centered?: boolean;
+    width?: string | number;
+    okText?: React.ReactNode;
+    okType?: ModalLegacyButtonType;
+    cancelText?: React.ReactNode;
+    icon?: React.ReactNode;
+    mask?: boolean | "static";
+    maskClosable?: boolean;
+    zIndex?: number;
+    okCancel?: boolean;
+    style?: React.CSSProperties;
+    wrapClassName?: string;
+    maskStyle?: React.CSSProperties;
+    type?: "info" | "success" | "error" | "warn" | "warning" | "confirm";
+    keyboard?: boolean;
+    getContainer?: string | HTMLElement | ModalGetContainerFunc | false;
+    transitionName?: string;
+    maskTransitionName?: string;
+    direction?: "ltr" | "rtl";
+    bodyStyle?: React.CSSProperties;
+    closeIcon?: React.ReactNode;
+    footer?: ModalProps["footer"];
+    modalRender?(node: React.ReactNode): React.ReactNode;
+    focusTriggerAfterClose?: boolean;
+    autoFocusButton?: null | "ok" | "cancel";
+    focusable?: {
+        focusTriggerAfterClose?: boolean;
+        autoFocusButton?: null | "ok" | "cancel";
+    };
+}
+type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
+interface ModalFuncReturn {
+    destroy(): void;
+    update(configUpdate: ModalConfigUpdate): void;
+}
+type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
+interface ModalStaticFunctions {
+    info: ModalFunc;
+    success: ModalFunc;
+    error: ModalFunc;
+    warning: ModalFunc;
+    confirm: ModalFunc;
+    warn: ModalFunc;
+}
+interface ModalBaseMethods {
+    useModal(): [api: any, contextHolder: React.ReactNode];
+    destroyAll(): void;
+    config(config: {
+        rootPrefixCls: string;
+    }): void;
+    _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
+}
+type AntdNotification = NotificationNoticeMethods & NotificationBaseMethods;
+type AntdMessage = MessageMethods & MessageBaseMethods;
+type AntdModal = React.FC<ModalProps> & ModalStaticFunctions & ModalBaseMethods;
+
 interface ModalButton {
     text: string;
     style?: "primary" | "danger" | "close";
@@ -10660,7 +10707,9 @@ interface Internals {
 
 const gimkitComponents: readonly ["notification", "message", "modal"];
 type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
-class BaseUIApi {
+class UIApi {
+    #private;
+    constructor(id: string);
     /**
      * Shows a customizable modal to the user
      * @example
@@ -10668,7 +10717,7 @@ class BaseUIApi {
      * const element = document.createElement("div");
      * element.textContent = "Hello, world!";
      *
-     * GL.UI.showModal(element, {
+     * api.UI.showModal(element, {
      *     id: "my-modal",
      *     title: "My Modal",
      *     style: "width: 300px;",
@@ -10704,42 +10753,6 @@ class BaseUIApi {
      * {@link https://ant.design/components/modal#modalmethod}
      */
     get modal(): AntdModal;
-}
-class UIApi extends BaseUIApi {
-    /**
-     * Adds a style to the DOM
-     * @returns A function to remove the styles
-     * @example
-     * ```js
-     * const styles = `#element {
-     *     color: red;
-     * }`;
-     *
-     * GL.UI.addStyles("MyPlugin", styles);
-     * ```
-     */
-    addStyles(id: string, style: string): () => void;
-    /** Remove all styles with a given id */
-    removeStyles(id: string): void;
-    /**
-     * Waits for a component to load, and calls the callback with the component as an argument.
-     * If the component has already loaded the callback will be fired immediately.
-     * The available components are "notification", "message", and "modal".
-     * @returns A function that cancels waiting
-     * @example
-     * ```js
-     * GL.UI.onComponentLoad("MyPlugin", "message", (message) => {
-     *     message.success({ content: "This is a message!" });
-     * });
-     * ```
-     */
-    onComponentLoad<K extends keyof GimkitComponents>(id: string, type: K, callback: (component: GimkitComponents[K]) => void): (() => void) | undefined;
-    /** Cancels any calls made to {@link onComponentLoad} with the same id */
-    offComponentLoad(id: string): void;
-}
-class ScopedUIApi extends BaseUIApi {
-    #private;
-    constructor(id: string);
     /**
      * Adds a style to the DOM
      * @returns A function to remove the styles
@@ -10765,42 +10778,13 @@ class ScopedUIApi extends BaseUIApi {
      * });
      * ```
      */
-    onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void): (() => void) | undefined;
+    onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void): () => void;
 }
 
 /** @inline */
 type ValueChangeCallback = (value: any, remote: boolean) => void;
 
 class StorageApi {
-    /** Gets a value that has previously been saved */
-    getValue(pluginName: string, key: string, defaultValue?: any): any;
-    /** Sets a value which can be retrieved later, through reloads */
-    setValue(pluginName: string, key: string, value: any): void;
-    /** Removes a value which has been saved */
-    deleteValue(pluginName: string, key: string): void;
-    /**
-     * @deprecated use {@link deleteValue}
-     * @hidden
-     */
-    get removeValue(): (pluginName: string, key: string) => void;
-    /**
-     * Adds a listener for when a plugin's stored value with a certain key changes
-     * @returns a function that removes the listener when called
-     * @example
-     * ```js
-     * GL.storage.onChange("MyPlugin", "key", (value, remote) => {
-     *     console.log("Value is now", value);
-     *     console.log("Value was updated", remote ? "remotely" : "locally");
-     * });
-     * ```
-     */
-    onChange(pluginName: string, key: string, callback: ValueChangeCallback): () => void;
-    /** Removes a listener added by onChange */
-    offChange(pluginName: string, key: string, callback: ValueChangeCallback): void;
-    /** Removes all listeners added by onChange for a certain plugin */
-    offAllChanges(pluginName: string): void;
-}
-class ScopedStorageApi {
     #private;
     constructor(id: string);
     /** Gets a value that has previously been saved */
@@ -10837,67 +10821,6 @@ type PatcherInsteadCallback<T> = (thisVal: any, args: T extends BaseFunction ? P
 type PatcherSwapCallback<T> = (...args: T extends BaseFunction ? Parameters<T> : any[]) => any;
 
 class PatcherApi {
-    /**
-     * Runs a callback after a function on an object has been run
-     * @returns A function to remove the patch
-     * @example
-     * ```js
-     * const object = { method: () => 100 };
-     * GL.patcher.after("MyPlugin", object, "method", (thisVal, args, returnVal) => {
-     *     console.log("Came after:", returnVal);
-     * });
-     *
-     * object.method(); // Logs "Came after: 100"
-     * ```
-     */
-    after<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
-    /**
-     * Runs a callback before a function on an object has been run.
-     * Return true from the callback to prevent the function from running
-     * @returns A function to remove the patch
-     * @example
-     * ```js
-     * const object = { method: (arg1, arg2) => 100 };
-     * GL.patcher.before("MyPlugin", object, "method", (thisVal, args) => {
-     *     console.log("Came before:", args);
-     * });
-     *
-     * object.method(5, 6); // Logs "Came before: [5, 6]"
-     * ```
-     */
-    before<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
-    /**
-     * Runs a function instead of a function on an object
-     * @returns A function to remove the patch
-     * @example
-     * ```js
-     * const object = { method: (arg1, arg2) => 100 };
-     * GL.patcher.instead("MyPlugin", object, "method", (thisVal, args) => {
-     *     return args[0] + args[1];
-     * });
-     *
-     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
-     * ```
-     */
-    instead<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
-    /**
-     * Replaces a function on an object with another function
-     * @returns A function to remove the patch
-     * @example
-     * ```js
-     * const object = { method: (arg1, arg2) => 100 };
-     * GL.patcher.swap("MyPlugin", object, "method", (arg1, arg2) => {
-     *     return arg1 + arg2;
-     * });
-     *
-     * console.log(object.method(5, 6)); // Logs "11" instead of "100"
-     * ```
-     */
-    swap<O extends object, K extends FunctionKeys<O>>(id: string, object: O, method: K, callback: PatcherSwapCallback<O[K]>): () => void;
-    /** Removes all patches with a given id */
-    unpatchAll(id: string): void;
-}
-class ScopedPatcherApi {
     #private;
     constructor(id: string);
     /**
@@ -10913,7 +10836,7 @@ class ScopedPatcherApi {
      * object.method(); // Logs "Came after: 100"
      * ```
      */
-    after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
+    after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): (() => void) | undefined;
     /**
      * Runs a callback before a function on an object has been run.
      * Return true from the callback to prevent the function from running
@@ -10928,7 +10851,7 @@ class ScopedPatcherApi {
      * object.method(5, 6); // Logs "Came before: [5, 6]"
      * ```
      */
-    before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
+    before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): (() => void) | undefined;
     /**
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
@@ -10942,7 +10865,7 @@ class ScopedPatcherApi {
      * console.log(object.method(5, 6)); // Logs "11" instead of "100"
      * ```
      */
-    instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
+    instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): (() => void) | undefined;
     /**
      * Replaces a function on an object with another function
      * @returns A function to remove the patch
@@ -10956,170 +10879,7 @@ class ScopedPatcherApi {
      * console.log(object.method(5, 6)); // Logs "11" instead of "100"
      * ```
      */
-    swap<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherSwapCallback<O[K]>): () => void;
-}
-
-/** @inline */
-type RunInScopeCallback = (code: string, run: (evalCode: string) => any, initial: boolean) => true | void;
-/** @inline */
-interface Exposer {
-    check?: string;
-    find: RegExp;
-    callback: (val: any) => void;
-    multiple?: boolean;
-}
-
-/**
- * The rewriter API allows you to modify the bundled code of Gimkit in order to expose values
- * or change certain behaviors. Due to the unpredictable nature of bundling, you cannot assume that variable names
- * will remain the same beteen updates.
- */
-class RewriterApi {
-    /**
-     * Creates a hook that will modify the code of a script before it is run.
-     * This value is cached, so this hook may not run on subsequent page loads.
-     * addParseHook should always be called in the top level of a script.
-     * @param pluginName The name of the plugin creating the hook.
-     * @param prefix Limits the hook to only running on scripts beginning with this prefix.
-     * Passing `true` will only run on the index script, and passing `false` will run on all scripts.
-     * @param modifier A function that will modify the code, which should return the modified code.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * GL.rewriter.addParseHook("MyPlugin", "App", (code) => {
-     *     let index = code.indexOf("something");
-     *     code = code.slice(0, index) + `console.log("something else")` + code.slice(index);
-     *     code += "console.log(someVar)";
-     *     return code;
-     * });
-     * ```
-     */
-    addParseHook(pluginName: string, prefix: string | boolean, modifier: (code: string) => string): () => void;
-    /** Removes all parse hooks created by a certain plugin */
-    removeParseHooks(pluginName: string): void;
-    /**
-     * Creates a shared value that can be accessed from any script.
-     * @param pluginName The name of the plugin creating the shared value.
-     * @param id A unique identifier for the shared value.
-     * @param value The value to be shared.
-     * @returns A string representing the code to access the shared value.
-     * @example
-     * ```js
-     * const callback = GL.rewriter.createShared("MyPlugin", "uniqueId", (val) => {
-     *     console.log(val);
-     * });
-     *
-     * eval(`${callback}("15")`); // Don't actually do this, but it logs 15
-     * ```
-     */
-    createShared(pluginName: string, id: string, value: any): string;
-    /** Removes all values created by {@link createShared} by a certain plugin */
-    removeShared(pluginName: string): void;
-    /** Removes the shared value with a certain id created by {@link createShared} */
-    removeSharedById(pluginName: string, id: string): void;
-    /**
-     * Runs code in the scope of modules when they are loaded, or when runInScope is called with them already loaded.
-     * Returning true from the callback will remove the hook.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * GL.rewriter.runInScope("MyPlugin", "App", (code, run, initial) => {
-     *     if(code.includes("something")) {
-     *         run(`someVar=15`);
-     *     }
-     * });
-     * ```
-     */
-    runInScope(pluginName: string, prefix: string | boolean, callback: RunInScopeCallback): () => void;
-    /** Stops all hooks created by {@link runInScope} */
-    removeRunInScope(pluginName: string): void;
-    /**
-     * A utility function that exposes a variable based on regex to get its name.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * GL.rewriter.exposeVar("MyPlugin", "App", {
-     *     check: "StringThatMustExistInFile",
-     *     find: /let (\w+) = something/g,
-     *     multiple: false,
-     *     callback: (var) => console.log(var)
-     * });
-     * ```
-     */
-    exposeVar(pluginName: string, prefix: string | boolean, exposer: Exposer): () => void;
-}
-/**
- * The rewriter API allows you to modify the bundled code of Gimkit in order to expose values
- * or change certain behaviors. Due to the unpredictable nature of bundling, you cannot assume that variable names
- * will remain the same beteen updates.
- */
-class ScopedRewriterApi {
-    #private;
-    constructor(id: string);
-    /**
-     * Creates a hook that will modify the code of a script before it is run.
-     * This value is cached, so this hook may not run on subsequent page loads.
-     * addParseHook should always be called in the top level of a script.
-     * @param prefix Limits the hook to only running on scripts beginning with this prefix.
-     * Passing `true` will only run on the index script, and passing `false` will run on all scripts.
-     * @param modifier A function that will modify the code, which should return the modified code.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * api.rewriter.addParseHook("App", (code) => {
-     *     let index = code.indexOf("something");
-     *     code = code.slice(0, index) + `console.log("something else")` + code.slice(index);
-     *     code += "console.log(someVar)";
-     *     return code;
-     * });
-     * ```
-     */
-    addParseHook(prefix: string | boolean, modifier: (code: string) => string): () => void;
-    /**
-     * Creates a shared value that can be accessed from any script.
-     * @param id A unique identifier for the shared value.
-     * @param value The value to be shared.
-     * @returns A string representing the code to access the shared value.
-     * @example
-     * ```js
-     * const callback = api.rewriter.createShared("uniqueId", (val) => {
-     *     console.log(val);
-     * });
-     *
-     * eval(`${callback}("15")`); // Don't actually do this, but it logs 15
-     * ```
-     */
-    createShared(id: string, value: any): string;
-    /** Removes the shared value with a certain id created by {@link createShared} */
-    removeSharedById(id: string): void;
-    /**
-     * Runs code in the scope of modules when they are loaded, or when runInScope is called with them already loaded.
-     * Returning true from the callback will remove the hook.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * api.rewriter.runInScope("App", (code, run, initial) => {
-     *     if(code.includes("something")) {
-     *         run(`someVar=15`);
-     *     }
-     * });
-     * ```
-     */
-    runInScope(prefix: string | boolean, callback: RunInScopeCallback): () => void;
-    /**
-     * A utility function that exposes a variable based on regex to get its name.
-     * @returns A function that removes the hook when called
-     * @example
-     * ```js
-     * api.rewriter.exposeVar("App", {
-     *     check: "StringThatMustExistInFile",
-     *     find: /let (\w+) = something/g,
-     *     multiple: false,
-     *     callback: (var) => console.log(var)
-     * });
-     * ```
-     */
-    exposeVar(prefix: string | boolean, exposer: Exposer): () => void;
+    swap<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherSwapCallback<O[K]>): (() => void) | undefined;
 }
 
 /** @inline */
@@ -11156,44 +10916,6 @@ type CommandCallback = (context: CommandContext) => void | Promise<void>;
 
 /** An API for adding commands to the command palette */
 class CommandsApi {
-    /**
-     * Adds a command to the user's command palette. Can request additional input within the callback.
-     * @returns A function to remove the command
-     * @example
-     * ```js
-     * GL.commands.addCommand("MyPlugin", {
-     *     text: "Do a thing",
-     *     keywords: ["execute", "run"],
-     *     hidden: () => false
-     * }, async (context) => {
-     *     const choice = await context.select({
-     *         title: "Choose an option",
-     *         options: [
-     *             { label: "Option 1", value: "one" },
-     *             { label: "Option 2", value: "two" }
-     *          ]
-     *     });
-     *     const number = await context.number({
-     *         title: "Pick a number"
-     *         min: 1,
-     *         max: 10,
-     *         decimal: true
-     *     });
-     *     const string = await context.string({
-     *         title: "Enter a string",
-     *         maxLength: 20
-     *     });
-     *
-     *     console.log("User chose:", { choice, number, string });
-     * });
-     * ```
-     */
-    addCommand(id: string, options: CommandOptions, callback: CommandCallback): () => void;
-    /** Removes all commands that were added with the same id */
-    removeCommands(id: string): void;
-}
-/** An API for adding commands to the command palette */
-class ScopedCommandsApi {
     #private;
     constructor(id: string);
     /**
@@ -11232,6 +10954,8 @@ class ScopedCommandsApi {
 }
 
 class LibsApi {
+    #private;
+    constructor(id: string);
     /** A list of all the libraries installed */
     get list(): string[];
     /** Gets whether or not a plugin is installed and enabled */
@@ -11240,10 +10964,6 @@ class LibsApi {
     getHeaders(name: string): ScriptHeaders | null;
     /** Gets the exported values of a library */
     get<T extends keyof Gimloader.Libraries>(name: T): Gimloader.Libraries[T];
-}
-class ScopedLibsApi extends LibsApi {
-    #private;
-    constructor(id: string);
     /**
      * Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports.
      * @example
@@ -11255,6 +10975,8 @@ class ScopedLibsApi extends LibsApi {
 }
 
 class PluginsApi {
+    #private;
+    constructor(id: string);
     /** A list of all the plugins installed */
     get list(): string[];
     /** Whether a plugin exists and is enabled */
@@ -11263,17 +10985,6 @@ class PluginsApi {
     getHeaders(name: string): ScriptHeaders | null;
     /** Gets the exported values of a plugin, if it has been enabled */
     get<T extends keyof Gimloader.Plugins>(name: T): Gimloader.Plugins[T];
-    /**
-     * @deprecated Use {@link get} instead
-     * @hidden
-     */
-    getPlugin(name: string): {
-        return: any;
-    };
-}
-class ScopedPluginsApi extends PluginsApi {
-    #private;
-    constructor(id: string);
     /**
      * Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports
      * @example
@@ -11304,137 +11015,54 @@ class LoggerApi {
 class Api {
     #private;
     /** Functions to edit Gimkit's code */
-    static rewriter: Readonly<RewriterApi>;
-    /** Functions to edit Gimkit's code */
-    rewriter: Readonly<ScopedRewriterApi>;
+    rewriter: Readonly<RewriterApi>;
     /** Functions to listen for key combinations */
-    static hotkeys: Readonly<HotkeysApi>;
-    /** Functions to listen for key combinations */
-    hotkeys: Readonly<ScopedHotkeysApi>;
+    hotkeys: Readonly<HotkeysApi>;
     /**
      * Ways to interact with the current connection to the server,
      * and functions to send general requests
      */
-    static net: Readonly<NetApi>;
-    /**
-     * Ways to interact with the current connection to the server,
-     * and functions to send general requests
-     */
-    net: Readonly<ScopedNetApi>;
+    net: Readonly<NetApi>;
     /** Functions for interacting with the DOM */
-    static UI: Readonly<UIApi>;
-    /** Functions for interacting with the DOM */
-    UI: Readonly<ScopedUIApi>;
+    UI: Readonly<UIApi>;
     /** Functions for persisting data between reloads */
-    static storage: Readonly<StorageApi>;
-    /** Functions for persisting data between reloads */
-    storage: Readonly<ScopedStorageApi>;
+    storage: Readonly<StorageApi>;
     /** Functions for intercepting the arguments and return values of functions */
-    static patcher: Readonly<PatcherApi>;
-    /** Functions for intercepting the arguments and return values of functions */
-    patcher: Readonly<ScopedPatcherApi>;
+    patcher: Readonly<PatcherApi>;
     /** Functions for adding commands to the command palette */
-    static commands: Readonly<CommandsApi>;
-    /** Functions for adding commands to the command palette */
-    commands: Readonly<ScopedCommandsApi>;
+    commands: Readonly<CommandsApi>;
     /** Methods for getting info on libraries */
-    static libs: Readonly<LibsApi>;
-    /** Methods for getting info on libraries */
-    libs: Readonly<ScopedLibsApi>;
+    libs: Readonly<LibsApi>;
     /** Gets the exported values of a library */
-    static lib: <T extends keyof Gimloader.Libraries>(name: T) => Gimloader.Libraries[T];
-    /** Gets the exported values of a library */
-    lib: <T extends keyof Gimloader.Libraries>(name: T) => Gimloader.Libraries[T];
+    lib: LibsApi["get"];
     /** Methods for getting info on plugins */
-    static plugins: Readonly<PluginsApi>;
-    /** Methods for getting info on plugins */
-    plugins: Readonly<ScopedPluginsApi>;
+    plugins: Readonly<PluginsApi>;
     /** Gets the exported values of a plugin, if it has been enabled */
-    static plugin: <T extends keyof Gimloader.Plugins>(name: T) => Gimloader.Plugins[T];
-    /** Gets the exported values of a plugin, if it has been enabled */
-    plugin: <T extends keyof Gimloader.Plugins>(name: T) => Gimloader.Plugins[T];
-    /** Gimkit's internal react instance */
-    static get React(): typeof React;
+    plugin: PluginsApi["get"];
+    /** Utilities for pretty logs with a tag showing they are from this script */
+    logger: Readonly<LoggerApi>;
     /** Gimkit's internal react instance */
     get React(): typeof React;
     /** Gimkit's internal reactDom instance */
-    static get ReactDOM(): typeof react_dom_client;
-    /** Gimkit's internal reactDom instance */
     get ReactDOM(): typeof react_dom_client;
-    /** A variety of Gimkit internal objects available in 2d gamemodes */
-    static get stores(): Stores.Stores;
     /** A variety of gimkit internal objects available in 2d gamemodes */
     get stores(): Stores.Stores;
     /** A variety of gimkit internal objects available in 1d gamemodes */
-    static get classicStores(): ClassicStores.ClassicStores;
-    /** A variety of gimkit internal objects available in 1d gamemodes */
     get classicStores(): ClassicStores.ClassicStores;
     /** Physics variables available in platformer gamemodes */
-    static get platformerPhysics(): any;
-    /** Physics variables available in platformer gamemodes */
     get platformerPhysics(): any;
-    /**
-     * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
-     * Should never be used by hand.
-     */
-    static svelte_5_43_0: SvelteExport;
+    /** The toast api exposed by svelte-sonner */
+    toast: ToastType;
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.
      */
     svelte_5_43_0: SvelteExport;
     /** Useful svelte components which can be used by scripts */
-    static Components: SvelteComponents;
-    /** Useful svelte components which can be used by scripts */
     Components: SvelteComponents;
-    /**
-     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
-     * @hidden
-     */
-    static parcel: Readonly<ParcelApi>;
-    /**
-     * @deprecated Gimkit has switched from Parcel to vite, rendering this api useless.
-     * @hidden
-     */
-    parcel: Readonly<ScopedParcelApi>;
-    /**
-     * @deprecated Use GL.UI.notification
-     * @hidden
-     */
-    static get notification(): AntdNotification;
-    /**
-     * @deprecated Use api.UI.notification
-     * @hidden
-     */
-    get notification(): AntdNotification;
-    /**
-     * @deprecated No longer supported
-     * @hidden
-     */
-    static get contextMenu(): {
-        showContextMenu: () => void;
-        createReactContextMenu: () => void;
-    };
-    /**
-     * @deprecated The api no longer emits events. Use GL.net.loaded to listen to load events
-     * @hidden
-     */
-    static addEventListener(type: string, callback: () => void): void;
-    /**
-     * @deprecated The api no longer emits events
-     * @hidden
-     */
-    static removeEventListener(type: string, callback: () => void): void;
-    /**
-     * @deprecated Use {@link plugins} instead
-     * @hidden
-     */
-    static get pluginManager(): Readonly<PluginsApi>;
-    constructor(type?: string, name?: string);
+    constructor(id: string, script?: Script);
     /** A utility for creating persistent settings menus, only available to plugins */
     settings: PluginSettings;
-    /** Utilities for pretty logs with a tag showing they are from this script */
-    logger: Readonly<LoggerApi>;
     /** Run a callback when this script is disabled */
     onStop: (...callbacks: (() => void)[]) => void;
     /**
@@ -11447,6 +11075,8 @@ class Api {
     requestReload: () => void;
     /** The headers containing this script's metadata */
     headers: Readonly<ScriptHeaders>;
+    /** Cleans up everything performed through this script's api */
+    cleanup: () => void;
 }
 
 interface Plugins {
@@ -11459,20 +11089,8 @@ interface Libraries {
 }
 
 const api: Gimloader.Api;
-/** @deprecated Use the api variable available to scripts */
-const GL: typeof Gimloader.Api;
-/** @deprecated Use GL.stores */
-const stores: Gimloader.Stores.Stores;
-/** @deprecated No longer supported */
-const platformerPhysics: any;
 
 interface Window {
     api: Gimloader.Api;
-    /** @deprecated Use the api variable available to scripts */
-    GL: typeof Gimloader.Api;
-    /** @deprecated Use GL.stores */
-    stores: Gimloader.Stores.Stores;
-    /** @deprecated No longer supported */
-    platformerPhysics: any;
 }
 }

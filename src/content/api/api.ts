@@ -19,6 +19,7 @@ import UI from "$core/ui/ui";
 import createSettingsApi from "./settings";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import Cleanup from "$core/scripts/cleanup";
+import toaster from "./toast";
 
 class Api {
     /** Functions to edit Gimkit's code */
@@ -84,6 +85,9 @@ class Api {
     get platformerPhysics() {
         return GimkitInternals.platformerPhysics;
     }
+
+    /** The toast api exposed by svelte-sonner */
+    toast = toaster;
 
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
