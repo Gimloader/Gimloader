@@ -40,6 +40,9 @@ class NetApi {
         Cleanup.on(id, (final) => {
             if(final) Net.offAny(emit);
             this.removeAllListeners();
+
+            // @ts-expect-error The type is wrong, this clears onAny listeners
+            this.#events.offAny();
         });
     }
 
