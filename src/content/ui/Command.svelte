@@ -24,6 +24,7 @@
 
     // Calculate which options to show in general
     let items = $derived.by(() => {
+        Commands.open;
         let options: Option[] = [];
 
         for(let command of Commands.commands) {

@@ -32,7 +32,7 @@ const StringSchema = z.object({
 });
 
 export default new class Commands {
-    commands: Command[] = $state([]);
+    commands: Command[] = [];
     action: CommandAction | null = $state(null);
     context: CommandContext;
     open = $state(false);
