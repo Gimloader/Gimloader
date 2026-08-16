@@ -9,7 +9,7 @@ interface ToastAction {
     label: string | AnyComponent;
     onClick: MouseEventHandler<HTMLButtonElement>;
     actionButtonStyle?: string;
-};
+}
 
 interface ToastOptions {
     id?: number | string;
@@ -36,14 +36,14 @@ interface ToastOptions {
     descriptionClass?: string;
     position?: Position;
     dismiss?: boolean;
-};
+}
 
 type ToastT = ToastOptions & {
     id: number | string;
     type: string;
     title?: string | AnyComponent;
     promise?: PromiseT;
-}
+};
 
 type PromiseData<ToastData> = ToastOptions & {
     /**
@@ -65,7 +65,7 @@ type PromiseData<ToastData> = ToastOptions & {
      * A function that is called when the promise is finally resolved or rejected.
      */
     finally?: () => void | Promise<void>;
-}
+};
 
 // Type needs to be reimplemented since Typescript doesn't like the way svelte-sonner exports it
 export interface ToastType {
@@ -80,7 +80,7 @@ export interface ToastType {
     dismiss: (id?: number | string) => string | number | undefined;
     loading: (message: string | AnyComponent, data?: ToastOptions) => string | number;
     getActiveToasts: () => ToastT[];
-};
+}
 
 const toaster = toast as ToastType;
 export default toaster;
