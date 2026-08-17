@@ -1,6 +1,5 @@
 import type { Component } from "svelte";
 import type { MouseEventHandler } from "svelte/elements";
-import { toast } from "svelte-sonner";
 
 type AnyComponent = Component<any, any, string>;
 type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
@@ -81,6 +80,3 @@ export interface ToastType {
     loading: (message: string | AnyComponent, data?: ToastOptions) => string | number;
     getActiveToasts: () => ToastT[];
 }
-
-const toaster = toast as ToastType;
-export default toaster;

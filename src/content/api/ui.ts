@@ -5,6 +5,8 @@ import { validate } from "$content/utils";
 import type * as React from "react";
 import * as z from "zod";
 import GimkitInternals, { type Internals } from "$core/internals";
+import { toast } from "svelte-sonner";
+import type { ToastType } from "$types/api/toast";
 
 const gimkitComponents = ["notification", "message", "modal"] as const;
 type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
@@ -128,6 +130,9 @@ class UIApi {
 
         return GimkitInternals.onLoad(this.#id, type, callback);
     }
+
+    /** The toast api exposed by svelte-sonner */
+    toast = toast as ToastType;
 }
 
 Object.freeze(UIApi);
