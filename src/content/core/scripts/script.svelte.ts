@@ -205,9 +205,11 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         return { required, optional };
     }
 
-    stop() {
+    async stop() {
         if(!this.started) return;
 
+        // Make sure to finish loading to avoid race conditions
+        await this.startPromise;
         Cleanup.cleanup(this.headers.name, true);
 
         for(const used of this.requires) used.unrequire?.(this, true);

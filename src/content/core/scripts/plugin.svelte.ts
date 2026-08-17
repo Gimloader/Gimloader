@@ -39,11 +39,11 @@ export class Plugin extends Script<PluginInfo> {
         };
     }
 
-    override edit(code: string, headers?: ScriptHeaders) {
+    override async edit(code: string, headers?: ScriptHeaders) {
         super.edit(code, headers);
         Modals.resolveAll(`${this.headers.name}-error`, undefined);
 
-        if(this.started) this.stop();
+        if(this.started) await this.stop();
         if(this.enabled) {
             this.start(false).catch((e) => {
                 this.showEnableError(e);
@@ -51,8 +51,8 @@ export class Plugin extends Script<PluginInfo> {
         }
     }
 
-    override stop() {
-        super.stop();
+    override async stop() {
+        await super.stop();
         this.openSettingsMenu = [];
     }
 
