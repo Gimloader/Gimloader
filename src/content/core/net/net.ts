@@ -221,8 +221,8 @@ export default new class Net extends EventEmitter2 {
         if(this.room) return;
         log("Blueboat room intercepted", room);
 
-        this.room = room;
         this.type = "Blueboat";
+        this.room = room;
         gameState.inGame = true;
 
         // intercept incoming messages
