@@ -12,17 +12,14 @@ type TaggedSentMessages = {
     [K in keyof SentMessages as `send:${K}`]: SentMessages[K];
 };
 
-type EventData<C extends string> = C extends keyof ReceivedMessages ? ReceivedMessages[C]
-    : C extends keyof TaggedSentMessages ? TaggedSentMessages[C]
-    : any;
-
-type AllEvents = TaggedSentMessages & ReceivedMessages;
-
+type AllMessages = ReceivedMessages & TaggedSentMessages;
+type EventData<C extends keyof AllMessages> = AllMessages[C];
 type EditFN<T> = (newValue: T | null) => void;
 
-type EventTuple = {
-    [K in keyof AllEvents]: [channel: K, data: AllEvents[K], editFn: EditFN<AllEvents[K]>];
-}[keyof AllEvents];
+const eventsConfig = {
+    wildcard: true,
+    delimiter: ":"
+};
 
 /**
  * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
@@ -47,10 +44,7 @@ class NetApi extends EventEmitter2 {
     readonly #defaultGamemode: string[];
 
     constructor(id: string, defaultGamemode: string[]) {
-        super({
-            wildcard: true,
-            delimiter: ":"
-        });
+        super(eventsConfig);
 
         this.#id = id;
         this.#defaultGamemode = defaultGamemode;
@@ -106,12 +100,12 @@ class NetApi extends EventEmitter2 {
         Net.send(channel, args[0]);
     }
 
-    override on<C extends string>(channel: C, listener: (data: EventData<C>, editFn: EditFN<EventData<C>>) => void) {
+    override on<C extends keyof AllMessages>(channel: C, listener: (data: EventData<C>, editFn: EditFN<EventData<C>>) => void) {
         return super.on(channel, listener);
     }
 
-    override onAny(listener: (...args: EventTuple) => void) {
-        // @ts-expect-error It works, source: trust me
+    override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
+        // @ts-expect-error just gotta trust me
         return super.onAny(listener);
     }
 

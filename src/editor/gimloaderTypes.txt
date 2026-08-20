@@ -1750,80 +1750,6 @@ interface SvelteExport {
     Transition: typeof Transition;
 }
 
-type AnyComponent = Component<any, any, string>;
-type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
-interface ToastAction {
-    label: string | AnyComponent;
-    onClick: MouseEventHandler<HTMLButtonElement>;
-    actionButtonStyle?: string;
-}
-interface ToastOptions {
-    id?: number | string;
-    icon?: AnyComponent | null;
-    component?: AnyComponent;
-    componentProps?: any;
-    richColors?: boolean;
-    invert?: boolean;
-    closeButton?: boolean;
-    dismissable?: boolean;
-    description?: string | AnyComponent;
-    duration?: number;
-    delete?: boolean;
-    action?: ToastAction | AnyComponent;
-    cancel?: ToastAction | AnyComponent;
-    onDismiss?: (toast: ToastT) => void;
-    onAutoClose?: (toast: ToastT) => void;
-    cancelButtonStyle?: string;
-    actionButtonStyle?: string;
-    style?: string;
-    unstyled?: boolean;
-    class?: string;
-    classes?: string;
-    descriptionClass?: string;
-    position?: Position;
-    dismiss?: boolean;
-}
-type ToastT = ToastOptions & {
-    id: number | string;
-    type: string;
-    title?: string | AnyComponent;
-    promise?: PromiseT;
-};
-type PromiseData<ToastData> = ToastOptions & {
-    /**
-     * The loading message or a function that returns the message or
-     * a custom toast component.
-     */
-    loading?: string | (() => AnyComponent | string);
-    /**
-     * The success message or a function that returns the message or
-     * a custom toast component.
-     */
-    success?: string | ((data: ToastData) => AnyComponent | string);
-    /**
-     * The error message or a function that returns the message or
-     * a custom toast component.
-     */
-    error?: string | ((error: unknown) => AnyComponent | string);
-    /**
-     * A function that is called when the promise is finally resolved or rejected.
-     */
-    finally?: () => void | Promise<void>;
-};
-interface ToastType {
-    (message: string | AnyComponent, data?: ToastOptions): string | number;
-    success: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    info: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    warning: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    error: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    custom: (component: AnyComponent, data?: ToastOptions) => string | number;
-    message: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    promise: <ToastData>(promise: PromiseT<ToastData>, data?: PromiseData<ToastData>) => string | number | undefined;
-    dismiss: (id?: number | string) => string | number | undefined;
-    loading: (message: string | AnyComponent, data?: ToastOptions) => string | number;
-    getActiveToasts: () => ToastT[];
-}
-
 type Untyped = any;
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 
@@ -9768,7 +9694,7 @@ abstract class Script<T extends ScriptInfo = ScriptInfo> {
         required: Script<ScriptInfo>[];
         optional: Script<ScriptInfo>[];
     };
-    stop(): void;
+    stop(): Promise<void>;
     edit(code: string, headers?: ScriptHeaders): void;
     deleteConfirm(confirmed?: boolean): Promise<void>;
     delete(): void;
@@ -10065,17 +9991,6 @@ class EventEmitter2 {
     static defaultMaxListeners: number;
 }
 
-type ConnectionType = "None" | "Colyseus" | "Blueboat";
-interface RequesterOptions {
-    url: string;
-    method?: string;
-    data?: any;
-    cacheKey?: string;
-    success?: (response: any, cached: boolean) => void;
-    both?: () => void;
-    error?: (error: any) => void;
-}
-
 namespace Schema {
     interface ColyseusMethods {
         $callbacks: Record<string, Untyped>;
@@ -10277,6 +10192,288 @@ namespace Schema {
     type GimkitSchema = ObjectSchema<GimkitState>;
 }
 
+interface MessageForDevice {
+    data: any;
+    deviceId: string;
+    key: string;
+}
+interface ReceivedMessages {
+    "ACTIVITY_FEED_MESSAGE": {
+        id: string;
+        message: string;
+    };
+    "ALL_PROPS": {
+        circleColliders: Stores.CircleShort[];
+        defaultLayer?: string;
+        ellipseColliders: Stores.RotatedEllipse[];
+        id: string;
+        imageUrl: string;
+        minimumRoleLevel: undefined;
+        name: string;
+        originX: number;
+        originY: number;
+        rectColliders: {
+            angle: number;
+            x: number;
+            y: number;
+            h: number;
+            w: number;
+        }[];
+        scaleMultip: number;
+        seasonTicketRequired?: boolean;
+        shadows: {
+            x: number;
+            y: number;
+            r1: number;
+            r2: number;
+        }[];
+    }[];
+    "AUTH_ID": string;
+    "CONSUME_ITEM_ERROR": {
+        slot: string;
+        errorMessage: string;
+    };
+    "DEVICES_STATES_CHANGES": {
+        changes: [string, any[], any[]][];
+        initial: boolean;
+        removedIds: string[];
+        values: string[];
+    };
+    "GOT_KICKED": undefined;
+    "INFO_BEFORE_WORLD_SYNC": Vector;
+    "KNOCKOUT": {
+        id: string;
+        name: string;
+    };
+    "LEVEL_UP": undefined;
+    "MAP_PONG": number;
+    "MEMORY_COSTS_AND_LIMITS": number[];
+    "MESSAGE_FOR_DEVICE": MessageForDevice;
+    "MY_TEAM": string;
+    "NON_DISMISS_MESSAGE": {
+        title: string;
+        description: string;
+    };
+    "NOTIFICATION": {
+        description: string;
+        duration: number;
+        id: string;
+        placement: string;
+        title: string;
+        type: "success" | "info" | "warning" | "error";
+    };
+    "PHYSICS_STATE": {
+        x: number;
+        y: number;
+        packetId: number;
+        /** A stringified {@link PhysicsState} object. */
+        physicsState: string;
+        teleport: boolean;
+    };
+    "PROJECTILE_CHANGES": {
+        added: {
+            appearance: string;
+            damage: number;
+            end: Vector;
+            endTime: number;
+            hitPos?: Vector;
+            hitTime?: number;
+            id: string;
+            ownerId: string;
+            ownerTeamId: string;
+            radius: number;
+            start: Vector;
+            startTime: number;
+        }[];
+        hit: any[];
+    };
+    "RESET": undefined;
+    "SAVED": undefined;
+    "TERRAIN_CHANGES": {
+        added: {
+            terrains: string[];
+            tiles: string[][];
+        };
+        initial: boolean;
+        removedTiles: string[];
+        updateId: number;
+    };
+    "WORLD_CHANGES": {
+        devices: {
+            addedDevices: {
+                devices: any[];
+                values: string[];
+            };
+            initial: boolean;
+            removedDevices: string[];
+        };
+    };
+    "WORLD_OPTIONS": Stores.WorldOptions;
+    "XP_ADDITION": {
+        reason: string;
+        amount: number;
+    };
+}
+interface BaseGrid {
+    deviceId: string;
+    gridId: string;
+}
+interface SentMessages {
+    "MAP_PING": number;
+    "DROP_ITEM": {
+        amount: number;
+        interactiveSlotNumber?: number;
+        itemId?: string;
+    };
+    "MESSAGE_FOR_DEVICE": MessageForDevice;
+    "PLACE_TERRAIN": {
+        x: number;
+        y: number;
+        collides: boolean;
+        depth: number;
+        terrain: string;
+    };
+    "REMOVE_TERRAIN": {
+        x: number;
+        y: number;
+        depth: number;
+    };
+    "PLACE_DEVICE": {
+        x: number;
+        y: number;
+        copyingFromExistingDevice?: string;
+        depth?: number;
+        deviceTypeId: string;
+        hooks: {
+            connections: any[];
+        };
+        id: string;
+        layerId: any;
+        name: string;
+        object: string;
+    };
+    "REMOVE_DEVICE": {
+        id: string;
+    };
+    "START_GAME": {
+        customTeams: Record<string, string>;
+        modeType: Stores.SessionModeType;
+        ownerAsSpectator: boolean;
+    };
+    "END_GAME": undefined;
+    "RESTORE_MAP_EARLIER": undefined;
+    "CREATE_CODE_GRID": {
+        deviceId: string;
+        triggerType: string;
+        triggerValue: string;
+    };
+    "SET_CODE_GRID_JSON": BaseGrid & {
+        json: string;
+    };
+    "JOIN_CODE_GRID": BaseGrid;
+    "LEAVE_CODE_GRID": BaseGrid;
+    "DELETE_CODE_GRID": BaseGrid;
+    "UPDATE_DEVICE_UI_PRESENCE": {
+        action: string;
+        deviceId: string;
+    };
+    "KICK_PLAYER": {
+        characterId: string;
+    };
+    "SAVE": undefined;
+    /** Unused by Gimkit */
+    "PUBLISH": any;
+    "REQUEST_INITIAL_WORLD": undefined;
+    /** Tells the game that you switched cosmetics and they should refetch your character. */
+    "REFETCH_LATEST_APPEARANCE": undefined;
+    "UPDATE_AUTH_TOKEN": {
+        token: string;
+    };
+    /** Unused by Gimkit */
+    "HOOK_ACTION": any;
+    /** Unused by Gimkit */
+    "HOOK_OPTION_ACTION": any;
+    "PLACE_STICKER": {
+        placement: string;
+        size: string;
+        stickerId: string;
+    };
+    "PLACE_WIRE": {
+        endConnection?: string;
+        endDevice: string;
+        startConnection?: string;
+        startDevice: string;
+    };
+    "REMOVE_WIRE": {
+        id: string;
+    };
+    "FIRE": {
+        x: number;
+        y: number;
+        angle: number;
+    };
+    "SET_ACTIVE_INTERACTIVE_ITEM": {
+        slotNum: number;
+    };
+    "SET_INTERACTIVE_SLOTS_ORDER": {
+        order: number;
+    };
+    "RELOAD": undefined;
+    /** Drops or consumes the current item in your inventory. */
+    "CONSUME": Vector | Record<string, never>;
+    "AIMING": {
+        angle: number;
+    };
+    /** Adds a minute of game time. */
+    "ADD_GAME_TIME": undefined;
+    /** Requests for the server to send the 1k+ Creative props. Will result in `ALL_PROPS` being sent. */
+    "REQUEST_ALL_PROPS": undefined;
+    "SET_GLOBAL_PERMISSIONS": {
+        adding: boolean;
+        editing: boolean;
+        manageCodeGrids: boolean;
+        removing: boolean;
+    };
+    "TOGGLE_PHASE": {
+        enabled: boolean;
+    };
+    /** Only in creative modes */
+    "SET_SPEED": {
+        speed: number;
+    };
+    "INPUT": number[];
+    "REQUEST_TELEPORT": Vector;
+    "ADD_CUSTOM_ASSET": {
+        /** A stringified {@link CustomAssetData} object representing the figures in the drawing. */
+        data: string;
+        /** Base-64 encoded */
+        icon: string;
+        id: string;
+        name: string;
+        optionId: string;
+    };
+    "REMOVE_CUSTOM_ASSET": {
+        id: string;
+    };
+}
+
+type ConnectionType = "None" | "Colyseus" | "Blueboat";
+interface RequesterOptions {
+    url: string;
+    method?: string;
+    data?: any;
+    cacheKey?: string;
+    success?: (response: any, cached: boolean) => void;
+    both?: () => void;
+    error?: (error: any) => void;
+}
+
+type TaggedSentMessages = {
+    [K in keyof SentMessages as `send:${K}`]: SentMessages[K];
+};
+type AllMessages = ReceivedMessages & TaggedSentMessages;
+type EventData<C extends keyof AllMessages> = AllMessages[C];
+type EditFN<T> = (newValue: T | null) => void;
 /**
  * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
  * and uses wildcards with ":" as a delimiter.
@@ -10295,7 +10492,7 @@ namespace Schema {
  * api.net.on("send:*", () => {});
  * ```
  */
-class NetApi {
+class NetApi extends EventEmitter2 {
     #private;
     constructor(id: string, defaultGamemode: string[]);
     /** Which type of server the client is currently connected to */
@@ -10311,35 +10508,9 @@ class NetApi {
     /** Whether the user is the one hosting the current game */
     get isHost(): boolean;
     /** Sends a message to the server on a specific channel */
-    send(channel: string, message?: any): void;
-    emit(event: string | string[], ...args: any[]): void;
-    emitAsync(event: string | string[], ...args: any[]): Promise<any[]>;
-    addListener(event: string | string[], listener: (...data: any[]) => void): void;
-    on(event: string | string[], listener: (...data: any[]) => void): void;
-    prependListener(event: string | string[], listener: (...data: any[]) => void): void;
-    once(event: string | string[], listener: (...data: any[]) => void): void;
-    prependOnceListener(event: string | string[], listener: (...data: any[]) => void): void;
-    many(event: string | string[], timesToListen: number, listener: (...data: any[]) => void): void;
-    prependMany(event: string | string[], timesToListen: number, listener: (...data: any[]) => void): void;
-    onAny(listener: (event: string | string[], ...data: any[]) => void): void;
-    prependAny(listener: (event: string | string[], ...data: any[]) => void): void;
-    offAny(listener: (event: string | string[], ...data: any[]) => void): void;
-    removeListener(event: string | string[], listener: (...data: any[]) => void): void;
-    off(event: string | string[], listener: (...data: any[]) => void): void;
-    removeAllListeners(event?: string | string[]): void;
-    setMaxListeners(amount: number): void;
-    getMaxListeners(): number;
-    eventNames(nsAsArray?: boolean): (string | symbol | event[])[];
-    listenerCount(event: string | string[]): number;
-    listeners(event: string | string[]): ListenerFn[];
-    listenersAny(): ListenerFn[];
-    waitFor(event: string | string[], timeout?: number): CancelablePromise<any[]>;
-    waitFor(event: string | string[], filter?: WaitForFilter): CancelablePromise<any[]>;
-    waitFor(event: string | string[], options?: WaitForOptions): CancelablePromise<any[]>;
-    listenTo(target: GeneralEventEmitter, events: string | string[], options?: ListenToOptions): EventEmitter2;
-    listenTo(target: GeneralEventEmitter, events: Record<string, string>, options?: ListenToOptions): EventEmitter2;
-    stopListeningTo(target: GeneralEventEmitter, event?: string | string[]): Boolean;
-    hasListeners(event: string | string[]): Boolean;
+    send<C extends keyof SentMessages>(channel: C, ...args: SentMessages[C] extends undefined ? [] : [data: SentMessages[C]]): void;
+    on<C extends keyof AllMessages>(channel: C, listener: (data: EventData<C>, editFn: EditFN<EventData<C>>) => void): Listener | this;
+    onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
     /**
      * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded.
      * If the \@gamemode header is set the callback will only fire if the gamemode matches one of the provided gamemodes.
@@ -10705,6 +10876,80 @@ interface Internals {
     platformerPhysics: Untyped;
 }
 
+type AnyComponent = Component<any, any, string>;
+type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
+interface ToastAction {
+    label: string | AnyComponent;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+    actionButtonStyle?: string;
+}
+interface ToastOptions {
+    id?: number | string;
+    icon?: AnyComponent | null;
+    component?: AnyComponent;
+    componentProps?: any;
+    richColors?: boolean;
+    invert?: boolean;
+    closeButton?: boolean;
+    dismissable?: boolean;
+    description?: string | AnyComponent;
+    duration?: number;
+    delete?: boolean;
+    action?: ToastAction | AnyComponent;
+    cancel?: ToastAction | AnyComponent;
+    onDismiss?: (toast: ToastT) => void;
+    onAutoClose?: (toast: ToastT) => void;
+    cancelButtonStyle?: string;
+    actionButtonStyle?: string;
+    style?: string;
+    unstyled?: boolean;
+    class?: string;
+    classes?: string;
+    descriptionClass?: string;
+    position?: Position;
+    dismiss?: boolean;
+}
+type ToastT = ToastOptions & {
+    id: number | string;
+    type: string;
+    title?: string | AnyComponent;
+    promise?: PromiseT;
+};
+type PromiseData<ToastData> = ToastOptions & {
+    /**
+     * The loading message or a function that returns the message or
+     * a custom toast component.
+     */
+    loading?: string | (() => AnyComponent | string);
+    /**
+     * The success message or a function that returns the message or
+     * a custom toast component.
+     */
+    success?: string | ((data: ToastData) => AnyComponent | string);
+    /**
+     * The error message or a function that returns the message or
+     * a custom toast component.
+     */
+    error?: string | ((error: unknown) => AnyComponent | string);
+    /**
+     * A function that is called when the promise is finally resolved or rejected.
+     */
+    finally?: () => void | Promise<void>;
+};
+interface ToastType {
+    (message: string | AnyComponent, data?: ToastOptions): string | number;
+    success: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    info: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    warning: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    error: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    custom: (component: AnyComponent, data?: ToastOptions) => string | number;
+    message: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    promise: <ToastData>(promise: PromiseT<ToastData>, data?: PromiseData<ToastData>) => string | number | undefined;
+    dismiss: (id?: number | string) => string | number | undefined;
+    loading: (message: string | AnyComponent, data?: ToastOptions) => string | number;
+    getActiveToasts: () => ToastT[];
+}
+
 const gimkitComponents: readonly ["notification", "message", "modal"];
 type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
 class UIApi {
@@ -10779,6 +11024,8 @@ class UIApi {
      * ```
      */
     onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void): () => void;
+    /** The toast api exposed by svelte-sonner */
+    toast: ToastType;
 }
 
 /** @inline */
@@ -11051,8 +11298,6 @@ class Api {
     get classicStores(): ClassicStores.ClassicStores;
     /** Physics variables available in platformer gamemodes */
     get platformerPhysics(): any;
-    /** The toast api exposed by svelte-sonner */
-    toast: ToastType;
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.
