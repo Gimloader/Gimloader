@@ -80,6 +80,19 @@ export class ColyseusApi extends NetTypeApi {
         // @ts-expect-error just gotta trust me
         return super.onAny(listener);
     }
+
+    /** The colyseus room that the client is connected to, or null if there is no connection */
+    get room() {
+        if(Net.type !== "Colyseus") return null;
+        return Net.room;
+    }
+
+    /** Gimkit's internal Colyseus state */
+    get state(): Schema.GimkitSchema {
+        // We pretend that this is always defined for ease of use
+        if(Net.type !== "Colyseus") return undefined as any;
+        return Net.room?.state;
+    }
 }
 
 /**
@@ -116,6 +129,12 @@ export class BlueboatApi extends NetTypeApi {
     override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
         // @ts-expect-error
         return super.onAny(listener);
+    }
+
+    /** The blueboat room that the client is connected to, or null if there is no connection */
+    get room() {
+        if(Net.type !== "Blueboat") return null;
+        return Net.room;
     }
 }
 
@@ -155,12 +174,18 @@ class NetApi extends EventEmitter2 {
         return Net.gamemode;
     }
 
-    /** The room that the client is connected to, or null if there is no connection */
+    /**
+     * The room that the client is connected to, or null if there is no connection
+     * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
+     */
     get room() {
         return Net.room;
     }
 
-    /** Gimkit's internal Colyseus state */
+    /**
+     * Gimkit's internal Colyseus state
+     * @deprecated use `net.colyseus.state` instead
+     */
     get state(): Schema.GimkitSchema {
         // We pretend that this is always defined for ease of use
         if(Net.type !== "Colyseus") return undefined as any;
@@ -177,7 +202,10 @@ class NetApi extends EventEmitter2 {
         return Net.isHost;
     }
 
-    /** Sends a message to the server on a specific channel */
+    /**
+     * Sends a message to the server on a specific channel
+     * @deprecated use `net.blueboat.send` or `net.colyseus.send` instead
+     */
     send(channel: string, message?: any) {
         validate("net.send", arguments, ["channel", "string"]);
 
