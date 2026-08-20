@@ -1,5 +1,7 @@
 import type { Vector } from "@dimforge/rapier2d-compat";
 import type { Stores } from "./stores";
+import type { ClassicStores } from "./classicStores";
+import type { Untyped } from "./util";
 
 interface MessageForDevice {
     data: any;
@@ -36,7 +38,7 @@ export interface PhysicsState {
     lastGroundedAngle: number;
 }
 
-export interface ReceivedMessages {
+export interface ReceivedMessages2d {
     "ACTIVITY_FEED_MESSAGE": {
         id: string;
         message: string;
@@ -169,7 +171,7 @@ export interface CustomAssetData {
     };
 }
 
-export interface SentMessages {
+export interface SentMessages2d {
     "MAP_PING": number;
     "DROP_ITEM": {
         amount: number;
@@ -306,4 +308,149 @@ export interface SentMessages {
     "REMOVE_CUSTOM_ASSET": {
         id: string;
     };
+}
+
+export interface ReceivedMessages1d {
+    "HOST_STATIC_STATE": {
+        gameCode: string;
+        options: ClassicStores.GameOptions;
+        powerups: ClassicStores.Powerup[];
+        themes: ClassicStores.ShopTheme[];
+    };
+    "PLAYER_JOINS_STATIC_STATE": {
+        disabledThemes: string[];
+        gameOptions: ClassicStores.GameOptions;
+        news: Untyped[];
+        powerups: ClassicStores.Powerup[];
+        themes: ClassicStores.ShopTheme[];
+        upgrades: ClassicStores.Upgrade[];
+    };
+    "STATE_UPDATE": {
+        type: string;
+        value: any;
+    };
+    "VIEWABLE_GAME_CODE": string;
+    "UPDATED_PLAYER_LEADERBOARD": {
+        items: ClassicStores.Player[];
+        key: string;
+    };
+    "UPDATED_TEAM_LEADERBOARD": {
+        items: ClassicStores.Team[];
+        key?: string;
+    };
+    "NEW_GAME_STATUS": string;
+    "TOAST": {
+        message: string;
+        type: string;
+        blockedSound?: boolean;
+    };
+    "NEW_ACTIVITY_ITEM": {
+        name: string;
+        action: string;
+        customTextColor?: string;
+    };
+    "SPECIAL_SONG_PLAYED": {
+        audioFile: string;
+        background: string;
+    };
+    "NEW_PLAYER_STATS": Untyped;
+    "CLAP_COUNT": number;
+    "PLAY_AGAIN_INTENT_ID": string;
+    "ERROR_MODAL": {
+        title: string;
+        content: string;
+    };
+    "SET_REPORT_ID": {
+        reportId: string;
+    };
+    "NON_DISMISS_MESSAGE": ClassicStores.NonDismissMessage;
+    "BALANCE_FLASH_RED": undefined;
+    "DEFLECTED": undefined;
+    "ENABLE_POWERUP_RNG_ANIMATION": undefined;
+    "PLAY_AGAIN_NEW_GAME_CODE": string;
+    "SUCCESS_MODAL_INFO": ClassicStores.SuccessModalInfo;
+    "THANOS_RESULTS": ClassicStores.ThanosValues;
+    "DEFENDING_HOMEBASES": ClassicStores.DefendingHomebase[];
+    "DEFENDING_HOMEBASE_RESULTS": ClassicStores.DefendingHomebaseResults;
+    "AVAILABLE_HOMEBASE_UPGRADES": ClassicStores.HomebaseUpgrade[];
+    "DEFENDING_HOMEBASE_STATUS": ClassicStores.DefendingHomebase;
+    "IMPOSTER_MODE_PEOPLE": ClassicStores.Person[];
+    "IMPOSTER_MODE_MEETING_RESULTS": ClassicStores.MeetingResult;
+    "IMPOSTER_MODE_QUICK_STATS": {
+        impostersLeft: number;
+        meetingsLeft: number;
+        investigationsLeft: number;
+    };
+    "AVAILABLE_LAVA_UPGRADES": ClassicStores.LavaUpgrade[];
+    "LAVA_RESULTS": ClassicStores.Lava;
+    "IMPOSTER_MODE_CALL_A_MEETING": undefined;
+    "IMPOSTER_MODE_VOTE_IN_COUNT": number;
+    "DRAW_MODE_LINE": ClassicStores.Line;
+    "DRAW_MODE_FEED_ITEM": ClassicStores.FeedItem;
+    "DRAW_MODE_PERSON_COUNT": number;
+    "DRAW_MODE_POINT_ADDITIONS": ClassicStores.PointAddition[];
+    "DRAW_MODE_CLEAR": undefined;
+}
+
+export interface SentMessages1d {
+    "NEW_GAME_STATUS": string;
+    "PLAYER_LEADERBOARD_REQUESTED": undefined;
+    "TEAM_LEADERBOARD_REQUESTED": undefined;
+    "QUESTION_ANSWERED": {
+        questionId: string;
+        answer: string;
+    };
+    "UPGRADE_PURCHASED": {
+        level: number;
+        upgradeName: string;
+    };
+    "POWERUP_PURCHASED": string;
+    "POWERUP_ACTIVATED": string;
+    "POWERUP_ATTACK": {
+        name: string;
+        target: string;
+    };
+    "THEME_PURCHASED": string;
+    "THEME_APPLIED": string;
+    "OUTNUMBERED_COMPLETE": undefined;
+    "CLAP": {
+        amount: number;
+    };
+    "KICK_PLAYER": string;
+    "LEADERBOARD_CHANGE_BALANCE": {
+        balancePercentageChange: number;
+        playerId: string;
+    };
+    "LEADERBOARD_FREEZE_PLAYER": {
+        playerId: string;
+    };
+    "PLAY_AGAIN": undefined;
+    "MAKE_TEAMS": undefined;
+    "IMPOSTER_REQUEST_PEOPLE": undefined;
+    "IMPOSTER_MODE_STATUS": ClassicStores.ImposterStatus;
+    "IMPOSTER_MODE_IMPOSTER_WIN": undefined;
+    "DRAW_MODE_CREATE_ROUND": string;
+    "DRAW_MODE_END_ROUND": undefined;
+    "DRAW_MODE_CLEAR": undefined;
+    "PARDY_SET_NEW_ROUND_DETAILS": ClassicStores.Round;
+    "PARDY_SET_SCREEN": ClassicStores.Screen;
+    "PARDY_QUESTION_SCREEN": ClassicStores.QuestionScreen;
+    "PARDY_SET_QUESTION_STATUS": ClassicStores.QuestionStatus;
+    "UPGRADE_DEFENDING_HOMEBASE": {
+        id: string;
+    };
+    "LAVA_PURCHASE_PIECE": {
+        type: string;
+    };
+    "IMPOSTER_MODE_PURCHASE": {
+        item: string;
+    };
+    "IMPOSTER_MODE_VOTE": string;
+    "IMPOSTER_MODE_NOTES": string;
+    "DRAW_MODE_TERM_SELECTED": string;
+    "DRAW_MODE_LD": ClassicStores.Line;
+    "DRAW_MODE_ID": string;
+    "DRAW_MODE_GUESS": string;
+    "PARDY_SET_POWER": string;
+    "PARDY_SET_BET": number;
 }
