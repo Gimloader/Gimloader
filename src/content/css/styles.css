@@ -1,5 +1,6 @@
 #dnd-action-dragged-el {
     outline: none;
+    z-index: 100003 !important;
 }
 
 :root {

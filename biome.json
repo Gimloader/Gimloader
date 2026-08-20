@@ -1,7 +1,10 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
 	"files": {
-		"includes": ["./src/**/*"]
+		"includes": [
+			"./src/**/*",
+			"./tests/**/*"
+		]
 	},
 	"overrides": [
 		{
@@ -16,6 +19,16 @@
 						"noUnusedVariables": "off",
 						"noUnusedImports": "off",
 						"noSelfAssign": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["./src/content/**/*"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noAlert": "error"
 					}
 				}
 			}
@@ -45,12 +58,21 @@
 				"noAssignInExpressions": "off",
 				"noExplicitAny": "off",
 				"noAsyncPromiseExecutor": "off",
+				"noNonNullAssertedOptionalChain": "off",
 				"noConsole": {
 					"level": "error",
 					"options": {
 						"allow": [
 							"error"
 						]
+					}
+				}
+			},
+			"correctness": {
+				"noUnusedVariables": {
+					"level": "error",
+					"options": {
+						"ignoreRestSiblings": true
 					}
 				}
 			}

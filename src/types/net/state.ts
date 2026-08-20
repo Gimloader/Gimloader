@@ -11,8 +11,26 @@ export interface PluginInfo extends ScriptInfo {
 
 export type LibraryInfo = ScriptInfo;
 
+export interface ScriptInfoTypes {
+    plugin: PluginInfo;
+    library: LibraryInfo;
+}
+
 export type PluginStorage = Record<string, Record<string, any>>;
 export type ConfigurableHotkeysState = Record<string, HotkeyTrigger | null>;
+
+export interface LayoutItem {
+    type: "folder" | "script";
+    id: string;
+}
+
+export interface LayoutPath {
+    parent?: string;
+    name?: string;
+    contents: LayoutItem[];
+}
+
+export type ScriptLayout = Record<string, LayoutPath>;
 
 export interface Settings {
     pollerEnabled: boolean;
@@ -21,11 +39,14 @@ export interface Settings {
     autoDownloadMissingPlugins: boolean;
     menuView: "grid" | "list";
     showPluginButtons: boolean;
+    suppressGimkitLogs: boolean;
 }
 
 export interface SavedState {
     plugins: PluginInfo[];
     libraries: LibraryInfo[];
+    pluginLayout: ScriptLayout;
+    libraryLayout: ScriptLayout;
     pluginStorage: PluginStorage;
     pluginSettings: PluginStorage;
     settings: Settings;

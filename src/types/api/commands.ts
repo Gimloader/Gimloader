@@ -2,12 +2,10 @@
 export interface CommandOptions {
     text: string | (() => string);
     keywords?: ReadonlyArray<string>;
-    hidden?: () => boolean;
+    hidden?(): boolean;
 }
 
 export interface Command extends CommandOptions {
-    id: string | null;
-    identifier: number;
     callback: CommandCallback;
 }
 
@@ -40,8 +38,8 @@ export interface CommandContext {
 export type CommandCallback = (context: CommandContext) => void | Promise<void>;
 
 export interface BaseCommandAction<T> {
-    callback: (value: T) => void;
-    cancel: () => void;
+    callback(value: T): void;
+    cancel(): void;
 }
 
 export interface CommandSelectAction extends BaseCommandAction<string> {

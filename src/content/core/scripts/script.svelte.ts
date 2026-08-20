@@ -4,36 +4,53 @@ import type { ScriptInfo } from "$types/net/state";
 import { error } from "$shared/utils";
 import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
-import { gameState } from "$content/stores";
+import { gameState } from "$content/stores.svelte";
 import Modals from "../modals.svelte";
-import { scripts } from "./map";
-import Port from "$shared/net/port.svelte";
 import { signaturePublicKey } from "$shared/consts";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
+import { scriptInstanceMap } from "./map";
+import StateManager from "$shared/state";
+import { deepFreeze } from "$content/utils";
+import Rewriter from "$core/rewriter";
+import Api from "$content/api/api";
+import Cleanup from "./cleanup";
 
-const apiCreatedRegex = /new\s+GL\s*\(/;
+const apis = new Map<string, Script>();
+const createApi = Rewriter.createShared(null, "createApi", (id: string) => {
+    const script = apis.get(id);
+    if(!script) throw new Error("Invalid api creation id");
+
+    apis.delete(id);
+    return new Api(script.headers.name, script);
+});
 
 export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     abstract type: ScriptType;
     abstract warnAbout: boolean;
     code: string;
-    headers: ScriptHeaders = $state();
+    headers: ScriptHeaders = $state({} as ScriptHeaders);
     requires: Script[] = [];
     optionalRequires: Script[] = [];
     requiredBy: Script[] = [];
     optionalBy: Script[] = [];
-    onStop: (() => void)[] = [];
     exported: any;
     errored: boolean = $state(false);
 
     constructor(info: T, headers?: ScriptHeaders) {
         this.code = info.code;
         this.updateHeaders(headers);
+        scriptInstanceMap.set(this.headers.name, this);
     }
+
+    abstract getInfo(): T;
 
     updateHeaders(headers?: ScriptHeaders) {
         if(headers) this.headers = headers;
         else this.headers = parseScriptHeaders(this.code);
+    }
+
+    getHeaders() {
+        return deepFreeze($state.snapshot(this.headers));
     }
 
     started = false;
@@ -84,9 +101,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
                 const uri = encodeURIComponent(this.headers.name);
                 const sourceUrl = `\n//# sourceURL=gimloader://${this.type}/${uri}.js`;
+                const id = this.headers.name;
 
-                // Only create the api automatically if the plugin doesn't call new GL() itself for backwards compatibility
-                const apiDeclaration = this.code.match(apiCreatedRegex) ? "" : `const api = new GL("${this.type}", "${this.headers.name}");\n`;
+                apis.set(id, this);
+                const apiDeclaration = `const api = ${createApi}("${id}");\n`;
 
                 const blob = new Blob([apiDeclaration, this.code, sourceUrl], { type: "application/javascript" });
                 const url = URL.createObjectURL(blob);
@@ -95,20 +113,18 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
                     .then((exports) => {
                         if(!initial) this.checkReloadNeeded();
 
-                        if(exports.onStop && typeof exports.onStop === "function") {
-                            this.onStop.push(exports.onStop);
-                        }
-
                         if(exports.default) exports = exports.default;
                         this.exported = exports;
 
-                        this.onImport?.(exports);
                         const version = this.headers.version ? " v" + this.headers.version : "";
                         log(`Loaded ${this.type} ${this.headers.name}${version}`);
 
                         res();
                     })
-                    .catch(rej)
+                    .catch((e) => {
+                        apis.delete(id);
+                        rej(e);
+                    })
                     .finally(() => URL.revokeObjectURL(url));
             });
         });
@@ -120,8 +136,6 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
         return this.startPromise;
     }
-
-    onImport?(exports: any): void;
 
     get reloadNeeded() {
         return this.headers.reloadRequired === "true"
@@ -162,13 +176,13 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
         for(const type in strings) {
             const deps = strings[type as ScriptType];
-            const requiredDeps = deps.required?.map(getDepName) ?? [];
-            const optionalDeps = deps.optional?.map(getDepName) ?? [];
+            const requiredDeps = deps?.required?.map(getDepName) ?? [];
+            const optionalDeps = deps?.optional?.map(getDepName) ?? [];
             const allDeps = requiredDeps.concat(optionalDeps);
 
             // Confirm the dependencies are all the correct type
             for(const depName of allDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) continue;
 
                 if(script.type !== type) throw new Error(`${this.headers.name} expected dependency ${depName} to be a ${type}, but it is a ${script.type}`);
@@ -176,13 +190,13 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
             // Confirm all required dependencies exist
             for(const depName of requiredDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) throw new Error(`${this.headers.name} is missing ${type} dependency: ${depName}`);
                 required.push(script);
             }
 
             for(const depName of optionalDeps) {
-                const script = scripts.get(depName);
+                const script = scriptInstanceMap.get(depName);
                 if(!script) continue;
                 optional.push(script);
             }
@@ -191,23 +205,17 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         return { required, optional };
     }
 
-    stop() {
+    async stop() {
         if(!this.started) return;
 
-        try {
-            // Call onStop in reverse order
-            for(let i = this.onStop.length - 1; i >= 0; i--) {
-                this.onStop[i]?.();
-            }
-        } catch (e) {
-            error(`Error stopping ${this.headers.name}:`, e);
-        }
+        // Make sure to finish loading to avoid race conditions
+        await this.startPromise;
+        Cleanup.cleanup(this.headers.name, true);
 
         for(const used of this.requires) used.unrequire?.(this, true);
         for(const used of this.optionalRequires) used.unrequire?.(this, false);
 
         this.started = false;
-        this.onStop = [];
         this.startPromise = null;
         this.exported = null;
         this.errored = false;
@@ -220,15 +228,14 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     }
 
     edit(code: string, headers?: ScriptHeaders) {
+        scriptInstanceMap.delete(this.headers.name);
         this.code = code;
         this.updateHeaders(headers);
+        scriptInstanceMap.set(this.headers.name, this);
     }
 
     async deleteConfirm(confirmed = false) {
-        const response = await Port.sendAndRecieve(`${this.type}TryDelete`, {
-            name: this.headers.name,
-            confirmed
-        });
+        const response = StateManager[this.type].tryDelete(this.headers.name, confirmed);
 
         if(response.status === "confirm") {
             const title = `Plugins depend on ${this.headers.name}`;
@@ -244,6 +251,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
     delete() {
         this.stop();
+        scriptInstanceMap.delete(this.headers.name);
     }
 
     signatureRegex = /\n\s*\*\s*@signature \S+\n/g;

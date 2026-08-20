@@ -19,7 +19,7 @@
 </script>
 
 <AlertDialog.Root open={names.length > 0}>
-    <AlertDialog.Content class="z-101">
+    <AlertDialog.Content>
         {englishList(names)}
         {names.length === 1 ? " requires" : " require"}
         a reload in order to function properly.

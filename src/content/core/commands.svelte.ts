@@ -1,8 +1,9 @@
 import type { Command, CommandAction, CommandCallback, CommandContext, CommandOptions } from "$types/api/commands";
 import Hotkeys from "./hotkeys/hotkeys.svelte";
-import { clearId, validate } from "$content/utils";
+import { validate } from "$content/utils";
 import * as z from "zod";
 import { isFirefox } from "$shared/consts";
+import Cleanup from "./scripts/cleanup";
 
 class CancelError extends Error {
     constructor() {
@@ -31,32 +32,13 @@ const StringSchema = z.object({
 });
 
 export default new class Commands {
-    commands: Command[] = $state([]);
+    commands: Command[] = [];
     action: CommandAction | null = $state(null);
     context: CommandContext;
     open = $state(false);
+    openedAt = 0;
 
-    init() {
-        const chromeDefault = {
-            key: "KeyP",
-            ctrl: true,
-            shift: true,
-            alt: false
-        };
-        const firefoxDefault = {
-            key: "KeyP",
-            ctrl: false,
-            shift: true,
-            alt: true
-        };
-
-        Hotkeys.addConfigurableHotkey("openCommandPalette", {
-            category: "Gimloader",
-            title: "Open Command Palette",
-            preventDefault: true,
-            default: isFirefox ? firefoxDefault : chromeDefault
-        }, () => this.startOpen());
-
+    constructor() {
         const createAction = <T extends CommandAction, R>(type: T["type"], options: T["options"]) => {
             this.startOpen();
 
@@ -91,6 +73,28 @@ export default new class Commands {
         };
     }
 
+    init() {
+        const chromeDefault = {
+            key: "KeyP",
+            ctrl: true,
+            shift: true,
+            alt: false
+        };
+        const firefoxDefault = {
+            key: "KeyP",
+            ctrl: false,
+            shift: true,
+            alt: true
+        };
+
+        Hotkeys.addConfigurableHotkey("openCommandPalette", {
+            category: "Gimloader",
+            title: "Open Command Palette",
+            preventDefault: true,
+            default: isFirefox ? firefoxDefault : chromeDefault
+        }, () => this.startOpen());
+    }
+
     closeTimeout?: ReturnType<typeof setTimeout>;
     startClose() {
         this.closeTimeout = setTimeout(() => {
@@ -105,6 +109,7 @@ export default new class Commands {
         }
 
         this.open = true;
+        this.openedAt = Date.now();
     }
 
     onClosed() {
@@ -114,32 +119,18 @@ export default new class Commands {
         this.action = null;
     }
 
-    commandIdentifier = 0;
     addCommand(id: string | null, options: CommandOptions | string, callback: CommandCallback) {
-        const identifier = this.commandIdentifier++;
-
         if(typeof options === "string") {
-            this.commands.push({
+            return Cleanup.addCleanedUpItem(id, this.commands, {
                 text: options,
-                id,
-                identifier,
                 callback
             });
         } else {
-            this.commands.push({
+            return Cleanup.addCleanedUpItem(id, this.commands, {
                 ...options,
-                id,
-                identifier,
                 callback
             });
         }
-
-        return () => {
-            const index = this.commands.findIndex(c => c.identifier === identifier);
-            if(index === -1) return;
-
-            this.commands.splice(index, 1);
-        };
     }
 
     runCommand(callback: CommandCallback) {
@@ -152,9 +143,5 @@ export default new class Commands {
                 throw err;
             });
         }
-    }
-
-    removeCommands(id: string) {
-        clearId(this.commands, id);
     }
 }();

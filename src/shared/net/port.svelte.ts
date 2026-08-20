@@ -1,28 +1,23 @@
-import type { State } from "$types/net/state";
+import type { ExtractOnceMessage, Messages, OnceMessageProps, OnceMessages, StateMessageProps, StateMessages } from "$types/net/messages";
 import EventEmitter2 from "eventemitter2";
 import { isFirefox, portCryptoAlgorithm } from "../consts";
-import type { Messages, OnceMessages, OnceResponses, StateMessages } from "$types/net/messages";
 import { log } from "$shared/utils";
+import { Deferred } from "$shared/utils";
+import StateManager from "$shared/state";
 
 const extensionId = "ngbhofnofkggjbpkpnogcdfdgjkpmgka";
-type StateCallback = (state: State) => void;
 
 export default new class Port extends EventEmitter2 {
-    port: chrome.runtime.Port;
+    port?: chrome.runtime.Port;
     firstMessage = true;
     firstState = true;
-    firstCallback: StateCallback;
-    subsequentCallback?: StateCallback;
     disconnected = $state(false);
     pendingMessages = new Map<string, (response?: any) => void>();
-    runtime: typeof chrome.runtime;
-    signKeyRes: (key: CryptoKey) => void;
-    signKey = new Promise<CryptoKey>((res) => this.signKeyRes = res);
+    runtime!: typeof chrome.runtime;
+    signKey = Deferred.create<CryptoKey>();
     name?: string;
 
-    init(callback: StateCallback, subsequentCallback?: StateCallback, name?: string) {
-        this.firstCallback = callback;
-        this.subsequentCallback = subsequentCallback;
+    init(name?: string) {
         this.name = name;
 
         if(typeof chrome === "undefined") {
@@ -79,9 +74,10 @@ export default new class Port extends EventEmitter2 {
     async postMessage(type: string, message: any, returnId?: string) {
         // just discard messages sent while disconnected, we'll resynchronize to before they mattered
         if(this.disconnected) return;
+        log("Sending message:", type, message);
 
         if(typeof chrome !== "undefined") {
-            this.port.postMessage({ type, message, returnId, source: "gimloader-out" });
+            this.port?.postMessage({ type, message, returnId, source: "gimloader-out" });
             return;
         }
 
@@ -102,7 +98,7 @@ export default new class Port extends EventEmitter2 {
 
         if(data?.type === "key") {
             crypto.subtle.importKey("jwk", data.key, portCryptoAlgorithm, true, ["sign", "verify"])
-                .then((key) => this.signKeyRes(key));
+                .then((key) => this.signKey.resolve(key));
             return;
         }
 
@@ -110,9 +106,12 @@ export default new class Port extends EventEmitter2 {
         if(this.firstMessage) {
             if(this.firstState) {
                 this.firstState = false;
-                this.firstCallback(data);
+                StateManager.init(data, {
+                    downloadDependencies: (deps) => this.sendAndRecieve("downloadDependencies", deps),
+                    broadcast: (type, props) => this.send(type, props)
+                });
             } else {
-                this.subsequentCallback?.(data);
+                StateManager.update(data);
             }
 
             this.firstMessage = false;
@@ -127,16 +126,18 @@ export default new class Port extends EventEmitter2 {
             callback(response);
             this.pendingMessages.delete(returnId);
         } else {
+            log("Recieved message:", data.type, data.message);
+            StateManager.handle(data.type, data.message, true);
             this.emit(data.type, data.message);
         }
     }
 
-    send<Channel extends keyof StateMessages>(type: Channel, message: StateMessages[Channel] = undefined) {
+    send<Channel extends StateMessages["type"]>(type: Channel, message: StateMessageProps<Channel>) {
         this.postMessage(type, message);
     }
 
-    sendAndRecieve<Channel extends keyof OnceMessages>(type: Channel, message: OnceMessages[Channel] = undefined) {
-        return new Promise<OnceResponses[Channel]>((res) => {
+    sendAndRecieve<Channel extends OnceMessages["channel"]>(type: Channel, message: OnceMessageProps<Channel>) {
+        return new Promise<ExtractOnceMessage<Channel>["response"]>((res) => {
             const returnId = crypto.randomUUID();
             this.pendingMessages.set(returnId, res);
             this.postMessage(type, message, returnId);
@@ -154,12 +155,7 @@ export default new class Port extends EventEmitter2 {
         }, 20000);
     }
 
-    // add types for emit and on, the others aren't used
-    emit<Channel extends keyof StateMessages>(channel: Channel, value: StateMessages[Channel]) {
-        return super.emit(channel, value);
-    }
-
-    on<Channel extends keyof Messages>(channel: Channel, callback: (value: Messages[Channel]) => void) {
+    override on<Channel extends Messages["type"]>(channel: Channel, callback: (value: Extract<Messages, { type: Channel }>["props"]) => void) {
         return super.on(channel, callback);
     }
 }();

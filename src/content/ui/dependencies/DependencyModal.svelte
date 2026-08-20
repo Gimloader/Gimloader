@@ -34,7 +34,8 @@
 <Dialog.Root bind:open onOpenChangeComplete={onOpenChange}>
     <Dialog.Content
         class="flex flex-col items-start gap-2 text-gray-600 text-lg"
-        style="max-width: min(760px, calc(100% - 32px))">
+        style="max-width: min(760px, calc(100% - 32px))"
+    >
         <Dialog.Header class="text-2xl font-bold! border-b-2 w-full">
             {title}
         </Dialog.Header>

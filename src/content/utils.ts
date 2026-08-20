@@ -1,8 +1,7 @@
-import Port from "$shared/net/port.svelte";
-import { nop } from "$shared/utils";
-import type { ScriptType } from "$types/net/messages";
 import * as z from "zod";
 import rawChangelog from "../../release-notes.txt";
+import { dndZoneSettings } from "./stores.svelte";
+import { flipDurationMs } from "$shared/consts";
 
 export function validate(fnName: string, args: IArguments, ...schema: [string, string | z.ZodType][]) {
     for(let i = 0; i < schema.length; i++) {
@@ -39,7 +38,7 @@ export function splicer<T>(array: T[], obj: T) {
     };
 }
 
-export function clearId<T extends { id?: string }>(array: T[], id: string) {
+export function clearId<T extends { id?: string | null }>(array: T[], id: string) {
     for(let i = 0; i < array.length; i++) {
         if(array[i].id === id) {
             array.splice(i, 1);
@@ -68,34 +67,6 @@ export function readUserFile(accept: string, callback: (text: string) => void) {
     input.click();
 }
 
-export function showEditor(type: ScriptType, name?: string) {
-    Port.sendAndRecieve("showEditor", { type, name });
-}
-
-// Because of some nonsense with the spec subclassing promises is wonky
-export class Deferred<T = void> extends Promise<T> {
-    resolve: (value?: T) => void;
-    reject: (reason?: any) => void;
-
-    constructor(callback: any) {
-        let resolve: (value?: T) => void;
-        let reject: (reason?: any) => void;
-
-        super((res, rej) => {
-            resolve = res;
-            reject = rej;
-            callback(res, rej);
-        });
-
-        this.resolve = resolve;
-        this.reject = reject;
-    }
-
-    static create<T = void>() {
-        return new Deferred<T>(nop);
-    }
-}
-
 export const domLoaded = new Promise<void>((res) => {
     if(document.readyState !== "loading") {
         res();
@@ -106,3 +77,26 @@ export const domLoaded = new Promise<void>((res) => {
 });
 
 export const changelog = rawChangelog.split("\n").filter(line => line);
+
+export function createTransformDragged(transform: string, disableFlip: boolean) {
+    return (el?: HTMLElement) => {
+        const changeEl = el?.firstElementChild;
+        if(!(changeEl instanceof HTMLElement)) return;
+
+        dndZoneSettings.flipDurationMs = disableFlip ? undefined : flipDurationMs;
+        changeEl.style.transform = transform;
+    };
+}
+
+export function deepFreeze<T>(object: T): T {
+    Object.freeze(object);
+
+    for(const key in object) {
+        const value = object[key as keyof typeof object];
+        if(value && typeof value === "object" && !Object.isFrozen(value)) {
+            deepFreeze(value);
+        }
+    }
+
+    return object;
+}

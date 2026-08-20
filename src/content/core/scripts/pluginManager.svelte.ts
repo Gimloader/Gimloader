@@ -1,35 +1,26 @@
+import type { PluginInfo } from "$types/net/state";
 import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
-import Port from "$shared/net/port.svelte";
-import { Deferred } from "$content/utils";
-import type { PluginInfo } from "$types/net/state";
 import Modals from "../modals.svelte";
-import { parseScriptHeaders } from "$shared/parseHeader";
-import { toast } from "svelte-sonner";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
-import { scripts } from "./map";
+import StateManager from "$shared/state";
+import { pluginsLoaded, scriptInstanceMap } from "./map";
 
-export default new class PluginManager extends ScriptManager<Plugin, PluginInfo> {
+export default new class PluginManager extends ScriptManager<PluginInfo, Plugin> {
     singular = "plugin";
     plural = "plugins";
-    loaded = Deferred.create();
 
     constructor() {
         super(Plugin, "plugin");
 
-        Port.on("pluginCreate", (info) => this.onCreate(info));
-        Port.on("pluginSetAll", ({ enabled }) => this.onSetAll(enabled));
-        Port.on("pluginToggled", ({ name, enabled }) => this.onToggled(name, enabled));
-    }
+        StateManager.plugin.on("pluginToggled", this.onToggled.bind(this));
+        StateManager.events.on("init", async () => {
+            const toRun = this.scripts.filter(p => p.enabled);
+            await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
 
-    async init(info: PluginInfo[]) {
-        super.init(info);
-
-        const toRun = this.scripts.filter(p => p.enabled);
-        await Promise.allSettled(toRun.map(p => p.onToggled(true, true)));
-
-        this.loaded.resolve();
+            pluginsLoaded.resolve();
+        });
     }
 
     isEnabled(name: string) {
@@ -39,15 +30,12 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         return script.enabled;
     }
 
-    async setAllConfirm(enabled: boolean, confirmed = false) {
-        const response = await Port.sendAndRecieve("trySetAllPlugins", {
-            enabled,
-            confirmed
-        });
+    async setAllConfirm(enabled: boolean, folder?: string, confirmed = false) {
+        const response = await StateManager.plugin.trySetAllPlugins(enabled, folder, confirmed);
 
         switch (response.status) {
             case "dependencyError": {
-                const scripts = response.scripts.map(s => this.getScript(s));
+                const scripts = response.scripts.map(s => this.getScript(s)).filter(s => s) as Plugin[];
                 const title = scripts.length > 1 ? "Could not enable some plugins" : `Could not enable ${scripts[0].headers.name}`;
 
                 Modals.open("dependency", {
@@ -55,16 +43,16 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
                     type: "error",
                     title
                 });
-                return false;
+                return;
             }
             case "downloadError":
                 Modals.open("error", {
                     text: response.message,
                     title: "Download Error"
                 });
-                return false;
-            case "confirm": {
-                const scripts = response.scripts.map(s => this.getScript(s));
+                return;
+            case "dependencyConfirm": {
+                const scripts = response.scripts.map(s => this.getScript(s)).filter(s => s) as Plugin[];
                 const title = "Dependencies need to be downloaded";
 
                 const confirmed = await Modals.open("dependency", {
@@ -74,20 +62,21 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
                 });
                 if(!confirmed) return;
 
-                this.setAllConfirm(enabled, true);
+                this.setAllConfirm(enabled, folder, true);
+                return;
+            }
+            case "confirm": {
+                const title = `Plugins depend on plugins in this folder`;
+                const confirmed = await Modals.open("confirm", {
+                    text: response.message,
+                    title
+                });
+                if(!confirmed) return;
+
+                this.setAllConfirm(enabled, folder, true);
                 return;
             }
         }
-    }
-
-    setAll(enabled: boolean) {
-        this.onSetAll(enabled);
-        Port.send("pluginSetAll", { enabled });
-    }
-
-    onSetAll(enable: boolean) {
-        const toSet = this.scripts.filter(p => p.enabled !== enable);
-        for(const plugin of toSet) plugin.onToggled(enable);
     }
 
     onToggled(name: string, enabled: boolean) {
@@ -97,34 +86,15 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         plugin.onToggled(enabled);
     }
 
-    async create(code: string) {
-        const headers = parseScriptHeaders(code);
-        if(headers.isLibrary !== "false") {
-            toast.error("Plugins must not have the @isLibrary header set");
-            return;
-        }
-
-        const info = { name: headers.name, code, enabled: false };
-        this.deleteConflicting(info.name);
-
-        const created = this.onCreate(info);
-
-        // Create it disabled and enable it
-        Port.send("pluginCreate", info);
-        created.toggleConfirm(true);
-
-        return created;
-    }
-
-    onCreate(info: PluginInfo) {
-        const plugin = super.onCreate(info);
-        if(info.enabled) plugin.start(false);
+    override onCreate(info: PluginInfo, initial: boolean) {
+        const plugin = super.onCreate(info, initial);
+        if(!initial && info.enabled) plugin.start(false);
 
         return plugin;
     }
 
     async require(requirer: string, name: string, downloadUrl?: string) {
-        const requirerScript = scripts.get(requirer);
+        const requirerScript = scriptInstanceMap.get(requirer);
         if(!requirerScript) throw new Error(`Requirer script ${requirer} not found`);
 
         // Try to enable the plugin if it already exists
@@ -161,7 +131,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         if(!confirmed) throw new Error("User declined downloading dependency");
 
         // Download the plugin
-        await downloadScript(downloadUrl, "plugin", true);
+        await downloadScript(downloadUrl, "root", "plugin", true);
         const script = this.getScript(name);
         if(!script) throw new Error(`Failed to download dependency ${name}`);
 
@@ -172,7 +142,7 @@ export default new class PluginManager extends ScriptManager<Plugin, PluginInfo>
         return script.exported;
     }
 
-    addCommands() {
+    override addCommands() {
         super.addCommands();
 
         const hasSettings = (p: Plugin) => p.openSettingsMenu.length > 0;

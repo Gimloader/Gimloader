@@ -1,5 +1,5 @@
+import StateManager from "$shared/state";
 import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyTrigger } from "$types/api/hotkeys";
-import Hotkeys from "./hotkeys.svelte";
 
 export default class ConfigurableHotkey {
     id: string;
@@ -24,10 +24,12 @@ export default class ConfigurableHotkey {
     }
 
     loadTrigger() {
-        if(Hotkeys.savedHotkeys[this.id] === null) {
+        const configurable = StateManager.hotkeys.configurable.value;
+
+        if(configurable[this.id] === null) {
             this.trigger = null;
-        } else if(Hotkeys.savedHotkeys[this.id]) {
-            this.trigger = Object.assign({}, Hotkeys.savedHotkeys[this.id]);
+        } else if(configurable[this.id]) {
+            this.trigger = Object.assign({}, configurable[this.id]);
         } else if(this.default) {
             this.trigger = Object.assign({}, this.default);
         }

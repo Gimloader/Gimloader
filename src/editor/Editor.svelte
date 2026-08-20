@@ -1,23 +1,29 @@
 <script lang="ts">
-    import Port from "$shared/net/port.svelte";
+    import type { CreateEditor, Editor } from "$types/editor";
+    import type { ScriptType } from "$types/net/messages";
+    import type { LibraryInfo, PluginInfo } from "$types/net/state";
     import ContentSaveAlertOutline from "svelte-material-icons/ContentSaveAlertOutline.svelte";
     import ContentSaveOutline from "svelte-material-icons/ContentSaveOutline.svelte";
     import Close from "svelte-material-icons/Close.svelte";
     import { defaultLibraryScript, defaultPluginScript } from "./consts";
-    import State from "$shared/net/bareState.svelte";
     import { parseScriptHeaders } from "$shared/parseHeader";
-    import type { CreateEditor, Editor } from "$types/editor";
-    import type { ScriptType } from "$types/net/messages";
+    import StateManager from "$shared/state";
 
     let { createEditor }: { createEditor: CreateEditor } = $props();
 
+    let plugins: PluginInfo[] = $state([]);
+    let libraries: LibraryInfo[] = $state([]);
+
+    StateManager.plugin.scripts.bind(() => plugins, (value) => plugins = value);
+    StateManager.library.scripts.bind(() => libraries, (value) => libraries = value);
+
     const params = new URLSearchParams(location.search);
     const type = params.get("type") as ScriptType;
-    let name: string | undefined = $state(params.get("name"));
+    let name: string | null = $state(params.get("name"));
 
     let existing = $derived.by(() => {
-        if(type === "plugin") return State.plugins.find(p => p.name === name);
-        else return State.libraries.find(l => l.name === name);
+        if(type === "plugin") return plugins.find(p => p.name === name);
+        else return libraries.find(l => l.name === name);
     });
 
     let title = $derived(`${existing ? "Editing" : "Creating"} ${name ? `${type} ${name}` : `a new ${type}`}`);
@@ -25,11 +31,11 @@
         document.title = `${title} | Gimloader`;
     });
 
-    let editorDiv: HTMLElement = $state();
+    let editorDiv: HTMLElement = $state()!;
     let saved = $state(true);
     let editor: Editor;
 
-    State.init(() => {
+    StateManager.events.on("init", () => {
         let value: string;
 
         if(existing) value = existing.code;
@@ -43,7 +49,7 @@
         });
     });
 
-    function save() {
+    async function save() {
         let code = editor.getValue();
         let headers = parseScriptHeaders(code);
         const isLibrary = headers.isLibrary !== "false";
@@ -60,7 +66,7 @@
             }
         }
 
-        Port.sendAndRecieve("editOrCreate", { name, code });
+        await StateManager.allScripts.editOrCreate(code, name, params.get("folder") ?? undefined);
 
         name = headers.name;
         saved = true;
@@ -74,7 +80,10 @@
         if(!saved && !confirm("You have unsaved changes! Are you sure you want to exit?")) return;
         saved = true;
 
-        chrome.tabs.getCurrent().then((tab) => chrome.tabs.remove(tab.id));
+        chrome.tabs.getCurrent().then((tab) => {
+            if(!tab?.id) return;
+            chrome.tabs.remove(tab.id);
+        });
     }
 
     function onKeydown(e: KeyboardEvent) {

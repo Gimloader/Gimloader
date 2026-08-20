@@ -1,6 +1,6 @@
 {
   "name": "gimloader",
-  "version": "1.12.4",
+  "version": "2.0.0",
   "description": "A plugin loader and manager for Gimkit",
   "type": "module",
   "scripts": {
@@ -37,29 +37,32 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.5",
-    "@dimforge/rapier2d-compat": "^0.19.1",
-    "@lucide/svelte": "^0.544.0",
+    "@dimforge/rapier2d-compat": "~0.17.3",
+    "@internationalized/date": "^3.12.0",
+    "@lucide/svelte": "^1.17.0",
     "@tailwindcss/postcss": "^4.1.16",
     "@types/bun": "^1.3.8",
     "@types/chrome": "^0.0.299",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.22",
-    "bits-ui": "^2.11.0",
+    "bits-ui": "^2.18.1",
     "clsx": "^2.1.1",
     "dprint": "^0.50.2",
-    "dts-bundle-generator": "^9.5.1",
     "esbuild": "^0.25.0",
     "esbuild-svelte": "^0.9.3",
     "phaser": "^3.90.0",
     "postcss": "^8.5.6",
     "postcss-load-config": "^6.0.1",
+    "rollup": "^4.61.1",
+    "rollup-plugin-dts": "^6.4.1",
     "runed": "^0.36.0",
-    "svelte-check": "^4.3.4",
+    "svelte-check": "^4.7.1",
+    "svelte2tsx": "^0.7.56",
     "tailwind-merge": "^3.3.1",
     "tailwind-variants": "^3.1.1",
     "tailwindcss": "^4.1.16",
     "tw-animate-css": "^1.4.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   },
   "dependencies": {
     "@codemirror/commands": "^6.8.1",
@@ -75,10 +78,13 @@
     "monaco-editor": "^0.52.2",
     "svelte": "5.43.0",
     "svelte-awesome-color-picker": "^4.1.0",
-    "svelte-dnd-action": "^0.9.66",
+    "svelte-dnd-action": "^0.9.70",
     "svelte-material-icons": "^3.0.5",
     "svelte-sonner": "^1.0.6",
     "wildcard-match": "^5.1.4",
     "zod": "^4.1.12"
+  },
+  "patchedDependencies": {
+    "rollup-plugin-dts@6.4.1": "patches/rollup-plugin-dts@6.4.1.patch"
   }
 }

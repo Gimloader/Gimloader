@@ -1,72 +1,47 @@
 import type { Script } from "./script.svelte";
 import type { ScriptHeaders } from "$types/scripts";
-import type { ScriptInfo } from "$types/net/state";
-import Port from "$shared/net/port.svelte";
+import type { LayoutItem, ScriptInfo, ScriptLayout } from "$types/net/state";
+import type { CommandContext } from "$types/api/commands";
+import type { FolderExport, ScriptType } from "$types/net/messages";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
-import { scripts } from "./map";
 import Commands from "../commands.svelte";
-import type { CommandContext } from "$types/api/commands";
 import { addUpdated } from "$content/ui/modals/Changelog.svelte";
+import Modals from "$core/modals.svelte";
+import { amountWithS, downloadJson } from "$shared/utils";
+import { readUserFile } from "$content/utils";
+import StateManager from "$shared/state";
+import Port from "$shared/net/port.svelte";
 
-export default abstract class ScriptManager<T extends Script, I extends ScriptInfo> {
+export default abstract class ScriptManager<I extends ScriptInfo = any, T extends Script<I> = any> {
     abstract singular: string;
     abstract plural: string;
     scripts: T[] = $state([]);
-    type: T["type"];
+    layout: ScriptLayout = $state({ root: { contents: [] } });
+    openFolderId = $state("root");
+    currentFolder = $derived(this.layout[this.openFolderId]);
+    type: ScriptType;
     ScriptClass: new(info: I, headers?: ScriptHeaders) => T;
 
     constructor(script: new(info: I, headers?: ScriptHeaders) => T, type: T["type"]) {
         this.ScriptClass = script;
         this.type = type;
 
-        Port.on(`${type}Edit`, ({ name, code, updated }) => this.onEdit(name, code, updated));
-        Port.on(`${type}Delete`, ({ name }) => this.onDelete(name));
-        Port.on(`${type}DeleteAll`, () => this.onDeleteAll());
-        Port.on(`${type}Arrange`, ({ order }) => this.onArrange(order));
+        StateManager[this.type].layout.bind(() => this.layout, (layout) => this.layout = layout);
+
+        StateManager[this.type].on("scriptDelete", this.onDelete.bind(this));
+        StateManager[this.type].on("scriptEdit", this.onEdit.bind(this));
+        StateManager[this.type].on("scriptCreate", this.onCreate.bind(this) as (info: unknown, initial: boolean) => void);
+        StateManager[this.type].on("stateUpdate", () => {
+            if(!this.layout[this.openFolderId]) this.openFolderId = "root";
+        });
     }
 
-    init(info: I[]) {
-        for(const item of info) {
-            const script = new this.ScriptClass(item);
-            this.scripts.push(script);
-            scripts.set(script.headers.name, script);
-        }
+    init() {
+        const savedFolder = localStorage.getItem(`gl-${this.type}Folder`);
+        if(savedFolder && this.layout[savedFolder]) this.openFolderId = savedFolder;
 
         this.addCommands();
-    }
-
-    updateState(scriptInfo: I[]) {
-        // check if any scripts were added
-        for(const info of scriptInfo) {
-            if(!this.getScript(info.name)) {
-                this.onCreate(info);
-            }
-        }
-
-        // check if any scripts were removed
-        for(const script of this.scripts) {
-            if(!scriptInfo.some(i => i.name === script.headers.name)) {
-                this.onDelete(script.headers.name);
-            }
-        }
-
-        // check if any scripts were updated
-        for(const info of scriptInfo) {
-            const existing = this.getScript(info.name);
-            if(existing.code !== info.code) {
-                this.onEdit(info.name, info.code);
-            }
-        }
-
-        // move the scripts into the correct order
-        const newOrder = [];
-        for(const info of scriptInfo) {
-            const addScript = this.getScript(info.name);
-            if(addScript) newOrder.push(addScript);
-        }
-
-        this.scripts = newOrder;
     }
 
     getScriptNames(): string[] {
@@ -74,10 +49,9 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
     }
 
     getScript(name: string): T | null {
-        const script = scripts.get(name);
-
-        if(script instanceof this.ScriptClass) return script;
-        return null;
+        const script = this.scripts.find(s => s.headers.name === name);
+        if(!script) return null;
+        return script;
     }
 
     getExports(name: string): any {
@@ -96,20 +70,13 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
         return script.started;
     }
 
-    onEdit(name: string, code: string, updated?: boolean) {
+    onEdit(name: string, newName: string, code: string, updated?: boolean) {
         const script = this.getScript(name);
         if(!script) return;
 
-        // Update the name if needed
-        const oldName = script.headers.name;
         const headers = parseScriptHeaders(code);
-        if(oldName !== headers.name) {
-            scripts.delete(oldName);
-            scripts.set(headers.name, script);
-        }
-
-        if(updated && headers.changelog.length > 0) {
-            addUpdated(headers.name, headers.version, headers.changelog);
+        if(updated && headers.version && headers.changelog.length > 0) {
+            addUpdated(newName, headers.version, headers.changelog);
         }
 
         script.edit(code, headers);
@@ -121,67 +88,18 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
 
         this.scripts[index].delete();
         this.scripts.splice(index, 1);
-        scripts.delete(name);
     }
 
-    deleteAll(shouldToast: boolean) {
-        if(this.scripts.length === 0) {
-            toast.error(`No ${this.plural} to delete`);
-            return;
-        }
-
-        const deleted = this.scripts.length;
-
-        this.onDeleteAll();
-        Port.send(`${this.type}DeleteAll`);
-        if(shouldToast) toast.success(`Deleted ${deleted} ${deleted === 1 ? this.singular : this.plural}`);
-    }
-
-    onDeleteAll() {
-        for(const script of this.scripts) {
-            script.delete();
-            scripts.delete(script.headers.name);
-        }
-
-        this.scripts = [];
-    }
-
-    onCreate(info: I) {
+    onCreate(info: I, _initial: boolean) {
         const headers = parseScriptHeaders(info.code);
         const script = new this.ScriptClass(info, headers);
+
         this.scripts.push(script);
-        scripts.set(script.headers.name, script);
 
         return script;
     }
 
-    arrange(order: string[]) {
-        this.onArrange(order);
-        Port.send(`${this.type}Arrange`, { order });
-    }
-
-    onArrange(order: string[]) {
-        const newOrder: T[] = [];
-
-        for(const name of order) {
-            const script = this.getScript(name);
-            if(script) newOrder.push(script);
-        }
-
-        this.scripts = newOrder;
-    }
-
-    deleteConflicting(name: string) {
-        const index = this.scripts.findIndex(s => s.headers.name === name);
-        if(index === -1) return;
-
-        this.scripts.splice(index, 1);
-        scripts.delete(name);
-        Port.send(`${this.type}Delete`, { name });
-        toast.warning(`Overwrote ${this.singular} ${name}`);
-    }
-
-    async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T> {
+    async selectScript(context: CommandContext, title: string, filter?: (script: T) => boolean): Promise<T | null> {
         const scripts = filter ? this.scripts.filter(filter) : this.scripts;
 
         const name = await context.select({
@@ -193,14 +111,104 @@ export default abstract class ScriptManager<T extends Script, I extends ScriptIn
     }
 
     addCommands() {
-        // Add a command for deleting a script
         Commands.addCommand(null, {
             text: `Delete ${this.singular}`,
             keywords: ["remove", "uninstall"],
             hidden: () => this.scripts.length === 0
         }, async (context) => {
             const script = await this.selectScript(context, `Select ${this.singular} to delete`);
-            script.deleteConfirm();
+            script?.deleteConfirm();
+        });
+
+        Commands.addCommand(null, {
+            text: `Edit ${this.singular}`,
+            hidden: () => this.scripts.length === 0
+        }, async (context) => {
+            const script = await this.selectScript(context, `Select ${this.singular} to edit`);
+            if(!script) return;
+
+            Port.sendAndRecieve("showEditor", {
+                type: this.type,
+                name: script.headers.name
+            });
+        });
+    }
+
+    getFolderName(id: string) {
+        return this.layout[id]?.name ?? this.plural;
+    }
+
+    getItemName(item: LayoutItem) {
+        if(item.type === "folder") return this.getFolderName(item.id);
+        return item.id;
+    }
+
+    viewFolder(id: string) {
+        this.openFolderId = id;
+        localStorage.setItem(`gl-${this.type}Folder`, id);
+    }
+
+    async folderTryDelete(id: string, confirmed = false) {
+        const response = StateManager[this.type].tryDeleteFolder(id, confirmed);
+
+        if(response.status === "confirm") {
+            const title = `Plugins depend on ${this.plural} in this folder`;
+            const confirmed = await Modals.open("confirm", {
+                text: response.message,
+                title
+            });
+            if(!confirmed) return;
+
+            this.folderTryDelete(id, true);
+        }
+    }
+
+    exportFolder(id: string) {
+        const exportedLayout: ScriptLayout = {};
+        const scripts: I[] = [];
+
+        const addFolder = (folderId: string) => {
+            exportedLayout[folderId] = this.layout[folderId];
+
+            for(const item of this.layout[folderId].contents) {
+                if(item.type === "folder") {
+                    addFolder(item.id);
+                } else {
+                    const script = this.getScript(item.id);
+                    if(script) scripts.push(script.getInfo());
+                }
+            }
+        };
+
+        addFolder(id);
+
+        const exported: FolderExport = {
+            layout: exportedLayout,
+            entryId: id,
+            type: this.type,
+            scripts
+        };
+
+        downloadJson(exported, `${this.getFolderName(id)}.json`);
+    }
+
+    importFolder() {
+        readUserFile(".json", async (contents) => {
+            try {
+                const json: FolderExport = JSON.parse(contents);
+
+                if(json.type !== this.type) {
+                    toast.error(`That folder import isn't for ${this.plural}!`);
+                    return;
+                }
+
+                const { scripts, folders } = StateManager[this.type].importFolder(this.openFolderId, json);
+
+                toast.success(`Imported a folder containing ${amountWithS(scripts, "script")} and ${amountWithS(folders, "folder")}`);
+            } catch (e) {
+                console.error(e);
+                toast.error("That folder appears to be invalid!");
+            }
         });
     }
 }

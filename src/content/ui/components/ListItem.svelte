@@ -16,6 +16,7 @@
         description?: Snippet;
         hasDrag?: boolean;
         deprecated?: boolean;
+        overlay?: Snippet;
     }
 
     let {
@@ -30,7 +31,8 @@
         author,
         description,
         hasDrag = true,
-        deprecated
+        deprecated,
+        overlay
     }: Props = $props();
 
     function checkDrag() {
@@ -40,11 +42,12 @@
     let expanded = $state(false);
     let classes = $derived(
         (error ? "border-2 border-red-500" : deprecated ? "border-2 border-yellow-300" : "border border-gray-500")
-            + " p-3 h-full bg-white preflight rounded-xl relative"
+            + " p-3 h-full bg-white preflight rounded-xl relative overflow-hidden origin-right transition-transform duration-150"
     );
 </script>
 
 <div class={classes}>
+    {@render overlay?.()}
     <div class="flex items-center">
         {#if loading}
             <div class="absolute bottom-0 left-0 z-0 overflow-hidden w-full rounded-bl-xl rounded-br-xl h-6 animWrap">
@@ -54,15 +57,15 @@
         <button
             class="transition-transform"
             style={expanded ? "transform: rotate(90deg)" : ""}
-            onclick={() => expanded = !expanded}>
+            onclick={() => expanded = !expanded}
+        >
             <ChevronRight width={28} height={28} />
         </button>
         {@render toggle?.()}
         <div class="grow leading-3 ml-2 min-w-0">
             {@render header?.()}
         </div>
-
-        <div class="flex flex-row-reverse items-end">
+        <div class="flex content-end items-end">
             {@render buttons?.()}
         </div>
         {#if hasDrag}
@@ -70,7 +73,8 @@
                 style:cursor={dragAllowed ? dragDisabled ? "grab" : "grabbing" : "not-allowed"}
                 title={dragAllowed ? "" : "Cannot rearrange while searching"}
                 class:opacity-50={!dragAllowed}
-                onpointerdown={checkDrag}>
+                onpointerdown={checkDrag}
+            >
                 <DotsGrid size={28} />
             </div>
         {/if}

@@ -4,11 +4,11 @@
 
     interface Props {
         value?: string;
+        searchOpen?: boolean;
     }
 
-    let { value = $bindable("") }: Props = $props();
-    let searchInput: HTMLInputElement = $state();
-    let searchOpen = $state(false);
+    let { value = $bindable(""), searchOpen = $bindable(false) }: Props = $props();
+    let searchInput: HTMLInputElement = $state()!;
 
     function openSearch() {
         searchInput.style.display = "block";

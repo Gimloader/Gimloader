@@ -1,11 +1,13 @@
-import { clearId, splicer } from "$content/utils";
 import { domLoaded } from "$content/utils";
 import { clear, get, set } from "idb-keyval";
-import PluginManager from "./scripts/pluginManager.svelte";
-import Port from "$shared/net/port.svelte";
-import { englishList, error, nop } from "$shared/utils";
+import { englishList, error, log, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
+import StateManager from "$shared/state";
+import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
+import { toast } from "svelte-sonner";
+import Cleanup from "./scripts/cleanup";
+import { pluginsLoaded } from "./scripts/map";
 
 interface Import {
     text: string;
@@ -50,17 +52,21 @@ export default class Rewriter {
     static shared: Record<string, any> = {
         onload: this.onload.bind(this)
     };
-    static sharedPluginNames: Record<string, string[]> = {};
     static rootScript = "";
     static scriptCode: Record<string, string> = {};
     static parseHooks: ParseHook[] = [];
     static runInScopes: RunInScope[] = [];
+    static bundleHash = localStorage.getItem("gl-bundleHash");
 
-    static async init(cacheInvalid: boolean) {
-        if(cacheInvalid) this.invalidate(true);
+    static async init() {
+        // Don't bother broadcasting when the cache is invalidated since we can handle it locally
+        StateManager.filterBroadcast("cacheInvalid", ({ invalid }) => invalid);
 
-        Port.on("cacheInvalid", ({ invalid }) => {
-            if(invalid) this.invalidate(true);
+        StateManager.cache.on("invalid", (remote: boolean) => {
+            this.invalidate();
+
+            if(remote) StateManager.apply("cacheInvalid", { invalid: false });
+            else StateManager.handle("cacheInvalid", { invalid: false });
         });
 
         Object.defineProperties(window, {
@@ -79,6 +85,15 @@ export default class Rewriter {
         await domLoaded;
         const index = document.querySelector<HTMLScriptElement>('script[type="module"][src^="/assets/index"]');
 
+        if(!index) {
+            const text = `Critical error loading Gimkit.\n\n`
+                + "This error is likely caused by Gimloader itself. Please try reloading the page. "
+                + "If this issue persists open an issue at https://github.com/Gimloader/Gimloader.";
+            Modals.open("error", { text, title: "Error loading Gimkit" });
+
+            return;
+        }
+
         // Invalidate the database if the index script has changed
         const name = this.getName(index.src);
         if(name !== localStorage.getItem("gl-lastindex")) {
@@ -86,24 +101,35 @@ export default class Rewriter {
             localStorage.setItem("gl-lastindex", name);
         }
 
+        if(this.bundleHash) {
+            toast.warning("Using old Gimkit bundle");
+            log(`Loading old bundle ${this.bundleHash}`);
+        }
+
         this.base = new URL(index.src);
-        this.import(index.src, true);
+        this.import(this.bundleHash ? "https://gimkit.com/assets/_index.js" : index.src, true);
     }
 
-    static updateState(cacheInvalid: boolean) {
-        if(cacheInvalid) this.invalidate(true);
+    static setBundleHash(hash: string) {
+        localStorage.setItem("gl-bundleHash", hash);
+        this.invalidate();
+        addReloadNeeded("Gimloader");
+    }
+
+    static clearBundleHash() {
+        localStorage.removeItem("gl-bundleHash");
+        this.invalidate();
+        addReloadNeeded("Gimloader");
     }
 
     static getName(src: string) {
-        return src.split("/").pop();
+        return src.split("/").pop()!;
     }
 
-    static invalidate(broadcast = false) {
+    static invalidate() {
         if(this.cleared) return;
         this.cleared = true;
         clear();
-
-        if(broadcast) Port.send("cacheInvalid", { invalid: false });
     }
 
     static loadingSrcs = new Map<string, Promise<string>>();
@@ -112,11 +138,15 @@ export default class Rewriter {
         if(existing) return existing;
 
         const promise = new Promise<string>(async (res) => {
-            let parsed: ParsedJs;
+            let parsed: ParsedJs | undefined;
             if(!this.cleared && !skipPluginHooks) parsed = await get(name);
 
             if(!parsed) {
-                const resp = await fetch(`https://www.gimkit.com/gimloader/assets/${name}`);
+                const url = this.bundleHash
+                    ? `https://raw.githubusercontent.com/Gimloader/bundle-tracker/${this.bundleHash}/data/rawjs/${name}`
+                    : `https://www.gimkit.com/gimloader/assets/${name}`;
+
+                const resp = await fetch(url);
                 const js = await resp.text();
                 parsed = this.parse(js, name, root, skipPluginHooks);
 
@@ -141,7 +171,7 @@ export default class Rewriter {
         const blobUrl = await this.fetchScript(name, root);
 
         // Negligible impact on load time
-        await PluginManager.loaded;
+        await pluginsLoaded;
 
         try {
             const imported = await import(blobUrl);
@@ -153,7 +183,7 @@ export default class Rewriter {
 
             // Create an error message that lists plugins that might be causing the issue
             let usedHooks = this.getParseHooks(name, root, false)
-                .map(hook => hook.id).filter(name => name);
+                .map(hook => hook.id).filter(name => name) as string[];
             usedHooks = [...new Set(usedHooks)];
 
             // If no hooks were used, just give up
@@ -188,7 +218,7 @@ export default class Rewriter {
         // Remove dependency preloading
         if(js.startsWith("const __vite__mapDeps")) {
             const start = js.indexOf(";");
-            js = "const __vite__mapDeps = () => [];" + js.slice(start + 1);
+            js = "const __vite__mapDeps=()=>[];" + js.slice(start + 1);
         }
 
         // Replace dynamic imports
@@ -270,38 +300,24 @@ export default class Rewriter {
         }
     }
 
-    static addParseHook(pluginName: string | null, prefix: Prefix, modifier: (code: string) => string) {
+    static addParseHook(pluginName: string | null, prefix: Prefix, modifier: (code: string) => string | undefined) {
         const object: ParseHook = { prefix, callback: modifier };
         if(pluginName) object.id = pluginName;
 
-        return splicer(this.parseHooks, object);
-    }
-
-    static removeParseHooks(pluginName: string) {
-        clearId(this.parseHooks, pluginName);
+        return Cleanup.addCleanedUpItem(pluginName, this.parseHooks, object);
     }
 
     static createShared(pluginName: string | null, id: string, value: any) {
-        let sharedId = id;
+        const sharedId = pluginName ? `${pluginName}-${id}` : id;
 
         if(pluginName !== null) {
-            sharedId = `${pluginName}-${id}`;
-            this.sharedPluginNames[pluginName] ??= [];
-            this.sharedPluginNames[pluginName].push(sharedId);
+            Cleanup.on(pluginName, () => {
+                delete this.shared[sharedId];
+            });
         }
 
         this.shared[sharedId] = value;
         return `GLShared["${sharedId}"]`;
-    }
-
-    static removeShared(pluginName: string) {
-        if(!this.sharedPluginNames[pluginName]) return;
-
-        for(const id of this.sharedPluginNames[pluginName]) {
-            delete this.shared[id];
-        }
-
-        delete this.sharedPluginNames[pluginName];
     }
 
     static removeSharedById(pluginName: string, id: string) {
@@ -324,11 +340,7 @@ export default class Rewriter {
         const object: RunInScope = { prefix, callback };
         if(pluginName) object.id = pluginName;
 
-        return splicer(this.runInScopes, object);
-    }
-
-    static removeRunInScope(pluginName: string) {
-        clearId(this.runInScopes, pluginName);
+        return Cleanup.addCleanedUpItem(pluginName, this.runInScopes, object);
     }
 
     static exposeVar(pluginName: string | null, prefix: Prefix, exposer: Exposer) {
@@ -348,7 +360,7 @@ export default class Rewriter {
         });
 
         return () => {
-            this.removeSharedById(pluginName, id);
+            if(pluginName) this.removeSharedById(pluginName, id);
             cancel();
         };
     }

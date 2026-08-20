@@ -5,6 +5,7 @@ import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
 import * as z from "zod";
 import Modals from "$core/modals.svelte";
+import StateManager from "$shared/state";
 
 const BaseSchema = z.object({
     id: z.string(),
@@ -160,7 +161,7 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             applyDefaults(id, description);
             registerListeners(id, description);
 
-            return this;
+            return this as any;
         },
         listen(key, callback, immediate = false) {
             validate("settings.listen", arguments, ["key", "string"], ["callback", "function"], ["immediate?", "boolean"]);
@@ -179,14 +180,14 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
 
             return Storage.pluginSettings[id]?.[prop] ?? null;
         },
-        set(_, prop, value) {
-            if(typeof prop !== "string") return false;
-            if(prop in methods) {
-                error(`settings.${prop} is reserved and cannot be set`);
+        set(_, key, value) {
+            if(typeof key !== "string") return false;
+            if(key in methods) {
+                error(`settings.${key} is reserved and cannot be set`);
                 return false;
             }
 
-            Storage.setPluginSetting(id, prop, value);
+            StateManager.apply("pluginSettingUpdate", { id, key, value });
             return true;
         }
     });

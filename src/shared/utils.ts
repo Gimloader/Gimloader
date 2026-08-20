@@ -1,4 +1,7 @@
 // biome-ignore-all lint/suspicious/noConsole: Used for intended logging
+import type EventEmitter from "node:events";
+import EventEmitter2 from "eventemitter2";
+
 export function log(...args: any[]) {
     console.log("%c[GL]", "color:#5030f2", ...args);
 }
@@ -13,4 +16,50 @@ export function englishList(items: string[], combiner = "and") {
     else return `${items.slice(0, -1).join(", ")}, ${combiner} ${items.at(-1)}`;
 }
 
+export function capitalize(string: string) {
+    return string[0].toUpperCase() + string.slice(1);
+}
+
+export function amountWithS(amount: number, word: string) {
+    return `${amount} ${word}${amount === 1 ? "" : "s"}`;
+}
+
+export function downloadJson(json: any, name: string) {
+    const blob = new Blob([JSON.stringify(json, null, 4)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = name;
+    link.href = url;
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
 export const nop = () => {};
+
+export const TypedEventEmitter = EventEmitter2 as unknown as typeof EventEmitter;
+
+// Because of some nonsense with the spec subclassing promises is wonky
+export class Deferred<T = void> extends Promise<T> {
+    resolve: (value?: T) => void;
+    reject: (reason?: any) => void;
+
+    constructor(callback: any) {
+        let resolve: (value?: T) => void;
+        let reject: (reason?: any) => void;
+
+        super((res, rej) => {
+            // @ts-expect-error trust me bro
+            resolve = res;
+            reject = rej;
+            callback(res, rej);
+        });
+
+        this.resolve = resolve!;
+        this.reject = reject!;
+    }
+
+    static create<T = void>() {
+        return new Deferred<T>(nop);
+    }
+}

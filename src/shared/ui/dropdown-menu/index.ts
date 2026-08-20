@@ -1,4 +1,4 @@
-import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+import { DropdownMenu as DropdownMenuPrimitive, type DropdownMenuRootProps } from "bits-ui";
 import CheckboxGroup from "./dropdown-menu-checkbox-group.svelte";
 import CheckboxItem from "./dropdown-menu-checkbox-item.svelte";
 import Content from "./dropdown-menu-content.svelte";
@@ -13,8 +13,13 @@ import Trigger from "./dropdown-menu-trigger.svelte";
 import SubContent from "./dropdown-menu-sub-content.svelte";
 import SubTrigger from "./dropdown-menu-sub-trigger.svelte";
 import GroupHeading from "./dropdown-menu-group-heading.svelte";
+import type { Component } from "svelte";
+
+// biome-ignore lint: typescript does not like the root type for some reason
+type RootType = Component<DropdownMenuRootProps, {}, "open">;
+
+const Root = DropdownMenuPrimitive.Root as RootType;
 const Sub = DropdownMenuPrimitive.Sub;
-const Root = DropdownMenuPrimitive.Root;
 
 export {
     CheckboxGroup,

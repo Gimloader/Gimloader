@@ -32,10 +32,11 @@ export const defaultSettings: Settings = {
     autoDownloadMissingLibs: true,
     autoDownloadMissingPlugins: false,
     menuView: "grid",
-    showPluginButtons: true
+    showPluginButtons: true,
+    suppressGimkitLogs: false
 };
 
-export const flipDurationMs = 300;
+export const flipDurationMs = 350;
 
 export const glslTypes = [
     "bool",

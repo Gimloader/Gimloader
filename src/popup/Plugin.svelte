@@ -5,6 +5,7 @@
     import { createConfirmToast } from "$shared/toast/create";
     import Port from "$shared/net/port.svelte";
     import { toast } from "svelte-sonner";
+    import StateManager from "$shared/state";
 
     let waiting = false;
     let { plugin }: { plugin: PluginInfo } = $props();
@@ -12,11 +13,8 @@
     async function tryToggle(enabled: boolean, confirmed = false) {
         if(waiting) return;
         waiting = true;
-        const response = await Port.sendAndRecieve("tryTogglePlugin", {
-            name: plugin.name,
-            enabled,
-            confirmed
-        });
+
+        const response = await StateManager.plugin.tryTogglePlugin(plugin.name, enabled, confirmed);
 
         switch (response.status) {
             case "dependencyError":
@@ -40,10 +38,8 @@
     async function tryDelete(confirmed = false) {
         if(waiting) return;
         waiting = true;
-        const response = await Port.sendAndRecieve("pluginTryDelete", {
-            name: plugin.name,
-            confirmed
-        });
+
+        const response = StateManager.plugin.tryDelete(plugin.name, confirmed);
 
         if(response.status !== "confirm") {
             waiting = false;
@@ -53,6 +49,7 @@
         createConfirmToast(response.message, (confirmed) => {
             waiting = false;
             if(!confirmed) return;
+
             tryDelete(true);
         });
     }

@@ -2,6 +2,12 @@ import LibManager from "$core/scripts/libManager.svelte";
 import { validate } from "$content/utils";
 
 class LibsApi {
+    readonly #id: string;
+
+    constructor(id: string) {
+        this.#id = id;
+    }
+
     /** A list of all the libraries installed */
     get list() {
         return LibManager.getScriptNames();
@@ -27,15 +33,6 @@ class LibsApi {
 
         return LibManager.getExports(name as string);
     }
-}
-
-class ScopedLibsApi extends LibsApi {
-    readonly #id: string;
-
-    constructor(id: string) {
-        super();
-        this.#id = id;
-    }
 
     /**
      * Gets a library by name, prompting the user to enable/download it if necessary. Returns a promise with its exports.
@@ -44,15 +41,13 @@ class ScopedLibsApi extends LibsApi {
      * api.libs.require("Communication", "https://raw.githubusercontent.com/Gimloader/builds/main/libraries/Communication.js");
      * ```
      */
-    require(name: string, downloadUrl?: string) {
+    require<T extends keyof Gimloader.Libraries>(name: T, downloadUrl?: string): Promise<Gimloader.Libraries[T]> {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 
-        return LibManager.require(this.#id, name, downloadUrl);
+        return LibManager.require(this.#id, name as string, downloadUrl);
     }
 }
 
 Object.freeze(LibsApi);
 Object.freeze(LibsApi.prototype);
-Object.freeze(ScopedLibsApi);
-Object.freeze(ScopedLibsApi.prototype);
-export { LibsApi, ScopedLibsApi };
+export default LibsApi;

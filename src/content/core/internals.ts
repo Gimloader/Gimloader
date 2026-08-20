@@ -1,17 +1,21 @@
-import Rewriter from "./rewriter";
+import { nop } from "$shared/utils";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
-import { clearId, splicer } from "$content/utils";
+import type { ClassicStores } from "$types/classicStores";
+import type { Stores } from "$types/stores";
+import type { Untyped } from "$types/util";
+import Rewriter from "./rewriter";
+import Cleanup from "./scripts/cleanup";
 
 export interface Internals {
     stores: Stores.Stores;
     notification: AntdNotification;
     message: AntdMessage;
     modal: AntdModal;
-    platformerPhysics: any;
+    classicStores: ClassicStores.ClassicStores;
+    platformerPhysics: Untyped;
 }
 
 interface LoadCallback<K extends keyof Internals> {
-    id: string | null;
     type: K;
     callback: (value: Internals[K]) => void;
 }
@@ -21,17 +25,24 @@ export default class GimkitInternals {
     static notification: AntdNotification;
     static message: AntdMessage;
     static modal: AntdModal;
+    static classicStores: ClassicStores.ClassicStores;
     static platformerPhysics: any;
 
     static loadCallbacks: LoadCallback<keyof Internals>[] = [];
 
     static init() {
-        // window.stores
+        // stores
         Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores: Stores.Stores) => {
             this.stores = stores;
-            window.stores = stores;
 
             this.onLoaded("stores", stores);
+        });
+
+        // classicStores
+        Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
+            this.classicStores = classicStores;
+
+            this.onLoaded("classicStores", classicStores);
         });
 
         // ant-design notifications
@@ -55,10 +66,9 @@ export default class GimkitInternals {
             this.onLoaded("modal", modal);
         });
 
-        // window.platformerPhysics
+        // platformerPhysics
         Rewriter.exposeObject("App", "platformerPhysics", "topDownBaseSpeed:", (phys) => {
             this.platformerPhysics = phys;
-            window.platformerPhysics = phys;
 
             this.onLoaded("platformerPhysics", phys);
         });
@@ -77,13 +87,9 @@ export default class GimkitInternals {
     static onLoad<K extends keyof Internals>(id: string | null, type: K, callback: (value: Internals[K]) => void) {
         if(this[type]) {
             callback(this[type] as Internals[K]);
-            return;
+            return nop;
         }
 
-        return splicer(this.loadCallbacks, { id, type, callback });
-    }
-
-    static offLoad(id: string) {
-        clearId(this.loadCallbacks, id);
+        return Cleanup.addCleanedUpItem(id, this.loadCallbacks, { type, callback });
     }
 }

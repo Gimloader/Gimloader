@@ -1,12 +1,110 @@
 <script lang="ts">
+    import type { Settings, State } from "$types/net/state";
     import { Button } from "$shared/ui/button";
     import { Switch } from "$shared/ui/switch";
     import Storage from "$core/storage.svelte";
-    import StateManager from "$core/state";
-    import type { Settings } from "$types/net/state";
+    import StateManager from "$shared/state";
+    import { downloadJson } from "$shared/utils";
+    import { readUserFile } from "$content/utils";
+    import { toast } from "svelte-sonner";
+    import Port from "$shared/net/port.svelte";
+    import Modals from "$core/modals.svelte";
+    import * as Accordion from "$shared/ui/accordion";
+    import Rewriter from "$core/rewriter";
+
+    async function onShowButtonsChange(shown: boolean) {
+        // Show a confirmation screen if they are trying to hide the buttons
+        if(!shown) {
+            const text = "Are you sure you want to hide the buttons that open the Gimloader menu? "
+                + "The menu is still accessible by pressing Alt+P.";
+
+            const confirmed = await Modals.open("confirm", { text, title: "Hide Gimloader Menu Buttons" });
+            if(!confirmed) return;
+        }
+
+        StateManager.apply("settingUpdate", {
+            key: "showPluginButtons",
+            value: shown
+        });
+    }
 
     function saveKey(key: keyof Settings) {
-        Storage.updateSetting(key, Storage.settings[key]);
+        StateManager.apply("settingUpdate", { key, value: Storage.settings[key] });
+    }
+
+    function downloadState() {
+        downloadJson(StateManager.getSavedState(), "gimloader_config.json");
+    }
+
+    async function loadState(e: MouseEvent) {
+        if(!e.isTrusted) return;
+
+        const text =
+            "Do you want to import a new config? You will lose everything, including plugins, libraries, settings, and hotkeys.";
+        const confirmed = await Modals.open("confirm", { text, title: "Import Config" });
+        if(!confirmed) return;
+
+        readUserFile(".json", (text) => {
+            try {
+                const state: State = JSON.parse(text);
+                if(typeof state !== "object" || state === null) throw new Error("Invalid config");
+
+                const {
+                    plugins,
+                    libraries,
+                    pluginLayout,
+                    libraryLayout,
+                    pluginStorage,
+                    pluginSettings,
+                    settings,
+                    hotkeys
+                } = state;
+                if(
+                    !plugins && !libraries && !pluginLayout && !libraryLayout && !pluginStorage && !pluginSettings
+                    && !settings && !hotkeys
+                ) {
+                    throw new Error("No valid keys present");
+                }
+
+                Port.sendAndRecieve("setState", state);
+            } catch (e) {
+                console.error(e);
+                toast.error("That config appears to be invalid");
+            }
+        });
+    }
+
+    let initialHash = localStorage.getItem("gl-bundleHash") ?? "";
+    let bundleHash = $state(initialHash);
+
+    async function updateBundleHash() {
+        if(bundleHash.length === 0) {
+            if(!initialHash) return;
+
+            Rewriter.clearBundleHash();
+            initialHash = "";
+            return;
+        }
+
+        if(bundleHash === initialHash) return;
+
+        if(!bundleHash.match(/^[0-9a-f]{40}$/)) {
+            toast.error("That does not appear to be a valid hash!");
+            bundleHash = initialHash;
+            return;
+        }
+
+        const text =
+            "Are you absolutely sure you want to change the bundle hash? This WILL break Gimkit. If you don't know what this is you should not touch it.";
+        const confirmed = await Modals.open("confirm", { text, title: "Change bundle hash" });
+
+        if(!confirmed) {
+            bundleHash = initialHash;
+            return;
+        }
+
+        Rewriter.setBundleHash(bundleHash);
+        initialHash = bundleHash;
     }
 </script>
 
@@ -16,22 +114,7 @@
     Automatically check for plugin updates
 </div>
 <div class="flex items-center gap-2 mt-2!">
-    <Switch
-        bind:checked={Storage.settings.showPluginButtons}
-        onCheckedChange={() => {
-            if(!Storage.settings.showPluginButtons) {
-                let conf = confirm(
-                    "Are you sure you want to hide the buttons that open the Gimloader menu? "
-                        + "The menu is still accessible by pressing Alt+P."
-                );
-                if(!conf) {
-                    Storage.settings.showPluginButtons = true;
-                    return;
-                }
-            }
-            Storage.updateSetting("showPluginButtons", Storage.settings.showPluginButtons);
-        }}
-    />
+    <Switch bind:checked={() => Storage.settings.showPluginButtons, onShowButtonsChange} />
     Show buttons to open Gimloader menu
 </div>
 <div class="flex items-center gap-2 mt-2!">
@@ -49,18 +132,38 @@
     Attempt to automatically download missing plugins
 </div>
 
-<h2 class="text-xl font-bold! mt-3! mb-0!">Developer Settings</h2>
-<div class="flex items-center gap-2">
-    <Switch
-        bind:checked={Storage.settings.pollerEnabled}
-        onCheckedChange={() => {
-            Storage.updateSetting("pollerEnabled", Storage.settings.pollerEnabled);
-        }}
-    />
-    Poll for plugins/libraries being served locally
-</div>
+<Accordion.Root type="single">
+    <Accordion.Item>
+        <Accordion.Trigger class="text-xl font-bold!">Developer Settings</Accordion.Trigger>
+        <Accordion.Content class="text-base">
+            <div class="flex items-center gap-2">
+                <Switch
+                    bind:checked={Storage.settings.pollerEnabled}
+                    onCheckedChange={() => saveKey("pollerEnabled")}
+                />
+                Poll for plugins/libraries being served locally
+            </div>
+            <div class="flex items-center gap-2">
+                <Switch
+                    bind:checked={Storage.settings.suppressGimkitLogs}
+                    onCheckedChange={() => saveKey("suppressGimkitLogs")}
+                />
+                Suppress Gimkit's logs in the console
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-11"></div>
+                Hash of Gimkit bundle to use
+                <input
+                    bind:value={bundleHash}
+                    onchange={updateBundleHash}
+                    class="not-focus:border-b border-b-gray-600 outline-primary px-2 py-1"
+                />
+            </div>
+        </Accordion.Content>
+    </Accordion.Item>
+</Accordion.Root>
 
 <h2 class="text-xl font-bold! mt-3! mb-0!">Export/Import Config</h2>
 <div>Your config consists of plugins, plugin values, libraries, hotkeys, and settings.</div>
-<Button onclick={StateManager.downloadState}>Export Config</Button>
-<Button onclick={StateManager.loadState}>Import Config</Button>
+<Button onclick={downloadState}>Export Config</Button>
+<Button onclick={loadState}>Import Config</Button>

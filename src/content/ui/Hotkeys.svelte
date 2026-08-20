@@ -6,12 +6,13 @@
     import Undo from "svelte-material-icons/Undo.svelte";
     import { SvelteSet } from "svelte/reactivity";
     import Hotkeys from "$core/hotkeys/hotkeys.svelte";
+    import Modals from "$core/modals.svelte";
+    import StateManager from "$shared/state";
+    import type { ConfigurableHotkeysState } from "$types/net/state";
 
-    let hotkeys = Hotkeys.configurableHotkeys;
-
-    let categories: Record<string, ConfigurableHotkey[]> = $derived.by(() => {
-        let categories = {};
-        for(let hotkey of hotkeys.values()) {
+    let categories = $derived.by(() => {
+        let categories: Record<string, ConfigurableHotkey[]> = {};
+        for(let hotkey of Hotkeys.configurableHotkeys) {
             if(!categories[hotkey.category]) {
                 categories[hotkey.category] = [];
             }
@@ -40,14 +41,14 @@
     }
 
     function onEscape() {
-        configuring.trigger = null;
+        if(configuring) configuring.trigger = null;
         stopConfigure();
     }
 
     function stopConfigure() {
         if(!configuring) return;
 
-        Hotkeys.saveConfigurable(configuring.id, configuring.trigger);
+        StateManager.apply("hotkeyUpdate", { id: configuring.id, trigger: configuring.trigger });
         configuring = null;
     }
 
@@ -61,20 +62,26 @@
         else stopConfigure();
     }
 
-    function reset(hotkey: ConfigurableHotkey, noSave = false) {
+    function reset(hotkey: ConfigurableHotkey) {
         hotkey.reset();
-
-        if(noSave) return;
-        Hotkeys.saveConfigurable(hotkey.id, hotkey.trigger);
+        StateManager.apply("hotkeyUpdate", { id: hotkey.id, trigger: hotkey.trigger });
     }
 
-    function resetAll() {
-        if(!confirm("Are you sure you want to reset all hotkeys?")) return;
-        for(let hotkey of hotkeys.values()) {
-            reset(hotkey, true);
+    async function resetAll() {
+        const confirmed = await Modals.open("confirm", {
+            text: "Are you sure you want to reset all hotkeys to their default state?",
+            title: "Reset All Hotkeys"
+        });
+
+        if(!confirmed) return;
+
+        let newHotkeys: ConfigurableHotkeysState = {};
+        for(let hotkey of Hotkeys.configurableHotkeys) {
+            hotkey.reset();
+            newHotkeys[hotkey.id] = hotkey.trigger;
         }
 
-        Hotkeys.saveAllConfigurable();
+        StateManager.apply("hotkeysUpdate", { hotkeys: newHotkeys });
     }
 
     function formatTrigger(trigger: HotkeyTrigger | null) {
@@ -89,7 +96,7 @@
             if(trigger.key.startsWith("Key")) keys.push(trigger.key.slice(3));
             else if(trigger.key.startsWith("Digit")) keys.push(trigger.key.slice(5));
             else keys.push(trigger.key);
-        } else {
+        } else if(trigger.keys) {
             if(trigger.ctrl && !trigger.keys.some(key => key.startsWith("Control"))) keys.push("Ctrl");
             if(trigger.alt && !trigger.keys.some(key => key.startsWith("Alt"))) keys.push("Alt");
             if(trigger.shift && !trigger.keys.some(key => key.startsWith("Shift"))) keys.push("Shift");
@@ -113,7 +120,7 @@
             <h1 class="col-span-4 text-center font-bold text-3xl pt-5">There aren't any hotkeys!</h1>
             <h2 class="col-span-4 text-center text-xl">Some plugins will add hotkeys that can be changed here.</h2>
         {/if}
-        {#each Object.entries(categories) as [category, hotkeys], i}
+        {#each Object.entries(categories) as [category, hotkeys]}
             <h2 class="text-xl font-bold! col-span-4 border-b border-gray-200">{category}</h2>
             {#each hotkeys as hotkey}
                 <div class="flex items-center">

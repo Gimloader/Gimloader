@@ -1,11 +1,9 @@
-import type { OnceMessages, OnceResponses, ScriptType } from "$types/net/messages";
-import type { State } from "$types/net/state";
-import Server from "$bg/net/server";
-import { formatDownloadUrl } from "$shared/net/util";
-import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
-import Scripts from "$bg/scripts";
-import { englishList } from "$shared/utils";
 import type { Dependency } from "$types/net/downloads";
+import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
+import Server from "$bg/net/server";
+import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
+import { englishList } from "$shared/utils";
+import StateManager from "$shared/state";
 
 export default class Downloader {
     static maxDepth = 16;
@@ -13,19 +11,20 @@ export default class Downloader {
 
     static init() {
         Server.onMessage("downloadScript", this.downloadScript.bind(this));
+        Server.onMessage("downloadDependencies", this.onDownloadDeps.bind(this));
     }
 
-    static async downloadScript(state: State, message: OnceMessages["downloadScript"], respond: (response: OnceResponses["downloadScript"]) => void) {
+    static async downloadScript(message: OnceMessageProps<"downloadScript">, respond: OnceResponder<"downloadScript">) {
         if(!message.url.startsWith("http://") && !message.url.startsWith("https://")) {
             respond({ status: "downloadError", message: "Invalid URL" });
             return;
         }
 
         if(message.confirmed) {
-            const result = await this.download(message.url, 0, message.type);
+            const result = await this.download(message.url, message.folder, 0, message.type);
             this.fetchCache.clear();
 
-            if(result.errors.length > 0) {
+            if(result.errors.length > 0 || !result.name) {
                 const message = `Download failed: ${result.errors.join("\n")}`;
                 respond({ status: "downloadError", message });
                 return;
@@ -45,8 +44,8 @@ export default class Downloader {
 
         // Check if confirmation is needed
         const warnAbout = willDownload.filter((dep) => (
-            (dep.type === "library" && !state.settings.autoDownloadMissingLibs)
-            || (dep.type === "plugin" && !state.settings.autoDownloadMissingPlugins)
+            (dep.type === "library" && !StateManager.settings.settings.value.autoDownloadMissingLibs)
+            || (dep.type === "plugin" && !StateManager.settings.settings.value.autoDownloadMissingPlugins)
         ));
         if(warnAbout.length > 0) {
             const message = `${englishList(warnAbout.map(d => d.name))} will also be downloaded. Continue?`;
@@ -55,9 +54,9 @@ export default class Downloader {
         }
 
         // Actually download it
-        const result = await this.download(message.url, 0, message.type);
+        const result = await this.download(message.url, message.folder, 0, message.type);
         this.fetchCache.clear();
-        if(result.errors.length > 0) {
+        if(result.errors.length > 0 || !result.name) {
             const message = `Download failed: ${result.errors.join("\n")}`;
             respond({ status: "downloadError", message });
             return;
@@ -87,7 +86,7 @@ export default class Downloader {
 
                 // Check if missing dependencies can be downloaded
                 for(const dep of dependencies) {
-                    if(Scripts.has(dep.name)) continue;
+                    if(StateManager.allScripts.exists(dep.name)) continue;
 
                     if(!dep.url) {
                         error = `${dep.name} is required and cannot be automatically downloaded`;
@@ -97,7 +96,8 @@ export default class Downloader {
                     if(!willDownload.includes(dep)) willDownload.push(dep);
                     await checkScripts(dep.url, depth + 1);
                 }
-            } catch {
+            } catch (e) {
+                console.error(e);
                 error = `Could not download script from ${url}`;
             }
         };
@@ -110,7 +110,7 @@ export default class Downloader {
         let text = this.fetchCache.get(url);
 
         if(!text) {
-            const response = await fetch(formatDownloadUrl(url));
+            const response = await fetch(url);
             if(!response.ok) throw new Error("Response not OK");
 
             text = await response.text();
@@ -138,19 +138,24 @@ export default class Downloader {
         return { text, headers, dependencies, type };
     }
 
+    static async onDownloadDeps(message: OnceMessageProps<"downloadDependencies">, respond: OnceResponder<"downloadDependencies">) {
+        const errors = await this.downloadDeps(message);
+        respond(errors);
+    }
+
     static async downloadDeps(dependencies: Dependency[]) {
         const errors: string[] = [];
 
         for(const dep of dependencies) {
-            if(Scripts.has(dep.name)) continue;
-            const downloadRes = await this.download(dep.url, 0);
+            if(StateManager.allScripts.exists(dep.name) || !dep.url) continue;
+            const downloadRes = await this.download(dep.url, "root", 0);
             errors.push(...downloadRes.errors);
         }
 
         return errors;
     }
 
-    static async download(url: string, depth: number, expectType?: ScriptType) {
+    static async download(url: string, folder: string, depth: number, expectType?: ScriptType) {
         if(depth > this.maxDepth) return { errors: [`Maximum dependency depth exceeded`] };
 
         try {
@@ -162,25 +167,21 @@ export default class Downloader {
 
             const errors: string[] = [];
             for(const dep of dependencies) {
-                if(Scripts.has(dep.name)) continue;
+                if(StateManager.allScripts.exists(dep.name)) continue;
                 if(!dep.url) {
                     errors.push(`${dep.name} is required and cannot be automatically downloaded`);
                     continue;
                 }
 
-                const childRes = await this.download(dep.url, depth + 1);
+                const childRes = await this.download(dep.url, "root", depth + 1);
                 errors.push(...childRes.errors);
             }
 
-            // Create the script after dependencies are installed
-            if(type === "library") {
-                await Server.executeAndSend("libraryCreate", { name: headers.name, code: text });
-            } else {
-                await Server.executeAndSend("pluginCreate", { name: headers.name, code: text, enabled: true });
-            }
+            await StateManager.allScripts.editOrCreate(text, headers.name, folder, false);
 
             return { errors, name: headers.name };
-        } catch {
+        } catch (e) {
+            console.error(e);
             return { errors: [`Could not download ${url}`] };
         }
     }

@@ -1,7 +1,7 @@
 <script lang="ts" module>
     import { cn, type WithElementRef } from "$shared/shadcn.js";
     import type { HTMLAnchorAttributes, HTMLButtonAttributes } from "svelte/elements";
-    import { tv, type VariantProps } from "tailwind-variants";
+    import { tv } from "tailwind-variants";
 
     export const buttonVariants = tv({
         base:
@@ -32,8 +32,8 @@
         }
     });
 
-    export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
-    export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
+    export type ButtonVariant = "link" | "secondary" | "destructive" | "default" | "outline" | "ghost";
+    export type ButtonSize = "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg";
 
     export type ButtonProps =
         & WithElementRef<HTMLButtonAttributes>
@@ -67,7 +67,8 @@
         aria-disabled={disabled}
         role={disabled ? "link" : undefined}
         tabindex={disabled ? -1 : undefined}
-        {...restProps}>
+        {...restProps}
+    >
         {@render children?.()}
     </a>
 {:else}
@@ -77,7 +78,8 @@
         class={cn(buttonVariants({ variant, size }), className)}
         {type}
         {disabled}
-        {...restProps}>
+        {...restProps}
+    >
         {@render children?.()}
     </button>
 {/if}

@@ -11,12 +11,13 @@
     import RadioSetting from "./RadioSetting.svelte";
     import ColorSetting from "./ColorSetting.svelte";
     import CustomSetting from "./CustomSetting.svelte";
+    import StateManager from "$shared/state";
 
     let { pluginName, setting }: { pluginName: string; setting: PluginSetting<string> } = $props();
 
     watch(() => Storage.pluginSettings[pluginName][setting.id], () => {
         const value = Storage.pluginSettings[pluginName][setting.id];
-        Storage.setPluginSetting(pluginName, setting.id, value);
+        StateManager.apply("pluginSettingUpdate", { id: pluginName, key: setting.id, value });
     }, { lazy: true });
 </script>
 

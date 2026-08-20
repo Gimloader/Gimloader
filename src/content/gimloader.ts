@@ -5,41 +5,72 @@ import GimkitInternals from "$core/internals";
 import { log } from "$shared/utils";
 import Port from "$shared/net/port.svelte";
 import { version } from "../../package.json";
-import { disableConsoleWarning, fixRDT } from "$core/qol";
-import StateManager from "$core/state";
+import { disableConsoleWarning, fixRDT, setupLogSuppression } from "$core/qol";
 import setupModals from "./core/ui/setupModals";
 import { toast } from "svelte-sonner";
 import { createToaster } from "$shared/toast/create";
-import { domLoaded } from "./utils";
+import { changelog, domLoaded } from "./utils";
+import StateManager from "$shared/state";
+import { addUpdated } from "./ui/modals/Changelog.svelte";
+import Storage from "$core/storage.svelte";
+import LibManager from "$core/scripts/libManager.svelte";
+import PluginManager from "$core/scripts/pluginManager.svelte";
+import Hotkeys from "$core/hotkeys/hotkeys.svelte";
+import UpdateNotifier from "$core/updateNotifier.svelte";
+import Rewriter from "$core/rewriter";
+import Commands from "$core/commands.svelte";
+import { addPluginButtons } from "$core/ui/addPluginButtons";
 
-Object.defineProperty(window, "GL", {
-    value: Api,
-    writable: false,
-    configurable: false
-});
+if(document.contentType === "text/html") {
+    Object.defineProperty(window, "GL", {
+        value: new Api("Global"),
+        writable: false,
+        configurable: false
+    });
 
-disableConsoleWarning();
-UI.init();
-Net.init();
-GimkitInternals.init();
-StateManager.init();
-setupModals();
-domLoaded.then(createToaster);
+    disableConsoleWarning();
+    setupLogSuppression();
+    UI.init();
+    Net.init();
+    GimkitInternals.init();
+    setupModals();
+    fixRDT();
+    addPluginButtons();
+    domLoaded.then(createToaster);
 
-Port.on("toast", (msg) => {
-    if(msg.type === "success") toast.success(msg.message);
-    else if(msg.type === "error") toast.error(msg.message);
-    else if(msg.type === "warning") toast.warning(msg.message);
-    else toast(msg.message);
-});
+    StateManager.events.on("error", toast.error);
+    StateManager.events.on("init", () => {
+        const lastVersion = localStorage.getItem("gl-version");
+        localStorage.setItem("gl-version", version);
 
-Port.init((state) => {
-    StateManager.initState(state);
-}, (state) => {
-    log("Resynchronizing with state", state);
-    StateManager.syncWithState(state);
-}, "game");
+        const versionChanged = version !== lastVersion;
+        const updated = lastVersion && versionChanged;
+        if(updated) addUpdated("Gimloader", version, changelog);
 
-fixRDT();
+        Storage.init();
+        LibManager.init();
+        PluginManager.init();
+        Hotkeys.init();
+        UpdateNotifier.init();
+        Rewriter.init();
+        Commands.init();
 
-log(`Gimloader v${version} loaded`);
+        if(updated) Rewriter.invalidate();
+    });
+
+    Port.on("toast", (msg) => {
+        if(msg.type === "success") toast.success(msg.message);
+        else if(msg.type === "error") toast.error(msg.message);
+        else if(msg.type === "warning") toast.warning(msg.message);
+        else toast(msg.message);
+    });
+
+    Port.on("setState", (state) => {
+        StateManager.update(state);
+        toast.success("New config applied");
+    });
+
+    Port.init("game");
+
+    log(`Gimloader v${version} loaded`);
+}

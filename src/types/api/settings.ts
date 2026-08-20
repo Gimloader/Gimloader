@@ -1,7 +1,9 @@
+import type { UnionToIntersection } from "$types/util";
+
 export interface BaseSetting<K extends string, T> {
     id: K;
     default?: T;
-    onChange?: (value: T, remote: boolean) => void;
+    onChange?(value: T, remote: boolean): void;
 }
 
 export interface NamedSetting<K extends string, T> extends BaseSetting<K, T> {
@@ -43,7 +45,7 @@ export interface SliderSetting<K extends string> extends NamedSetting<K, number>
     max: number;
     step?: number;
     ticks?: ReadonlyArray<number>;
-    formatter?: (value: number) => string;
+    formatter?(value: number): string;
 }
 
 export interface RadioSetting<K extends string> extends NamedSetting<K, string> {
@@ -58,12 +60,12 @@ export interface ColorSetting<K extends string> extends NamedSetting<K, string> 
 
 export interface CustomSetting<K extends string, T = any> extends NamedSetting<K, T> {
     type: "custom";
-    render: (container: HTMLElement, currentValue: T, update: (newValue: T) => void) => (() => void) | void;
+    render(container: HTMLElement, currentValue: T, update: (newValue: T) => void): (() => void) | void;
 }
 
 export interface CustomSection<K extends string, T = any> extends BaseSetting<K, T> {
     type: "customsection";
-    render: (container: HTMLElement, currentValue: T, onChange: (newValue: T) => void) => (() => void) | void;
+    render(container: HTMLElement, currentValue: T, onChange: (newValue: T) => void): (() => void) | void;
 }
 
 export type PluginSetting<K extends string = string> =
@@ -103,8 +105,6 @@ export type DescriptionToReturnType<T extends PluginSetting> = T extends Dropdow
 type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
     : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
     : never;
-
-type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
 
 type SettingsObject<T> = T & {
     listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;

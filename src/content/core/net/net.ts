@@ -1,18 +1,19 @@
+import type { WithSymbols } from "$types/util";
+import type { Stores } from "$types/stores";
 import Internals from "$core/internals";
 import EventEmitter2 from "eventemitter2";
-import { clearId, splicer } from "$content/utils";
 import { error, nop } from "$shared/utils";
 import { log } from "$shared/utils";
 import Patcher from "../patcher";
 import Rewriter from "../rewriter";
 import wildcardMatch from "wildcard-match";
-import { gameState } from "$content/stores";
+import { gameState } from "$content/stores.svelte";
+import Cleanup from "$core/scripts/cleanup";
 
 export type ConnectionType = "None" | "Colyseus" | "Blueboat";
 
 interface LoadCallback {
     callback: (type: ConnectionType, gamemode: string) => void;
-    id: string;
     gamemodes: string[];
 }
 
@@ -29,13 +30,11 @@ export interface RequesterOptions {
 type Requester = (options: RequesterOptions) => void;
 
 interface RequestCallback {
-    id: string | null;
     match: (url: string) => boolean;
     callback: (options: RequesterOptions) => any;
 }
 
 interface ResponseCallback {
-    id: string | null;
     match: (url: string) => boolean;
     callback: (response: any, url: string) => any;
 }
@@ -62,6 +61,9 @@ export default new class Net extends EventEmitter2 {
     }
 
     init() {
+        // Gimkit recently pushed and reverted an update that bumps the Colyseus version and breaks how we intercept it
+        // However, it was reverted, and presumably will be pushed again later
+        // Therefore both patches are left in, and once the update is pushed again the old patch will be removed
         // Patch the Colyseus callbacks
         const onColyseusCallbacks = Rewriter.createShared(null, "colyseusCallbacks", (Callbacks: any) => {
             this.Callbacks = Callbacks;
@@ -103,15 +105,26 @@ export default new class Net extends EventEmitter2 {
         // Patch the Blueboat client
         Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
             const proto = mod.Client.prototype;
-            if(!proto.createRoom || !proto.joinRoom) return;
 
-            Patcher.after(null, proto, "createRoom", (_, __, room) => {
-                this.onBlueboatRoom(room);
-            });
+            if(proto.joinById) {
+                // Colyseus
+                Patcher.after(null, proto, "create", (_, __, roomPromise) => {
+                    roomPromise.then((room: any) => this.onColyseusRoom(room));
+                });
 
-            Patcher.after(null, proto, "joinRoom", (_, __, room) => {
-                this.onBlueboatRoom(room);
-            });
+                Patcher.after(null, proto, "joinById", (_, __, roomPromise) => {
+                    roomPromise.then((room: any) => this.onColyseusRoom(room));
+                });
+            } else if(proto.createRoom && proto.joinRoom) {
+                // Blueboat
+                Patcher.after(null, proto, "createRoom", (_, __, room) => {
+                    this.onBlueboatRoom(room);
+                });
+
+                Patcher.after(null, proto, "joinRoom", (_, __, room) => {
+                    this.onBlueboatRoom(room);
+                });
+            }
         });
 
         // Patch the requester
@@ -162,16 +175,14 @@ export default new class Net extends EventEmitter2 {
     }
 
     modifyFetchRequest(id: string | null, path: string, callback: RequestCallback["callback"]) {
-        return splicer(this.requestCallbacks, {
-            id,
+        return Cleanup.addCleanedUpItem(id, this.requestCallbacks, {
             match: wildcardMatch(path),
             callback
         });
     }
 
     modifyFetchResponse(id: string | null, path: string, callback: ResponseCallback["callback"]) {
-        return splicer(this.responseCallbacks, {
-            id,
+        return Cleanup.addCleanedUpItem(id, this.responseCallbacks, {
             match: wildcardMatch(path),
             callback
         });
@@ -246,9 +257,9 @@ export default new class Net extends EventEmitter2 {
     }
 
     waitForColyseusLoad() {
-        const message = Internals.stores.me.nonDismissMessage;
-        const loading = Internals.stores.loading;
-        const me = Internals.stores.me;
+        const message = Internals.stores.me.nonDismissMessage as WithSymbols<Stores.NonDismissMessage>;
+        const loading = Internals.stores.loading as WithSymbols<Stores.Loading>;
+        const me = Internals.stores.me as WithSymbols<Stores.Me>;
 
         const mobxMsg = message[Object.getOwnPropertySymbols(message)[0]];
         const mobxLoading = loading[Object.getOwnPropertySymbols(loading)[0]];
@@ -354,27 +365,16 @@ export default new class Net extends EventEmitter2 {
     pluginOnLoad(id: string, callback: (type: ConnectionType, gamemode: string) => void, gamemode: string | ReadonlyArray<string> = []) {
         if(typeof gamemode === "string") gamemode = [gamemode];
 
-        if(this.loaded) {
+        if(this.loaded && this.gamemode) {
             callback(this.type, this.gamemode);
             return nop;
         }
 
-        const obj = {
+        const obj: LoadCallback = {
             callback,
-            id,
             gamemodes: gamemode.map(g => g.toLowerCase())
         };
 
-        return splicer(this.loadCallbacks, obj);
-    }
-
-    pluginOffLoad(id: string) {
-        clearId(this.loadCallbacks, id);
-    }
-    stopModifyRequest(id: string) {
-        clearId(this.requestCallbacks, id);
-    }
-    stopModifyResponse(id: string) {
-        clearId(this.responseCallbacks, id);
+        return Cleanup.addCleanedUpItem(id, this.loadCallbacks, obj);
     }
 }();

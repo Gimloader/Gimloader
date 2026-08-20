@@ -23,4 +23,6 @@ export function createConfirmToast(text: string, onConfirm: (confirmed: boolean)
         id,
         class: "confirm-toast-wrap preflight"
     });
+
+    return id;
 }

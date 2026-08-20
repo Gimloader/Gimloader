@@ -1,8 +1,12 @@
-import { Tooltip as TooltipPrimitive } from "bits-ui";
+import { Tooltip as TooltipPrimitive, type TooltipRootProps } from "bits-ui";
 import Trigger from "./tooltip-trigger.svelte";
 import Content from "./tooltip-content.svelte";
+import type { Component } from "svelte";
 
-const Root = TooltipPrimitive.Root;
+// biome-ignore lint: typescript explodes when it tries to figure out the type of Root for some reason
+type RootType = Component<TooltipRootProps, {}, "open">;
+
+const Root = TooltipPrimitive.Root as RootType;
 const Provider = TooltipPrimitive.Provider;
 const Portal = TooltipPrimitive.Portal;
 

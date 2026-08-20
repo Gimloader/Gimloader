@@ -23,10 +23,10 @@ export function addPluginButtons() {
         ctrl: false
     }, () => showMenu());
 
-    addTabCommand("Open Gimloader Menu", "plugins", ["manager"]);
-    addTabCommand("View Plugins", "plugins");
-    addTabCommand("View Official Plugins", "plugins", [], true);
-    addTabCommand("View Libraries", "libraries", ["libs"]);
+    addTabCommand("Open Gimloader Menu", "plugin", ["manager"]);
+    addTabCommand("View Plugins", "plugin");
+    addTabCommand("View Official Plugins", "plugin", [], true);
+    addTabCommand("View Libraries", "library", ["libs"]);
     addTabCommand("View Hotkeys", "hotkeys", ["binds"]);
     addTabCommand("View Updates", "updates", ["versions"]);
     addTabCommand("View Settings", "settings", ["options", "prefs"]);
@@ -114,9 +114,9 @@ export function addPluginButtons() {
     });
 
     // Add the wrench button to the join screen
-    const wrapJoin = Rewriter.createShared(null, "wrapJoinButton", (joinButton: () => any) => {
-        return function() {
-            const element = joinButton.apply(this, arguments);
+    const wrapJoin = Rewriter.createShared(null, "wrapJoinButton", (joinButton: (...args: any[]) => any) => {
+        return function(this: any, ...args: any[]) {
+            const element = joinButton.apply(this, args);
             const newButton = UI.React.createElement("button", {
                 className: "openPlugins",
                 dangerouslySetInnerHTML: { __html: whiteWrenchSvg },

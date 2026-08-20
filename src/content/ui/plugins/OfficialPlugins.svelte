@@ -45,6 +45,7 @@
             const res = await fetch("https://gimloader.github.io/plugins.json");
             officialPlugins = await res.json();
             localStorage.setItem("gl-officialPlugins", JSON.stringify(officialPlugins));
+            localStorage.setItem("gl-lastOfficialFetch", Date.now().toString());
         } catch (e) {
             error("Failed to fetch official plugins", e);
             return;
@@ -83,7 +84,10 @@
                         </h2>
                     {/snippet}
                     {#snippet toggle()}
-                        <Button class="px-2 py-2" onclick={() => downloadScript(plugin.downloadUrl, "plugin")}>
+                        <Button
+                            class="px-2 py-2"
+                            onclick={() => downloadScript(plugin.downloadUrl, PluginManager.openFolderId, "plugin")}
+                        >
                             <Download size={20} />
                         </Button>
                     {/snippet}

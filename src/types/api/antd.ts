@@ -22,7 +22,7 @@ interface MessageConfigOptions {
     top?: string | number;
     duration?: number;
     prefixCls?: string;
-    getContainer?: () => HTMLElement;
+    getContainer?(): HTMLElement;
     transitionName?: string;
     maxCount?: number;
     rtl?: boolean;
@@ -35,14 +35,14 @@ interface MessageArgsProps {
     content: React.ReactNode;
     duration?: number;
     type?: NoticeType;
-    onClose?: () => void;
+    onClose?(): void;
     icon?: React.ReactNode;
     key?: string | number;
     style?: React.CSSProperties;
     className?: string;
     classNames?: ArgsClassNamesType;
     styles?: ArgsStylesType;
-    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+    onClick?(e: React.MouseEvent<HTMLDivElement>): void;
     pauseOnHover?: boolean;
 }
 
@@ -64,15 +64,15 @@ interface MessageInstance {
     error: MessageTypeOpen;
     warning: MessageTypeOpen;
     loading: MessageTypeOpen;
-    open: (args: MessageArgsProps) => MessageType;
-    destroy: (key?: React.Key) => void;
+    open(args: MessageArgsProps): MessageType;
+    destroy(key?: React.Key): void;
 }
 
 interface MessageBaseMethods {
-    open: (config: MessageArgsProps) => MessageType;
-    destroy: (key?: React.Key) => void;
-    config: (config: MessageConfigOptions) => void;
-    useMessage: () => MessageInstance;
+    open(config: MessageArgsProps): MessageType;
+    destroy(key?: React.Key): void;
+    config(config: MessageConfigOptions): void;
+    useMessage(): MessageInstance;
     _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
 }
 
@@ -121,7 +121,7 @@ interface NotificationArgsProps {
     btn?: React.ReactNode;
     actions?: React.ReactNode;
     key?: React.Key;
-    onClose?: () => void;
+    onClose?(): void;
     duration?: number | false;
     showProgress?: boolean;
     pauseOnHover?: boolean;
@@ -132,10 +132,10 @@ interface NotificationArgsProps {
     classNames?: NotificationClassNamesType;
     styles?: NotificationStylesType;
     readonly type?: NotificationIconType;
-    onClick?: () => void;
+    onClick?(): void;
     closeIcon?: React.ReactNode;
     closable?: boolean | {
-        onClose?: () => void;
+        onClose?(): void;
     };
     props?: NotificationDivProps;
     role?: "alert" | "status";
@@ -149,7 +149,7 @@ interface NotificationInstance {
     info: NotificationStaticFn;
     warning: NotificationStaticFn;
     open: NotificationStaticFn;
-    destroy: (key?: React.Key) => void;
+    destroy(key?: React.Key): void;
 }
 
 interface NotificationGlobalConfigProps {
@@ -159,11 +159,11 @@ interface NotificationGlobalConfigProps {
     showProgress?: boolean;
     pauseOnHover?: boolean;
     prefixCls?: string;
-    getContainer?: () => HTMLElement | ShadowRoot;
+    getContainer?(): HTMLElement | ShadowRoot;
     placement?: NotificationPlacement;
     closeIcon?: React.ReactNode;
     closable?: boolean | {
-        onClose?: () => void;
+        onClose?(): void;
     };
     rtl?: boolean;
     maxCount?: number;
@@ -171,10 +171,10 @@ interface NotificationGlobalConfigProps {
 }
 
 interface NotificationBaseMethods {
-    open: (config: NotificationArgsProps) => void;
-    destroy: (key?: React.Key) => void;
-    config: (config: NotificationGlobalConfigProps) => void;
-    useNotification: () => NotificationInstance;
+    open(config: NotificationArgsProps): void;
+    destroy(key?: React.Key): void;
+    config(config: NotificationGlobalConfigProps): void;
+    useNotification(): NotificationInstance;
     _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
 }
 
@@ -228,8 +228,8 @@ interface ModalCommonProps {
             CancelBtn: React.FC;
         }) => React.ReactNode);
     closable?: boolean | {
-        onClose?: () => void;
-        afterClose?: () => void;
+        onClose?(): void;
+        afterClose?(): void;
     };
     classNames?: ModalClassNamesType;
     styles?: ModalStylesType;
@@ -239,10 +239,10 @@ interface ModalProps extends ModalCommonProps {
     open?: boolean;
     confirmLoading?: boolean;
     title?: React.ReactNode;
-    onOk?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    onCancel?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    afterClose?: () => void;
-    afterOpenChange?: (open: boolean) => void;
+    onOk?(e: React.MouseEvent<HTMLButtonElement>): void;
+    onCancel?(e: React.MouseEvent<HTMLButtonElement>): void;
+    afterClose?(): void;
+    afterOpenChange?(open: boolean): void;
     centered?: boolean;
     width?: string | number;
     okText?: React.ReactNode;
@@ -270,7 +270,7 @@ interface ModalProps extends ModalCommonProps {
     wrapProps?: any;
     prefixCls?: string;
     closeIcon?: React.ReactNode;
-    modalRender?: (node: React.ReactNode) => React.ReactNode;
+    modalRender?(node: React.ReactNode): React.ReactNode;
     children?: React.ReactNode;
     mousePosition?: ModalMousePosition;
     loading?: boolean;
@@ -287,9 +287,9 @@ interface ModalFuncProps extends ModalCommonProps {
     open?: boolean;
     title?: React.ReactNode;
     content?: React.ReactNode;
-    onOk?: (...args: any[]) => any;
-    onCancel?: (...args: any[]) => any;
-    afterClose?: () => void;
+    onOk?(...args: any[]): any;
+    onCancel?(...args: any[]): any;
+    afterClose?(): void;
     okButtonProps?: Record<string, any>;
     cancelButtonProps?: Record<string, any>;
     centered?: boolean;
@@ -314,7 +314,7 @@ interface ModalFuncProps extends ModalCommonProps {
     bodyStyle?: React.CSSProperties;
     closeIcon?: React.ReactNode;
     footer?: ModalProps["footer"];
-    modalRender?: (node: React.ReactNode) => React.ReactNode;
+    modalRender?(node: React.ReactNode): React.ReactNode;
     focusTriggerAfterClose?: boolean;
     autoFocusButton?: null | "ok" | "cancel";
     focusable?: {
@@ -326,8 +326,8 @@ interface ModalFuncProps extends ModalCommonProps {
 type ModalConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
 
 interface ModalFuncReturn {
-    destroy: () => void;
-    update: (configUpdate: ModalConfigUpdate) => void;
+    destroy(): void;
+    update(configUpdate: ModalConfigUpdate): void;
 }
 
 type ModalFunc = (props: ModalFuncProps) => ModalFuncReturn;
@@ -342,9 +342,9 @@ interface ModalStaticFunctions {
 }
 
 interface ModalBaseMethods {
-    useModal: () => [api: any, contextHolder: React.ReactNode];
-    destroyAll: () => void;
-    config: (config: { rootPrefixCls: string }) => void;
+    useModal(): [api: any, contextHolder: React.ReactNode];
+    destroyAll(): void;
+    config(config: { rootPrefixCls: string }): void;
     _InternalPanelDoNotUseOrYouWillBeFired: React.FC<any>;
 }
 

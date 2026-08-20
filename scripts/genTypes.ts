@@ -1,88 +1,113 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
+import tsconfig from "../tsconfig.json";
+import { emitDts } from "svelte2tsx";
+import { rollup } from "rollup";
+import { dts } from "rollup-plugin-dts";
+import { join } from "node:path";
+import { ModuleResolutionKind } from "typescript";
+import { readFile, writeFile, exists, rm } from "node:fs/promises";
 
-const isDT = process.argv.includes("--dt");
+const isNpmPackage = process.argv.includes("--npm");
+const noRegenerate = process.argv.includes("--no-regenerate");
 
-let flags = "--project declaration.tsconfig.json --no-check --no-banner";
-if(!isDT) flags += " --external-inlines=eventemitter2 @dimforge/rapier2d-compat --";
+const declarationDir = "./dist/declarations";
+const declarationsExist = await exists(declarationDir);
 
-// There's a warning when bundling eventemitter2, not much that can be done
-execSync(`bunx dts-bundle-generator -o tmp/api.d.ts ${flags} src/types/entry/api.ts`);
-execSync(`bunx dts-bundle-generator -o tmp/stores.d.ts ${flags} src/types/entry/stores.ts`);
+if(!declarationsExist || !noRegenerate) {
+    if(declarationsExist) {
+        await rm(declarationDir, { recursive: true, force: true });
+    }
 
-const importRegex = /(?:^|\n)(import .+)(?=\n)/g;
-function readTypes(path: string) {
-    let types = fs.readFileSync(path, "utf-8");
-    
-    // Remove export/declare keywords
-    types = types.replaceAll("export {};", "");
-    types = types.replaceAll("export ", "");
-    types = types.replaceAll("declare ", "");
-
-    // Remove #private annotations
-    types = types.replaceAll("#private;", "");
-
-    // Remove @inline jsdoc tags
-    types = types.replaceAll("/** @inline */", "");
-
-    // Allow void in unions
-    if(isDT) types = types.replace(/^(.*\| void.*)$/gm, "// eslint-disable-next-line @typescript-eslint/no-invalid-void-type\n$1");
-
-    // Extract import statements
-    const matches = types.matchAll(importRegex);
-    const importText = Array.from(matches).map(m => m[1]).join("\n");
-
-    types = types.replace(importRegex, "").trim();
-
-    return { types, importText };
+    console.log("Generating declaration files...");
+    await emitDts({
+        declarationDir,
+        svelteShimsPath: require.resolve("svelte2tsx/svelte-shims-v4.d.ts")
+    });
 }
 
-const apiTypes = readTypes("tmp/api.d.ts");
-const storeTypes = readTypes("tmp/stores.d.ts");
+const paths = tsconfig.compilerOptions.paths;
+for(const keyName in paths) {
+    const key = keyName as keyof typeof paths;
+    paths[key] = paths[key].map((path: string) => {
+        if(path.startsWith("./node_modules/")) return path;
+        return join("./dist/declarations", path)
+    });
+}
 
-let output = "export {};\n\n"
+const includeExternal = [
+    "bits-ui",
+    "tailwind-variants",
+    "svelte-toolbelt",
+    "tailwind-merge",
+    "eventemitter2"
+];
 
-// Add imports
-output += apiTypes.importText + "\n" + storeTypes.importText + "\n\n";
+if(!isNpmPackage) includeExternal.push("@dimforge/rapier2d-compat");
 
-// Add the declaration
-output += "declare global {\nnamespace Gimloader {\n";
+console.log("Creating type bundle...");
+const bundle = await rollup({
+    input: "./dist/declarations/src/content/api/api.d.ts",
+    plugins: [
+        dts({
+            compilerOptions: {
+                moduleResolution: ModuleResolutionKind.Bundler,
+                paths
+            },
+            includeExternal
+        })
+    ]
+});
 
-// Add the stores type
-output += "namespace Stores {\n" + storeTypes.types + "\n}\n\n";
+// For some reason we can't put this in the dist folder or bun freaks out
+await bundle.write({
+    file: "./tmp/type-rollup.d.ts",
+    format: "es"
+});
 
-// Add the API types
-output += apiTypes.types + "\n";
+await bundle.close();
 
-// Add Plugins/Libraries interfaces
-output += `
-interface Plugins {
+let typeContent = await readFile("./tmp/type-rollup.d.ts", "utf-8");
+
+// Remove export/declare keywords
+typeContent = typeContent.replace(/\nexport .+/g, "");
+typeContent = typeContent.replace(/\ndeclare\s+/g, "\n");
+
+// Replace csstype with CSSStyleProperties
+typeContent = typeContent.replace("\nimport * as csstype from 'csstype';", "");
+typeContent = typeContent.replace("csstype.Properties", "CSSStyleProperties");
+
+// Replace the phaser Scene import with BaseScene since rollup is stupid apparently
+typeContent = typeContent.replace("Scene", "Scene as BaseScene");
+typeContent = typeContent.replace("extends Scene", "extends BaseScene");
+
+// Fix the weird aliasing stuff we did for rapier
+if(isNpmPackage) {
+    const rapierRegex = /\nimport { (.+) } from 'rapier.*';/g;
+    const imports = typeContent.matchAll(rapierRegex).flatMap((match) => match[1].split(", "));
+    const importString = `\nimport { ${[...imports].join(", ")} } from '@dimforge/rapier2d-compat';`;
+    const index = typeContent.search(rapierRegex);
+    typeContent = typeContent.replace(rapierRegex, "");
+    typeContent = typeContent.slice(0, index) + importString + typeContent.slice(index);
+}
+
+// Wrap everything in a namespace
+const insertAt = typeContent.indexOf("\n", typeContent.lastIndexOf("\nimport ") + 1);
+typeContent = typeContent.slice(0, insertAt) + "\nexport {};\n\ndeclare global {\nnamespace Gimloader {" + typeContent.slice(insertAt + 1);
+
+typeContent += `interface Plugins {
     [name: string]: any;
 }
 
 interface Libraries {
     [name: string]: any;
 }
-}\n`;
+}
 
-// Add the global declarations
-output += `const api: Gimloader.Api;
-const GL: typeof Gimloader.Api;
-/** @deprecated Use GL.stores */
-const stores: Gimloader.Stores.Stores;
-/** @deprecated No longer supported */
-const platformerPhysics: any;
+const api: Gimloader.Api;
 
 interface Window {
     api: Gimloader.Api;
-    GL: typeof Gimloader.Api;
-    /** @deprecated Use GL.stores */
-    stores: Gimloader.Stores.Stores;
-    /** @deprecated No longer supported */
-    platformerPhysics: any;
 }
 }\n`;
 
-// Write the output
-const path = isDT ? "tmp/gimloader.d.ts" : "src/editor/gimloaderTypes.txt";
-fs.writeFileSync(path, output);
+if(isNpmPackage) await writeFile("./types/index.d.ts", typeContent);
+else await writeFile("./src/editor/gimloaderTypes.txt", typeContent);

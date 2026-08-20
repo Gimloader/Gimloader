@@ -1,67 +1,50 @@
 <script lang="ts">
-    import { flip } from "svelte/animate";
-    import { dndzone } from "svelte-dnd-action";
-    import Library from "./Library.svelte";
-    import { readUserFile, showEditor } from "$content/utils";
+    import { readUserFile } from "$content/utils";
     import LibManager from "$core/scripts/libManager.svelte";
-    import Storage from "$core/storage.svelte";
-    import Search from "../components/Search.svelte";
     import * as DropdownMenu from "$shared/ui/dropdown-menu";
     import { Button } from "$shared/ui/button";
-    import ViewControl from "../components/ViewControl.svelte";
-    import * as Dialog from "$shared/ui/dialog";
     import ChevronDown from "@lucide/svelte/icons/chevron-down";
-    import UrlInstall from "../components/UrlInstall.svelte";
-
-    let searchValue = $state("");
-    let items = $state(LibManager.scripts.map((lib) => ({ id: lib.headers.name })));
-    $effect(() => {
-        items = LibManager.scripts
-            .filter((lib) => lib.headers.name.toLowerCase().includes(searchValue.toLowerCase()))
-            .map((lib) => ({ id: lib.headers.name }));
-    });
-
-    let dragDisabled = $state(true);
-
-    function handleDndConsider(e: any) {
-        items = e.detail.items;
-    }
-
-    function handleDndFinalize(e: any) {
-        items = e.detail.items;
-        dragDisabled = true;
-
-        // Update the order of the libraries
-        let order = items.map(i => i.id);
-
-        LibManager.arrange(order);
-    }
-
-    function startDrag() {
-        dragDisabled = false;
-    }
+    import ScriptList from "../components/scripts/ScriptList.svelte";
+    import Modals from "$core/modals.svelte";
+    import { downloadScript } from "$core/net/download";
+    import Port from "$shared/net/port.svelte";
+    import StateManager from "$shared/state";
 
     function importLib() {
         readUserFile(".js", (code) => {
             code = code.replaceAll("\r\n", "\n");
-            LibManager.create(code);
+            StateManager.library.create(code, LibManager.openFolderId);
         });
     }
 
-    const flipDurationMs = 300;
-
     function deleteAll() {
-        if(!confirm("Are you sure you want to delete all libraries?")) return;
+        const text = `Are you sure you want to delete all libraries?`;
+        const confirmed = Modals.open("confirm", { text, title: "Delete All Libraries" });
+        if(!confirmed) return;
+
         LibManager.deleteAllConfirm();
     }
 
-    let urlInstallOpen = $state(false);
+    async function openUrlInstall() {
+        const url = await Modals.open("input", {
+            title: "Install library from URL",
+            placeholder: "Library URL"
+        });
+        if(!url) return;
+
+        downloadScript(url, LibManager.openFolderId, "library");
+    }
+
+    function createScript() {
+        Port.sendAndRecieve("showEditor", {
+            type: "library",
+            folder: LibManager.openFolderId
+        });
+    }
 </script>
 
-<UrlInstall bind:open={urlInstallOpen} placeholder="Library URL" type="library" />
-
-<div class="flex flex-col max-h-full">
-    <div class="flex items-center mb-[3px]">
+<ScriptList manager={LibManager}>
+    {#snippet buttons()}
         <DropdownMenu.Root>
             <DropdownMenu.Trigger class="mr-1.5!">
                 <Button class="h-7">
@@ -70,9 +53,9 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-                <DropdownMenu.Item onclick={() => showEditor("library")}>Create Blank</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={createScript}>Create Blank</DropdownMenu.Item>
                 <DropdownMenu.Item onclick={importLib}>Upload File</DropdownMenu.Item>
-                <DropdownMenu.Item onclick={() => urlInstallOpen = true}>Install From URL</DropdownMenu.Item>
+                <DropdownMenu.Item onclick={openUrlInstall}>Install From URL</DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>
@@ -88,24 +71,8 @@
                 </DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
-        <ViewControl />
-        <Search bind:value={searchValue} />
-    </div>
-    {#if LibManager.scripts.length === 0}
-        <h2 class="text-xl">No libraries installed!</h2>
-    {/if}
-    <div
-        class="overflow-y-auto outline-none grid gap-4 view-{Storage.settings.menuView} pb-1 grow"
-        use:dndzone={{ items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
-        onconsider={handleDndConsider}
-        onfinalize={handleDndFinalize}>
-        {#key searchValue}
-            {#each items as item (item.id)}
-                {@const library = LibManager.getScript(item.id)}
-                <div animate:flip={{ duration: flipDurationMs }}>
-                    <Library {library} {startDrag} {dragDisabled} dragAllowed={searchValue == ""} />
-                </div>
-            {/each}
-        {/key}
-    </div>
-</div>
+    {/snippet}
+    {#snippet noScripts()}
+        No libraries installed! You will be prompted to install these when plugins require them.
+    {/snippet}
+</ScriptList>

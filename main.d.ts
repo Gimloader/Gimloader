@@ -24,20 +24,9 @@ declare module '*.svelte' {
     export const ButtonProps;
     export const ButtonVariant;
     export const ButtonSize;
-}
-
-declare const GL: typeof import('./src/content/api/api').default;
-/** @deprecated Use GL.stores */
-declare const stores: Stores.Stores;
-/** @deprecated No longer supported */
-declare const platformerPhysics: any;
-
-interface Window {
-    GL: typeof import('./src/content/api/api').default;
-    /** @deprecated Use GL.stores */
-    stores: Stores.Stores;
-    /** @deprecated No longer supported */
-    platformerPhysics: any;
+    export const addReloadNeeded;
+    export const addUpdated;
+    export const showMenu;
 }
 
 declare namespace Gimloader {
@@ -49,10 +38,3 @@ declare namespace Gimloader {
         [name: string]: any;
     }
 }
-
-// Evil hack to avoid dts-bundle-generator including the stores types in the main bundle
-declare namespace Stores {
-    type Stores = {
-        [I in keyof import("./src/types/stores/stores").Stores]: import("./src/types/stores/stores").Stores[I];
-    }
-};

@@ -15,7 +15,7 @@
     <ColorPicker
         rgb={initialValue}
         onInput={({ rgb }) => {
-            value = `rgba(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+            if(rgb) value = `rgba(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
         }}
     />
 {:else}

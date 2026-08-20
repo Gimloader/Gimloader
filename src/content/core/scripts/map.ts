@@ -1,4 +1,5 @@
 import type { Script } from "./script.svelte";
+import { Deferred } from "$shared/utils";
 
-// Scripts must have globally unique name
-export const scripts = new Map<string, Script>();
+export const scriptInstanceMap = new Map<string, Script>();
+export const pluginsLoaded = Deferred.create();

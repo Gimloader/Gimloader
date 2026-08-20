@@ -2,6 +2,12 @@ import PluginManager from "$core/scripts/pluginManager.svelte";
 import { validate } from "$content/utils";
 
 class PluginsApi {
+    readonly #id: string;
+
+    constructor(id: string) {
+        this.#id = id;
+    }
+
     /** A list of all the plugins installed */
     get list() {
         return PluginManager.getScriptNames();
@@ -29,38 +35,19 @@ class PluginsApi {
     }
 
     /**
-     * @deprecated Use {@link get} instead
-     * @hidden
-     */
-    getPlugin(name: string) {
-        return { return: PluginManager.getExports(name) };
-    }
-}
-
-class ScopedPluginsApi extends PluginsApi {
-    readonly #id: string;
-
-    constructor(id: string) {
-        super();
-        this.#id = id;
-    }
-
-    /**
      * Gets a plugin by name, prompting the user to enable/download it if necessary. Returns a promise with its exports
      * @example
      * ```js
      * api.libs.require("Desynchronize", "https://raw.githubusercontent.com/Gimloader/builds/main/plugins/Desynchronize.js");
      * ```
      */
-    require(name: string, downloadUrl?: string) {
+    require<T extends keyof Gimloader.Plugins>(name: T, downloadUrl?: string): Promise<Gimloader.Plugins[T]> {
         validate("plugins.require", arguments, ["name", "string"], ["downloadUrl?", "string"]);
 
-        return PluginManager.require(this.#id, name, downloadUrl);
+        return PluginManager.require(this.#id, name as string, downloadUrl);
     }
 }
 
 Object.freeze(PluginsApi);
 Object.freeze(PluginsApi.prototype);
-Object.freeze(ScopedPluginsApi);
-Object.freeze(ScopedPluginsApi.prototype);
-export { PluginsApi, ScopedPluginsApi };
+export default PluginsApi;

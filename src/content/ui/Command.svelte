@@ -1,18 +1,18 @@
 <script lang="ts">
+    import type { CommandCallback } from "$types/api/commands";
+    import type { Action } from "svelte/action";
     import Commands from "$core/commands.svelte";
     import * as Dialog from "$shared/ui/dialog";
-    import type { CommandCallback } from "$types/api/commands";
     import Search from "@lucide/svelte/icons/search";
     import { computeCommandScore } from "bits-ui";
     import { watch } from "runed";
-    import type { Action } from "svelte/action";
 
     let selectedIndex = $state(0);
     let searched = $state("");
     let selectSearch = $state("");
     let textInput = $state("");
     let numberInput: number | undefined = $state();
-    watch([() => searched, () => selectSearch], () => {
+    watch([() => searched, () => selectSearch, () => Commands.open], () => {
         selectedIndex = 0;
     });
 
@@ -24,6 +24,7 @@
 
     // Calculate which options to show in general
     let items = $derived.by(() => {
+        Commands.open;
         let options: Option[] = [];
 
         for(let command of Commands.commands) {
@@ -105,6 +106,13 @@
         Commands.runCommand(command.callback);
     }
 
+    function selectIfDoneOpening(index: number) {
+        const sinceOpened = Date.now() - Commands.openedAt;
+        if(sinceOpened < 200) return;
+
+        selectedIndex = index;
+    }
+
     function onOpenChange(open: boolean) {
         if(open) return;
 
@@ -133,22 +141,24 @@
         use:makeVisible={index === selectedIndex}
         data-selected={index === selectedIndex ? true : null}
         onclick={() => onSelect(index)}
-        onmouseover={() => selectedIndex = index}
+        onmousemove={() => selectIfDoneOpening(index)}
         onfocus={() => selectedIndex = index}
         class="
             data-selected:bg-accent data-selected:text-accent-foreground w-full outline-hidden
             relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1! text-sm!
-        ">
+        "
+    >
         {text}
     </button>
 {/snippet}
 
 <Dialog.Root bind:open={Commands.open} onOpenChangeComplete={onOpenChange}>
-    <Dialog.Overlay class="z-100" />
+    <Dialog.Overlay class="z-overlay" />
     <Dialog.Content
-        class="flex flex-col p-0 gap-0 overflow-hidden z-100"
+        class="flex flex-col p-0 gap-0 overflow-hidden z-overlay"
         style="width: min(600px, 90vw)"
-        showCloseButton={false}>
+        showCloseButton={false}
+    >
         {#if !Commands.action}
             <div class="flex h-9 items-center gap-2 border-b pl-3 pr-8">
                 <Search class="size-4 shrink-0 opacity-50" />

@@ -1,10 +1,16 @@
 @layer properties, theme, base, components, utilities;
 
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities) source("../ui");
+@import "tailwindcss/theme.css";
+@import "tailwindcss/utilities.css" source("../ui");
 @import "tw-animate-css";
 @import "../../shared/vars.css";
 @source "../../shared";
+
+@theme {
+    --z-index-modal: 100001;
+    --z-index-alert: 100002;
+    --z-index-overlay: 100003;
+}
 
 @layer theme {
     .preflight, .preflight::after, .preflight::before, .preflight::backdrop, .preflight *, .preflight ::after, .preflight ::before, .preflight ::backdrop, .preflight ::file-selector-button {

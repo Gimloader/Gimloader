@@ -1,7 +1,5 @@
 import type { Vector } from "@dimforge/rapier2d-compat";
-import type WorldOptions from "./stores/worldOptions";
-import type { CircleShort, RotatedEllipse } from "./stores/shapes";
-import type { SessionModeType } from "./stores/session";
+import type { Stores } from "./stores";
 
 interface MessageForDevice {
     data: any;
@@ -44,9 +42,9 @@ export interface ReceivedMessages {
         message: string;
     };
     "ALL_PROPS": {
-        circleColliders: CircleShort[];
+        circleColliders: Stores.CircleShort[];
         defaultLayer?: string;
-        ellipseColliders: RotatedEllipse[];
+        ellipseColliders: Stores.RotatedEllipse[];
         id: string;
         imageUrl: string;
         minimumRoleLevel: undefined;
@@ -150,7 +148,7 @@ export interface ReceivedMessages {
             removedDevices: string[];
         };
     };
-    "WORLD_OPTIONS": WorldOptions;
+    "WORLD_OPTIONS": Stores.WorldOptions;
     "XP_ADDITION": {
         reason: string;
         amount: number;
@@ -210,7 +208,7 @@ export interface SentMessages {
     };
     "START_GAME": {
         customTeams: Record<string, string>;
-        modeType: SessionModeType;
+        modeType: Stores.SessionModeType;
         ownerAsSpectator: boolean;
     };
     "END_GAME": undefined;

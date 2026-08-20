@@ -7,17 +7,26 @@
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
-        "baseUrl": ".",
+        "strict": true,
+        "noImplicitOverride": true,
+        "types": ["bun", "chrome", "react", "react-dom"],
         "paths": {
             "$assets/*": ["./assets/*"],
             "$core/*": ["./src/content/core/*"],
             "$content/*": ["./src/content/*"],
             "$bg/*": ["./src/background/*"],
             "$types/*": ["./src/types/*"],
-            "$shared/*": ["./src/shared/*"]
+            "$shared/*": ["./src/shared/*"],
+            "rapier/*": ["./node_modules/@dimforge/rapier2d-compat/*"]
         },
         "verbatimModuleSyntax": true,
         "noEmit": true
     },
-    "include": ["./src/**/*.*", "main.d.ts"]
+    "include": [
+        "./scripts/**/*",
+        "./src/**/*",
+        "./tests/**/*",
+        "main.d.ts",
+        "./extension/scripts/*.ts"
+    ]
 }

@@ -20,11 +20,12 @@
         "scriptIndent": true,
         "styleIndent": true,
         "printWidth": 120,
-        "closingBracketSameLine": true,
+        "closingBracketSameLine": false,
         "preferAttrsSingleLine": true
     },
     "includes": [
-        "./src/**/*.{ts,js,json,css,svelte}"
+        "./src/**/*.{ts,js,json,css,svelte}",
+        "./tests/**/*.{ts,js,json,css,svelte}"
     ],
     "plugins": [
         "https://plugins.dprint.dev/typescript-0.95.11.wasm",
