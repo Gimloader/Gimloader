@@ -1,38 +1,156 @@
+import type { Schema } from "$types/schema";
+import type { ReceivedMessages1d, ReceivedMessages2d, SentMessages1d, SentMessages2d } from "$types/net";
 import Net, { type ConnectionType, type RequesterOptions } from "$core/net/net";
 import { validate } from "$content/utils";
 import EventEmitter2 from "eventemitter2";
 import * as z from "zod";
-import type { Schema } from "$types/schema";
-import type { CancelablePromise, GeneralEventEmitter, ListenToOptions, WaitForFilter, WaitForOptions } from "eventemitter2";
 import Cleanup from "$core/scripts/cleanup";
 
 const GamemodeSchema = z.union([z.string(), z.array(z.string())]);
 
+type TaggedSentMessages2d = {
+    [K in keyof SentMessages2d as `send:${K}`]: SentMessages2d[K];
+};
+
+type TaggedSentMessages1d = {
+    [K in keyof SentMessages1d as `send:${K}`]: SentMessages1d[K];
+};
+
+type Messages2d = ReceivedMessages2d & TaggedSentMessages2d;
+type Messages1d = ReceivedMessages1d & TaggedSentMessages1d;
+type EditFN<T> = (newValue: T | null) => void;
+
+const eventsConfig = {
+    wildcard: true,
+    delimiter: ":"
+};
+
+abstract class NetTypeApi extends EventEmitter2 {
+    constructor(id: string, type: ConnectionType) {
+        super(eventsConfig);
+
+        const emit = (event: string | string[], ...args: any[]) => {
+            if(type !== Net.type) return;
+            this.emit(event, ...args);
+        };
+
+        Net.onAny(emit);
+        Cleanup.on(id, (final) => {
+            if(final) Net.offAny(emit);
+            this.removeAllListeners();
+
+            // @ts-expect-error The type is wrong, this clears onAny listeners
+            this.offAny();
+        });
+    }
+}
+
 /**
- * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ * The colyseus api is for sending and recieving data in 2d modes.
+ * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
  * and uses wildcards with ":" as a delimiter.
  * ```js
  * // fired when data is recieved on a certain channel
- * api.net.on("CHANNEL", (data, editFn) => {
+ * api.net.colyseus.on("CHANNEL", (data, editFn) => {
  *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
  * });
  *
  * // fired when data is sent on a certain channel
- * api.net.on("send:CHANNEL", (data, editFn) => {
+ * api.net.colyseus.on("send:CHANNEL", (data, editFn) => {
  *     editFn(null); // Cancel the data being sent
  * });
  *
  * // you can also use wildcards, eg
- * api.net.on("send:*", () => {});
+ * api.net.colyseus.on("send:*", () => {});
  * ```
  */
-class NetApi {
+export class ColyseusApi extends NetTypeApi {
+    /** Sends a message to the server on a specific channel */
+    send<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]) {
+        validate("net.colyseus.send", arguments, ["channel", "string"]);
+
+        Net.send(channel, args[0]);
+    }
+
+    override on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void) {
+        return super.on(channel, listener);
+    }
+
+    override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
+        // @ts-expect-error just gotta trust me
+        return super.onAny(listener);
+    }
+
+    /** The colyseus room that the client is connected to, or null if there is no connection */
+    get room() {
+        if(Net.type !== "Colyseus") return null;
+        return Net.room;
+    }
+
+    /** Gimkit's internal Colyseus state */
+    get state(): Schema.GimkitSchema {
+        // We pretend that this is always defined for ease of use
+        if(Net.type !== "Colyseus") return undefined as any;
+        return Net.room?.state;
+    }
+}
+
+/**
+ * The colyseus api is for sending and recieving data in non-2d (classic) modes.
+ * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ * and uses wildcards with ":" as a delimiter.
+ * ```js
+ * // fired when data is recieved on a certain channel
+ * api.net.blueboat.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
+ *
+ * // fired when data is sent on a certain channel
+ * api.net.blueboat.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
+ *
+ * // you can also use wildcards, eg
+ * api.net.blueboat.on("send:*", () => {});
+ * ```
+ */
+export class BlueboatApi extends NetTypeApi {
+    /** Sends a message to the server on a specific channel */
+    send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]) {
+        validate("net.blueboat.send", arguments, ["channel", "string"]);
+
+        Net.send(channel, args[0]);
+    }
+
+    override on<C extends keyof Messages1d>(channel: C, listener: (data: Messages1d[C], editFn: EditFN<Messages1d[C]>) => void) {
+        return super.on(channel, listener);
+    }
+
+    override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
+        // @ts-expect-error
+        return super.onAny(listener);
+    }
+
+    /** The blueboat room that the client is connected to, or null if there is no connection */
+    get room() {
+        if(Net.type !== "Blueboat") return null;
+        return Net.room;
+    }
+}
+
+class NetApi extends EventEmitter2 {
     readonly #id: string;
     readonly #defaultGamemode: string[];
+    colyseus: ColyseusApi;
+    blueboat: BlueboatApi;
 
     constructor(id: string, defaultGamemode: string[]) {
+        super(eventsConfig);
+
         this.#id = id;
         this.#defaultGamemode = defaultGamemode;
+        this.colyseus = new ColyseusApi(id, "Colyseus");
+        this.blueboat = new BlueboatApi(id, "Blueboat");
 
         const emit = this.emit.bind(this);
         Net.onAny(emit);
@@ -41,15 +159,10 @@ class NetApi {
             if(final) Net.offAny(emit);
             this.removeAllListeners();
 
-            // @ts-expect-error The type is wrong, this clears onAny listeners
-            this.#events.offAny();
+            // @ts-expect-error
+            this.offAny();
         });
     }
-
-    #events = new EventEmitter2({
-        wildcard: true,
-        delimiter: ":"
-    });
 
     /** Which type of server the client is currently connected to */
     get type() {
@@ -61,12 +174,18 @@ class NetApi {
         return Net.gamemode;
     }
 
-    /** The room that the client is connected to, or null if there is no connection */
+    /**
+     * The room that the client is connected to, or null if there is no connection
+     * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
+     */
     get room() {
         return Net.room;
     }
 
-    /** Gimkit's internal Colyseus state */
+    /**
+     * Gimkit's internal Colyseus state
+     * @deprecated use `net.colyseus.state` instead
+     */
     get state(): Schema.GimkitSchema {
         // We pretend that this is always defined for ease of use
         if(Net.type !== "Colyseus") return undefined as any;
@@ -83,117 +202,14 @@ class NetApi {
         return Net.isHost;
     }
 
-    /** Sends a message to the server on a specific channel */
+    /**
+     * Sends a message to the server on a specific channel
+     * @deprecated use `net.blueboat.send` or `net.colyseus.send` instead
+     */
     send(channel: string, message?: any) {
         validate("net.send", arguments, ["channel", "string"]);
 
         Net.send(channel, message);
-    }
-
-    emit(event: string | string[], ...args: any[]) {
-        this.#events.emit(event, ...args);
-    }
-
-    emitAsync(event: string | string[], ...args: any[]) {
-        return this.#events.emitAsync(event, ...args);
-    }
-
-    addListener(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.addListener(event, listener);
-    }
-
-    on(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.on(event, listener);
-    }
-
-    prependListener(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.prependListener(event, listener);
-    }
-
-    once(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.once(event, listener);
-    }
-
-    prependOnceListener(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.prependOnceListener(event, listener);
-    }
-
-    many(event: string | string[], timesToListen: number, listener: (...data: any[]) => void) {
-        this.#events.many(event, timesToListen, listener);
-    }
-
-    prependMany(event: string | string[], timesToListen: number, listener: (...data: any[]) => void) {
-        this.#events.many(event, timesToListen, listener);
-    }
-
-    onAny(listener: (event: string | string[], ...data: any[]) => void) {
-        this.#events.onAny(listener);
-    }
-
-    prependAny(listener: (event: string | string[], ...data: any[]) => void) {
-        this.#events.prependAny(listener);
-    }
-
-    offAny(listener: (event: string | string[], ...data: any[]) => void) {
-        this.#events.offAny(listener);
-    }
-
-    removeListener(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.removeListener(event, listener);
-    }
-
-    off(event: string | string[], listener: (...data: any[]) => void) {
-        this.#events.removeListener(event, listener);
-    }
-
-    removeAllListeners(event?: string | string[]) {
-        this.#events.removeAllListeners(event);
-    }
-
-    setMaxListeners(amount: number) {
-        this.#events.setMaxListeners(amount);
-    }
-
-    getMaxListeners() {
-        return this.#events.getMaxListeners();
-    }
-
-    eventNames(nsAsArray?: boolean) {
-        return this.#events.eventNames(nsAsArray);
-    }
-
-    listenerCount(event: string | string[]) {
-        return this.#events.listenerCount(event);
-    }
-
-    listeners(event: string | string[]) {
-        return this.#events.listeners(event);
-    }
-
-    listenersAny() {
-        return this.#events.listenersAny();
-    }
-
-    waitFor(event: string | string[], timeout?: number): CancelablePromise<any[]>;
-    waitFor(event: string | string[], filter?: WaitForFilter): CancelablePromise<any[]>;
-    waitFor(event: string | string[], options?: WaitForOptions): CancelablePromise<any[]>;
-    waitFor(event: string | string[], options: any) {
-        return this.#events.waitFor(event, options);
-    }
-
-    listenTo(target: GeneralEventEmitter, events: string | string[], options?: ListenToOptions): EventEmitter2;
-    listenTo(target: GeneralEventEmitter, events: Record<string, string>, options?: ListenToOptions): EventEmitter2;
-    listenTo(target: GeneralEventEmitter, events: any, options?: ListenToOptions) {
-        return this.#events.listenTo(target, events, options);
-    }
-
-    stopListeningTo(target: GeneralEventEmitter, event?: string | string[]) {
-        return this.#events.stopListeningTo(target, event);
-    }
-
-    hasListeners(event: string | string[]) {
-        // @ts-expect-error EventEmitter2's type is wrong
-        return this.#events.hasListeners(event);
     }
 
     /**

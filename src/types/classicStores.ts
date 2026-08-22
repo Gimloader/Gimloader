@@ -268,13 +268,13 @@ export namespace ClassicStores {
         votedOff: boolean;
     }
 
-    export type Status = "intro" | "questions" | "discussion" | "voting" | "votingResult";
+    export type ImposterStatus = "intro" | "questions" | "discussion" | "voting" | "votingResult";
 
     export interface BaseImposter {
         impostersLeft: number;
         investigationsLeft: number;
         meetingsLeft: number;
-        status: Status;
+        status: ImposterStatus;
     }
 
     export interface HostImposter extends BaseImposter {
@@ -600,7 +600,7 @@ export namespace ClassicStores {
 
     export interface Upgrades {
         currentlySelectedUpgrade: string;
-        homebaseUpgades: HomebaseUpgrade[];
+        homebaseUpgrades: HomebaseUpgrade[];
         lavaUpgrades: LavaUpgrade[];
         upgradeLevelTabs: UpgradeLevels;
         upgradeLevels: UpgradeLevels;

@@ -100,7 +100,7 @@ class Api {
 
         this.rewriter = Object.freeze(new RewriterApi(id));
         this.hotkeys = Object.freeze(new HotkeysApi(id));
-        this.net = Object.freeze(new NetApi(id, script?.headers.gamemode ?? []));
+        this.net = new NetApi(id, script?.headers.gamemode ?? []);
         this.UI = Object.freeze(new UIApi(id));
         this.storage = Object.freeze(new StorageApi(id));
         this.patcher = Object.freeze(new PatcherApi(id));
