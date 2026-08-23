@@ -18,20 +18,19 @@ export default class CacheState extends TypedEventEmitter<CacheEvents> {
     }
 
     init(invalid: boolean) {
-        this.invalid.value = invalid;
-
-        this.emit("invalidChange");
-        if(invalid) this.emit("invalid", true);
+        this.update(invalid);
     }
 
     update(invalid: boolean) {
+        if(invalid === this.invalid.value) return;
         this.invalid.value = invalid;
 
         this.emit("invalidChange");
         if(invalid) this.emit("invalid", true);
     }
 
-    onCacheInvalid({ invalid }: StateMessageProps<"cacheInvalid">, remote: boolean) {
+    onCacheInvalid({ invalid }: StateMessageProps<"cacheInvalid">, remote: boolean, cancel: () => void) {
+        if(invalid === this.invalid.value) return cancel();
         this.invalid.value = invalid;
 
         this.emit("invalidChange");

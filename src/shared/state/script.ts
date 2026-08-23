@@ -219,7 +219,7 @@ export default abstract class ScriptState<
         this.deleteScript(name);
     }
 
-    onCreate({ folder, info }: StateMessageProps<`${ScriptType}Create`>, _: boolean) {
+    onCreate({ folder, info }: StateMessageProps<`${ScriptType}Create`>, _: boolean, __: () => void) {
         const layoutFolder = this.layout.value[folder];
         if(!layoutFolder) return;
 
@@ -234,14 +234,14 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    onDelete({ name }: StateMessageProps<`${ScriptType}Delete`>, _: boolean) {
+    onDelete({ name }: StateMessageProps<`${ScriptType}Delete`>, _: boolean, __: () => void) {
         const script = this.getScriptData(name);
         if(!script) return;
 
         this.deleteExisting(name, script);
     }
 
-    onEdit({ name, newName, code, updated }: StateMessageProps<`${ScriptType}Edit`>, _: boolean) {
+    onEdit({ name, newName, code, updated }: StateMessageProps<`${ScriptType}Edit`>, _: boolean, __: () => void) {
         const script = this.getScriptData(name);
         if(!script) return;
 
@@ -281,7 +281,7 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    onArrange({ folder, order }: StateMessageProps<`${ScriptType}Arrange`>, _: boolean) {
+    onArrange({ folder, order }: StateMessageProps<`${ScriptType}Arrange`>, _: boolean, __: () => void) {
         const layoutFolder = this.layout.value[folder];
         if(!layoutFolder) return;
 
@@ -295,7 +295,7 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    onCreateFolder({ parent, name, id }: StateMessageProps<`${ScriptType}FolderCreate`>, _: boolean) {
+    onCreateFolder({ parent, name, id }: StateMessageProps<`${ScriptType}FolderCreate`>, _: boolean, __: () => void) {
         this.layout.value[id] = {
             parent,
             name,
@@ -310,7 +310,7 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    onDeleteFolder({ id }: StateMessageProps<`${ScriptType}FolderDelete`>, _: boolean) {
+    onDeleteFolder({ id }: StateMessageProps<`${ScriptType}FolderDelete`>, _: boolean, __: () => void) {
         const parent = this.layout.value[id].parent;
         if(!parent) return;
 
@@ -336,7 +336,7 @@ export default abstract class ScriptState<
         delete this.layout.value[id];
     }
 
-    onEditFolder({ id, newName }: StateMessageProps<`${ScriptType}FolderEdit`>, _: boolean) {
+    onEditFolder({ id, newName }: StateMessageProps<`${ScriptType}FolderEdit`>, _: boolean, __: () => void) {
         const folder = this.layout.value[id];
         if(!folder) return;
 
@@ -345,7 +345,7 @@ export default abstract class ScriptState<
         this.emit("layoutUpdate");
     }
 
-    onMoveItem({ item, folder }: StateMessageProps<`${ScriptType}ItemMove`>, _: boolean) {
+    onMoveItem({ item, folder }: StateMessageProps<`${ScriptType}ItemMove`>, _: boolean, __: () => void) {
         const parentId = item.type === "folder" ? this.layout.value[item.id]?.parent : this.getScriptData(item.id)?.folder;
         if(!parentId) return;
 

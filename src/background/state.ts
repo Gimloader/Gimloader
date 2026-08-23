@@ -30,7 +30,7 @@ export default async function loadState() {
     StateManager.storage.on("pluginStorageChange", () => saveDebounced("pluginStorage"));
     StateManager.storage.on("pluginSettingsChange", () => saveDebounced("pluginSettings"));
     StateManager.hotkeys.on("configurablesChange", () => saveDebounced("hotkeys"));
-    StateManager.cache.on("invalidUpdate", () => saveDebounced("cacheInvalid"));
+    StateManager.cache.on("invalidChange", () => saveDebounced("cacheInvalid"));
 
     StateManager.init(sanitizeState(savedState), {
         downloadDependencies: (deps) => Downloader.downloadDeps(deps),

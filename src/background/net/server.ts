@@ -56,7 +56,8 @@ export default new class Server {
             });
         } else {
             // no reply expected, just a state update
-            StateManager.handle(type, message, true);
+            const cancelled = StateManager.handle(type, message, true);
+            if(cancelled) return;
 
             // send the message to other connected ports
             for(const openPort of this.open) {

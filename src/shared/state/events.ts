@@ -5,7 +5,8 @@ import { TypedEventEmitter } from "$shared/utils";
 type StateMessageEvents = {
     [Type in StateMessages["type"]]: [
         message: StateMessageProps<Type>,
-        remote: boolean
+        remote: boolean,
+        cancel: () => void
     ];
 };
 
@@ -21,7 +22,9 @@ export interface StateEvents {
 export const stateEvents = new TypedEventEmitter<StateEvents>();
 
 export function handle(type: string, props: any, remote = false) {
-    stateMessageEvents.emit(type, props, remote);
+    let cancelled = false;
+    stateMessageEvents.emit(type, props, remote, () => cancelled = true);
+    return cancelled;
 }
 
 export function apply<Type extends StateMessages["type"]>(type: Type, message: StateMessageProps<Type>) {
