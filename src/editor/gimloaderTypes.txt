@@ -10621,38 +10621,64 @@ type Messages2d = ReceivedMessages2d & TaggedSentMessages2d;
 type Messages1d = ReceivedMessages1d & TaggedSentMessages1d;
 type EditFN<T> = (newValue: T | null) => void;
 abstract class NetTypeApi extends EventEmitter2 {
-    constructor(id: string);
+    constructor(id: string, type: ConnectionType);
 }
+/**
+ * The colyseus api is for sending and recieving data in 2d modes.
+ * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ * and uses wildcards with ":" as a delimiter.
+ * ```js
+ * // fired when data is recieved on a certain channel
+ * api.net.colyseus.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
+ *
+ * // fired when data is sent on a certain channel
+ * api.net.colyseus.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
+ *
+ * // you can also use wildcards, eg
+ * api.net.colyseus.on("send:*", () => {});
+ * ```
+ */
 class ColyseusApi extends NetTypeApi {
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]): void;
     on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void): Listener | this;
     onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
+    /** The colyseus room that the client is connected to, or null if there is no connection */
+    get room(): any;
+    /** Gimkit's internal Colyseus state */
+    get state(): Schema.GimkitSchema;
 }
+/**
+ * The colyseus api is for sending and recieving data in non-2d (classic) modes.
+ * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
+ * and uses wildcards with ":" as a delimiter.
+ * ```js
+ * // fired when data is recieved on a certain channel
+ * api.net.blueboat.on("CHANNEL", (data, editFn) => {
+ *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * });
+ *
+ * // fired when data is sent on a certain channel
+ * api.net.blueboat.on("send:CHANNEL", (data, editFn) => {
+ *     editFn(null); // Cancel the data being sent
+ * });
+ *
+ * // you can also use wildcards, eg
+ * api.net.blueboat.on("send:*", () => {});
+ * ```
+ */
 class BlueboatApi extends NetTypeApi {
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]): void;
     on<C extends keyof Messages1d>(channel: C, listener: (data: Messages1d[C], editFn: EditFN<Messages1d[C]>) => void): Listener | this;
     onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
+    /** The blueboat room that the client is connected to, or null if there is no connection */
+    get room(): any;
 }
-/**
- * The net api extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
- * ```js
- * // fired when data is recieved on a certain channel
- * api.net.on("CHANNEL", (data, editFn) => {
- *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
- * });
- *
- * // fired when data is sent on a certain channel
- * api.net.on("send:CHANNEL", (data, editFn) => {
- *     editFn(null); // Cancel the data being sent
- * });
- *
- * // you can also use wildcards, eg
- * api.net.on("send:*", () => {});
- * ```
- */
 class NetApi extends EventEmitter2 {
     #private;
     colyseus: ColyseusApi;
@@ -10662,15 +10688,24 @@ class NetApi extends EventEmitter2 {
     get type(): ConnectionType;
     /** The id of the gamemode the player is currently playing */
     get gamemode(): string | null;
-    /** The room that the client is connected to, or null if there is no connection */
+    /**
+     * The room that the client is connected to, or null if there is no connection
+     * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
+     */
     get room(): any;
-    /** Gimkit's internal Colyseus state */
+    /**
+     * Gimkit's internal Colyseus state
+     * @deprecated use `net.colyseus.state` instead
+     */
     get state(): Schema.GimkitSchema;
     /** Colyseus's Callbacks function for listening to state changes */
     get Callbacks(): any;
     /** Whether the user is the one hosting the current game */
     get isHost(): boolean;
-    /** Sends a message to the server on a specific channel */
+    /**
+     * Sends a message to the server on a specific channel
+     * @deprecated use `net.blueboat.send` or `net.colyseus.send` instead
+     */
     send(channel: string, message?: any): void;
     /**
      * Runs a callback when the game is loaded, or runs it immediately if the game has already loaded.
