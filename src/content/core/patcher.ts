@@ -1,3 +1,4 @@
+import { nop } from "$shared/utils";
 import type { FunctionKeys, PatcherAfterCallback, PatcherBeforeCallback, PatcherInsteadCallback, PatcherSwapCallback } from "$types/api/patcher";
 import Cleanup from "./scripts/cleanup";
 
@@ -77,14 +78,14 @@ export default class Patcher {
         if(!this.patches.has(object)) this.patches.set(object, new Map());
 
         const properties = this.patches.get(object);
-        if(!properties) return;
+        if(!properties) return nop;
 
         if(!properties.has(property)) {
             properties.set(property, { original: object[property], patches: [] });
         }
 
         const patches = properties.get(property);
-        if(!patches) return;
+        if(!patches) return nop;
 
         patches.patches.push(patch);
         this.applyPatches(object, property);

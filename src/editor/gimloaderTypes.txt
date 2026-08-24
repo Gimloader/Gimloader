@@ -11279,7 +11279,7 @@ class PatcherApi {
      * object.method(); // Logs "Came after: 100"
      * ```
      */
-    after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): (() => void) | undefined;
+    after<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherAfterCallback<O[K]>): () => void;
     /**
      * Runs a callback before a function on an object has been run.
      * Return true from the callback to prevent the function from running
@@ -11294,7 +11294,7 @@ class PatcherApi {
      * object.method(5, 6); // Logs "Came before: [5, 6]"
      * ```
      */
-    before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): (() => void) | undefined;
+    before<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherBeforeCallback<O[K]>): () => void;
     /**
      * Runs a function instead of a function on an object
      * @returns A function to remove the patch
@@ -11308,7 +11308,7 @@ class PatcherApi {
      * console.log(object.method(5, 6)); // Logs "11" instead of "100"
      * ```
      */
-    instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): (() => void) | undefined;
+    instead<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherInsteadCallback<O[K]>): () => void;
     /**
      * Replaces a function on an object with another function
      * @returns A function to remove the patch
@@ -11322,7 +11322,7 @@ class PatcherApi {
      * console.log(object.method(5, 6)); // Logs "11" instead of "100"
      * ```
      */
-    swap<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherSwapCallback<O[K]>): (() => void) | undefined;
+    swap<O extends object, K extends FunctionKeys<O>>(object: O, method: K, callback: PatcherSwapCallback<O[K]>): () => void;
 }
 
 /** @inline */
