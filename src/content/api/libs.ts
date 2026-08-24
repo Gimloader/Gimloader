@@ -1,6 +1,7 @@
 import LibManager from "$core/scripts/libManager.svelte";
 import { validate } from "$content/utils";
 
+/** Methods for getting info on libraries */
 class LibsApi {
     readonly #id: string;
 

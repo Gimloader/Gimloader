@@ -30,6 +30,7 @@ export interface SvelteComponents {
     Switch: typeof Switch;
 }
 
+/** @hidden */
 const Components: SvelteComponents = {
     Accordion,
     Dialog,

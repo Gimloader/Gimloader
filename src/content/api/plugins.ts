@@ -1,6 +1,7 @@
 import PluginManager from "$core/scripts/pluginManager.svelte";
 import { validate } from "$content/utils";
 
+/** Methods for getting info on plugins */
 class PluginsApi {
     readonly #id: string;
 

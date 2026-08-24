@@ -26,6 +26,7 @@ const ConfigurableHotkeyOptionsSchema = z.object({
     default: HotkeyTriggerSchema.optional()
 });
 
+/** Tools for creating arbitrary hotkeys */
 class HotkeysApi {
     readonly #id: string;
 

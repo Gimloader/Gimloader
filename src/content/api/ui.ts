@@ -28,6 +28,7 @@ const ModalOptionsSchema = z.object({
     onClosed: z.function().optional()
 });
 
+/** Functions for interacting with user interfaces */
 class UIApi {
     readonly #id: string;
 

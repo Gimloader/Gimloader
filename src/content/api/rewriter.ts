@@ -10,7 +10,7 @@ const ExposerSchema = z.object({
 });
 
 /**
- * The rewriter API allows you to modify the bundled code of Gimkit in order to expose values
+ * The rewriter API allows you to modify the bundled code of Gimkit in order to alter behavior
  * or change certain behaviors. Due to the unpredictable nature of bundling, you cannot assume that variable names
  * will remain the same beteen updates.
  */

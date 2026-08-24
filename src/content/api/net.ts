@@ -59,9 +59,6 @@ abstract class NetTypeApi extends EventEmitter2 {
  * api.net.colyseus.on("send:CHANNEL", (data, editFn) => {
  *     editFn(null); // Cancel the data being sent
  * });
- *
- * // you can also use wildcards, eg
- * api.net.colyseus.on("send:*", () => {});
  * ```
  */
 export class ColyseusApi extends NetTypeApi {
@@ -109,9 +106,6 @@ export class ColyseusApi extends NetTypeApi {
  * api.net.blueboat.on("send:CHANNEL", (data, editFn) => {
  *     editFn(null); // Cancel the data being sent
  * });
- *
- * // you can also use wildcards, eg
- * api.net.blueboat.on("send:*", () => {});
  * ```
  */
 export class BlueboatApi extends NetTypeApi {
@@ -138,10 +132,14 @@ export class BlueboatApi extends NetTypeApi {
     }
 }
 
+/** Functions to interact with the current connection to the server */
 class NetApi extends EventEmitter2 {
     readonly #id: string;
     readonly #defaultGamemode: string[];
+
+    /** Tools for sending and receiving data and interacting with state in 2d modes */
     colyseus: ColyseusApi;
+    /** Tools for sending and receiving data in non-2d modes */
     blueboat: BlueboatApi;
 
     constructor(id: string, defaultGamemode: string[]) {
@@ -177,6 +175,7 @@ class NetApi extends EventEmitter2 {
     /**
      * The room that the client is connected to, or null if there is no connection
      * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
+     * @hidden
      */
     get room() {
         return Net.room;
@@ -185,6 +184,7 @@ class NetApi extends EventEmitter2 {
     /**
      * Gimkit's internal Colyseus state
      * @deprecated use `net.colyseus.state` instead
+     * @hidden
      */
     get state(): Schema.GimkitSchema {
         // We pretend that this is always defined for ease of use
@@ -205,6 +205,7 @@ class NetApi extends EventEmitter2 {
     /**
      * Sends a message to the server on a specific channel
      * @deprecated use `net.blueboat.send` or `net.colyseus.send` instead
+     * @hidden
      */
     send(channel: string, message?: any) {
         validate("net.send", arguments, ["channel", "string"]);

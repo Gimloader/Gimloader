@@ -20,20 +20,23 @@ import createSettingsApi from "./settings";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import Cleanup from "$core/scripts/cleanup";
 
+export type { ScriptHeaders };
+
+/**
+ * The Gimloader api which is exposed to scripts via the `api` variable.
+ * Contains many utilities for things like interacting with Gimkit and user interaction.
+ */
 class Api {
-    /** Functions to edit Gimkit's code */
+    /** Functions to edit Gimkit's code or to expose internals */
     rewriter: Readonly<RewriterApi>;
 
     /** Functions to listen for key combinations */
     hotkeys: Readonly<HotkeysApi>;
 
-    /**
-     * Ways to interact with the current connection to the server,
-     * and functions to send general requests
-     */
+    /** Functions to interact with the current connection to the server */
     net: Readonly<NetApi>;
 
-    /** Functions for interacting with the DOM */
+    /** Functions for interacting with user interfaces */
     UI: Readonly<UIApi>;
 
     /** Functions for persisting data between reloads */

@@ -12,6 +12,7 @@ import * as Reactivity from "svelte/reactivity";
 import * as Store from "svelte/store";
 import * as Transition from "svelte/transition";
 
+/** @hidden */
 export interface SvelteExport {
     Index: typeof Index;
     Client: any;
@@ -26,6 +27,7 @@ export interface SvelteExport {
     Transition: typeof Transition;
 }
 
+/** @hidden */
 const Svelte: SvelteExport = {
     Index,
     Client: { ...Client },

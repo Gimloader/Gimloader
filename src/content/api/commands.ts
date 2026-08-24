@@ -12,7 +12,7 @@ const CommandOptionsSchema = z.union([
     })
 ]);
 
-/** An API for adding commands to the command palette */
+/** Functions for adding commands to the command palette */
 class CommandsApi {
     readonly #id: string;
 

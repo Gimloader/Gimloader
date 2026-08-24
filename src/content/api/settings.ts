@@ -7,6 +7,8 @@ import * as z from "zod";
 import Modals from "$core/modals.svelte";
 import StateManager from "$shared/state";
 
+export type { PluginSettings };
+
 const BaseSchema = z.object({
     id: z.string(),
     title: z.string(),
@@ -147,6 +149,7 @@ function registerListeners(id: string, settings: PluginSettingsDescription) {
     }
 }
 
+/** @hidden */
 export default function createSettingsApi(plugin: Plugin): PluginSettings {
     const id = plugin.headers.name;
 

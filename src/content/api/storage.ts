@@ -1,6 +1,7 @@
 import Storage, { type ValueChangeCallback } from "$core/storage.svelte";
 import { validate } from "$content/utils";
 
+/** Functions for persisting data between reloads */
 class StorageApi {
     readonly #id: string;
 

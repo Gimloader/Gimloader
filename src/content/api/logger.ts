@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noConsole: Used for intended logging
 
+/** Utilities for pretty logs with a tag showing they are from this script */
 export class LoggerApi {
     readonly #tag: string[];
 

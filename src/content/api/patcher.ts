@@ -9,6 +9,7 @@ function checkMethod(fnName: string, object: object, method: PropertyKey) {
     throw new Error(`${fnName} expected object.${String(method)} to be a function, but got ${type}`);
 }
 
+/** Functions for intercepting the arguments and return values of functions */
 class PatcherApi {
     readonly #id: string;
 
