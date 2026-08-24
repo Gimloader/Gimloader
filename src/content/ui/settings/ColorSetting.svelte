@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ColorSetting } from "$types/api/settings";
     import ColorPicker, { type RgbaColor } from "svelte-awesome-color-picker";
+    import * as Popover from "$shared/ui/popover";
 
     let { value = $bindable(), setting }: { value: string; setting: ColorSetting<string> } = $props();
 
@@ -11,13 +12,27 @@
     }
 </script>
 
-{#if setting.rgba}
-    <ColorPicker
-        rgb={initialValue}
-        onInput={({ rgb }) => {
-            if(rgb) value = `rgba(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
-        }}
-    />
-{:else}
-    <ColorPicker bind:hex={value} isAlpha={false} />
-{/if}
+<Popover.Root>
+    <Popover.Trigger>
+        <div class="rounded-full w-8 h-8 border border-black" style:background-color={value}></div>
+    </Popover.Trigger>
+    <Popover.Content class="p-0 w-auto bg-transparent border-none shadow-none">
+        {#if setting.rgba}
+            <ColorPicker
+                rgb={initialValue}
+                onInput={({ rgb }) => {
+                    if(rgb) value = `rgba(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+                }}
+                isDialog={false}
+            />
+        {:else}
+            <ColorPicker bind:hex={value} isAlpha={false} isDialog={false} />
+        {/if}
+    </Popover.Content>
+</Popover.Root>
+
+<style>
+    :global(.color-picker > div) {
+        margin: 0 !important;
+    }
+</style>
