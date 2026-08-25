@@ -8,7 +8,7 @@
         dragDisabled: boolean;
         loading?: boolean;
         dragAllowed?: boolean;
-        error?: boolean;
+        errored?: boolean;
         toggle?: Snippet;
         header?: Snippet;
         buttons?: Snippet;
@@ -24,7 +24,7 @@
         dragDisabled,
         loading = false,
         dragAllowed = true,
-        error,
+        errored,
         toggle,
         header,
         buttons,
@@ -41,7 +41,7 @@
 
     let expanded = $state(false);
     let classes = $derived(
-        (error ? "border-2 border-red-500" : deprecated ? "border-2 border-yellow-300" : "border border-gray-500")
+        (errored ? "border-2 border-red-500" : deprecated ? "border-2 border-yellow-300" : "border border-gray-500")
             + " p-3 h-full bg-white preflight rounded-xl relative overflow-hidden origin-right transition-transform duration-150"
     );
 </script>

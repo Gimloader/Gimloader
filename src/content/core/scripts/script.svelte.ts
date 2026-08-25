@@ -34,7 +34,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     requiredBy: Script[] = [];
     optionalBy: Script[] = [];
     exported: any;
-    errored: boolean = $state(false);
+    startError: Error | null = $state(null);
 
     constructor(info: T, headers?: ScriptHeaders) {
         this.code = info.code;
@@ -130,7 +130,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         });
 
         this.startPromise.catch((e) => {
-            this.errored = true;
+            this.startError = e;
             error(e);
         });
 
@@ -218,7 +218,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         this.started = false;
         this.startPromise = null;
         this.exported = null;
-        this.errored = false;
+        this.startError = null;
         this.requires = [];
         this.optionalRequires = [];
         this.requiredBy = [];

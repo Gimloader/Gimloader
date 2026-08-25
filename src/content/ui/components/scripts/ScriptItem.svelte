@@ -62,6 +62,15 @@
             name: script.headers.name
         });
     }
+
+    function showErrorModal() {
+        if(!script?.startError) return;
+
+        Modals.open("error", {
+            title: `Error starting ${script.headers.name}`,
+            text: script.startError.stack ?? script.startError.message
+        });
+    }
 </script>
 
 <Component
@@ -69,7 +78,7 @@
     {startDrag}
     {dragAllowed}
     {loading}
-    error={script?.errored}
+    errored={Boolean(script?.startError)}
     deprecated={script?.headers.deprecated !== null}
     {toggle}
 >
@@ -93,10 +102,10 @@
         {script?.headers.description}
     {/snippet}
     {#snippet buttons()}
-        {#if script?.errored}
+        {#if script?.startError}
             <Tooltip.Provider>
                 <Tooltip.Root delayDuration={100}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger onclick={showErrorModal}>
                         <AlertCircleOutline size={28} color="#f05252" />
                     </Tooltip.Trigger>
                     <Tooltip.Content class="text-base">
