@@ -1,6 +1,6 @@
 # @gimloader/types
 
-These are type definitions for the environment used by Gimloader scripts. They include the global `GL` and `api` variables, and have types available through the `Gimloader` namespace.
+These are type definitions for the environment used by Gimloader scripts. This adds the script-specific `api` variable, and has types available through the `Gimloader` namespace.
 
 ## Usage
 
