@@ -1934,7 +1934,7 @@ export namespace Stores {
         myTeam: string;
         nonDismissMessage: NonDismissMessage;
         phase: boolean;
-        preferences: { startGameWithMode: string };
+        preferences: { startGameWithMode: SessionModeType };
         properties: Map<string, any>;
         removing: Removing;
         roleLevel: number;
