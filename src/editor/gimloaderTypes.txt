@@ -1736,6 +1736,7 @@ interface SvelteComponents {
     Switch: typeof Switch;
 }
 
+/** @hidden */
 interface SvelteExport {
     Index: typeof svelte;
     Client: any;
@@ -9657,7 +9658,7 @@ abstract class Script<T extends ScriptInfo = ScriptInfo> {
     requiredBy: Script[];
     optionalBy: Script[];
     exported: any;
-    errored: boolean;
+    startError: Error | null;
     constructor(info: T, headers?: ScriptHeaders);
     abstract getInfo(): T;
     updateHeaders(headers?: ScriptHeaders): void;
@@ -9704,6 +9705,7 @@ abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
 /** @inline */
 type KeyboardCallback = (e: KeyboardEvent) => void;
+/** Tools for creating arbitrary hotkeys */
 class HotkeysApi {
     #private;
     constructor(id: string);
@@ -9763,7 +9765,7 @@ interface Exposer {
 }
 
 /**
- * The rewriter API allows you to modify the bundled code of Gimkit in order to expose values
+ * The rewriter API allows you to modify the bundled code of Gimkit in order to alter behavior
  * or change certain behaviors. Due to the unpredictable nature of bundling, you cannot assume that variable names
  * will remain the same beteen updates.
  */
@@ -10637,9 +10639,6 @@ abstract class NetTypeApi extends EventEmitter2 {
  * api.net.colyseus.on("send:CHANNEL", (data, editFn) => {
  *     editFn(null); // Cancel the data being sent
  * });
- *
- * // you can also use wildcards, eg
- * api.net.colyseus.on("send:*", () => {});
  * ```
  */
 class ColyseusApi extends NetTypeApi {
@@ -10666,9 +10665,6 @@ class ColyseusApi extends NetTypeApi {
  * api.net.blueboat.on("send:CHANNEL", (data, editFn) => {
  *     editFn(null); // Cancel the data being sent
  * });
- *
- * // you can also use wildcards, eg
- * api.net.blueboat.on("send:*", () => {});
  * ```
  */
 class BlueboatApi extends NetTypeApi {
@@ -10679,9 +10675,12 @@ class BlueboatApi extends NetTypeApi {
     /** The blueboat room that the client is connected to, or null if there is no connection */
     get room(): any;
 }
+/** Functions to interact with the current connection to the server */
 class NetApi extends EventEmitter2 {
     #private;
+    /** Tools for sending and receiving data and interacting with state in 2d modes */
     colyseus: ColyseusApi;
+    /** Tools for sending and receiving data in non-2d modes */
     blueboat: BlueboatApi;
     constructor(id: string, defaultGamemode: string[]);
     /** Which type of server the client is currently connected to */
@@ -10691,11 +10690,13 @@ class NetApi extends EventEmitter2 {
     /**
      * The room that the client is connected to, or null if there is no connection
      * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
+     * @hidden
      */
     get room(): any;
     /**
      * Gimkit's internal Colyseus state
      * @deprecated use `net.colyseus.state` instead
+     * @hidden
      */
     get state(): Schema.GimkitSchema;
     /** Colyseus's Callbacks function for listening to state changes */
@@ -10705,6 +10706,7 @@ class NetApi extends EventEmitter2 {
     /**
      * Sends a message to the server on a specific channel
      * @deprecated use `net.blueboat.send` or `net.colyseus.send` instead
+     * @hidden
      */
     send(channel: string, message?: any): void;
     /**
@@ -11063,15 +11065,6 @@ interface ModalOptions {
     onClosed?: () => void;
 }
 
-interface Internals {
-    stores: Stores.Stores;
-    notification: AntdNotification;
-    message: AntdMessage;
-    modal: AntdModal;
-    classicStores: ClassicStores.ClassicStores;
-    platformerPhysics: Untyped;
-}
-
 type AnyComponent = Component<any, any, string>;
 type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
 interface ToastAction {
@@ -11146,8 +11139,23 @@ interface ToastType {
     getActiveToasts: () => ToastT[];
 }
 
+interface Internals {
+    stores: Stores.Stores;
+    notification: AntdNotification;
+    message: AntdMessage;
+    modal: AntdModal;
+    classicStores: ClassicStores.ClassicStores;
+    platformerPhysics: Untyped;
+}
+
 const gimkitComponents: readonly ["notification", "message", "modal"];
 type GimkitComponents = Pick<Internals, typeof gimkitComponents[number]>;
+interface PromptOptions {
+    text?: string;
+    defaultVal?: string;
+    placeholder?: string;
+}
+/** Functions for interacting with user interfaces */
 class UIApi {
     #private;
     constructor(id: string);
@@ -11220,6 +11228,39 @@ class UIApi {
      * ```
      */
     onComponentLoad<K extends keyof GimkitComponents>(type: K, callback: (component: GimkitComponents[K]) => void): () => void;
+    /**
+     * Shows an alert message. Resolves once the message is dismissed.
+     * @example
+     * ```js
+     * api.UI.alert("Something happened", "This is an alert")
+     *     .then(() => console.log("Alert dismissed"));
+     * ```
+     */
+    alert(title: string, text?: string): Promise<void>;
+    /**
+     * Shows a prompt asking the user to confirm an action. Resolves to a boolean containing their choice.
+     * @example
+     * ```js
+     * api.UI.confirm("Are you sure?", "This cannot be undone")
+     *     .then((confirmed) => console.log("Confirmation:", confirmed));
+     * ```
+     */
+    confirm(title: string, text?: string): Promise<boolean>;
+    /**
+     * Shows a prompt asking for user input. Resolves to null if cancelled.
+     * @example
+     * ```js
+     * api.UI.prompt("Name your character", {
+     *     text: "This can be changed later",
+     *     placeholder: "Character name",
+     *     defaultVal: "Player"
+     * }).then((name) => {
+     *     if(name === null) console.log("User cancelled");
+     *     else console.log("User entered:", name);
+     * });
+     * ```
+     */
+    prompt(title: string, options?: PromptOptions): Promise<string | null>;
     /** The toast api exposed by svelte-sonner */
     toast: ToastType;
 }
@@ -11227,6 +11268,7 @@ class UIApi {
 /** @inline */
 type ValueChangeCallback = (value: any, remote: boolean) => void;
 
+/** Functions for persisting data between reloads */
 class StorageApi {
     #private;
     constructor(id: string);
@@ -11263,6 +11305,7 @@ type PatcherInsteadCallback<T> = (thisVal: any, args: T extends BaseFunction ? P
 /** @inline */
 type PatcherSwapCallback<T> = (...args: T extends BaseFunction ? Parameters<T> : any[]) => any;
 
+/** Functions for intercepting the arguments and return values of functions */
 class PatcherApi {
     #private;
     constructor(id: string);
@@ -11357,7 +11400,7 @@ interface CommandContext {
 /** @inline */
 type CommandCallback = (context: CommandContext) => void | Promise<void>;
 
-/** An API for adding commands to the command palette */
+/** Functions for adding commands to the command palette */
 class CommandsApi {
     #private;
     constructor(id: string);
@@ -11396,6 +11439,7 @@ class CommandsApi {
     addCommand(options: CommandOptions, callback: CommandCallback): () => void;
 }
 
+/** Methods for getting info on libraries */
 class LibsApi {
     #private;
     constructor(id: string);
@@ -11417,6 +11461,7 @@ class LibsApi {
     require<T extends keyof Gimloader.Libraries>(name: T, downloadUrl?: string): Promise<Gimloader.Libraries[T]>;
 }
 
+/** Methods for getting info on plugins */
 class PluginsApi {
     #private;
     constructor(id: string);
@@ -11438,6 +11483,7 @@ class PluginsApi {
     require<T extends keyof Gimloader.Plugins>(name: T, downloadUrl?: string): Promise<Gimloader.Plugins[T]>;
 }
 
+/** Utilities for pretty logs with a tag showing they are from this script */
 class LoggerApi {
     #private;
     constructor(id: string, color: string);
@@ -11455,18 +11501,19 @@ class LoggerApi {
     trace(...data: any[]): void;
 }
 
+/**
+ * The Gimloader api which is exposed to scripts via the `api` variable.
+ * Contains many utilities for things like interacting with Gimkit and user interaction.
+ */
 class Api {
     #private;
-    /** Functions to edit Gimkit's code */
+    /** Functions to edit Gimkit's code or to expose internals */
     rewriter: Readonly<RewriterApi>;
     /** Functions to listen for key combinations */
     hotkeys: Readonly<HotkeysApi>;
-    /**
-     * Ways to interact with the current connection to the server,
-     * and functions to send general requests
-     */
+    /** Functions to interact with the current connection to the server */
     net: Readonly<NetApi>;
-    /** Functions for interacting with the DOM */
+    /** Functions for interacting with user interfaces */
     UI: Readonly<UIApi>;
     /** Functions for persisting data between reloads */
     storage: Readonly<StorageApi>;

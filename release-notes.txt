@@ -1,2 +1,3 @@
 Fixed color setting getting hidden in a small settings menu
 Made plugin error re-show when clicking error icon
+Added UI.alert, UI.confirm, and UI.prompt methods

@@ -4,14 +4,14 @@
     import * as Dialog from "$shared/ui/dialog";
     import type { Action } from "svelte/action";
 
-    let { title, placeholder, defaultVal = "", otherButtons = [], onClose }: ModalProps<"input"> = $props();
+    let { title, text, placeholder, defaultVal = "", otherButtons = [], onClose }: ModalProps<"input"> = $props();
 
     let cancelled = false;
     let value = $state(defaultVal);
     let open = $state(true);
 
     function onOpenChange() {
-        if(cancelled) onClose("");
+        if(cancelled) onClose(null);
         else onClose(value);
     }
 
@@ -43,6 +43,7 @@
         <Dialog.Header class="font-bold text-lg w-full border-b">
             {title}
         </Dialog.Header>
+        {text}
         <input
             {placeholder}
             {onkeydown}
@@ -66,7 +67,7 @@
                 </Button>
             {/each}
             <Button onclick={onCancelClick}>Cancel</Button>
-            <Button onclick={onConfirmClick}>Confirm</Button>
+            <Button onclick={onConfirmClick} disabled={!value}>Confirm</Button>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

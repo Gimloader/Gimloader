@@ -9,20 +9,21 @@ export interface Updated {
     changes: string[];
 }
 
-interface DependencyProps {
+export interface DependencyProps {
     script: Script | Script[];
     type: string;
     title: string;
 }
 
-interface SingleChangelogProps {
+export interface SingleChangelogProps {
     name: string;
     version: string | null;
     changes: string[];
 }
 
-interface InputProps {
+export interface InputProps {
     title: string;
+    text?: string;
     defaultVal?: string;
     placeholder?: string;
     otherButtons?: { text: string; onClick: () => void }[];
@@ -30,6 +31,7 @@ interface InputProps {
 
 type ModalInfo<Type extends string, Props, Result = void> = { type: Type; props: Props; result: Result };
 type ModalTypes =
+    | ModalInfo<"alert", { text?: string; title: string }>
     | ModalInfo<"error", { text: string; title: string }>
     | ModalInfo<"confirm", { text: string; title: string }, boolean>
     | ModalInfo<"pluginSettings", { plugin: Plugin }>

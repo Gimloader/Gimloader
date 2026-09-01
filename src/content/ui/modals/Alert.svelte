@@ -4,26 +4,19 @@
 
     interface Props {
         title: string;
-        text: string;
-        onClose: (confirmed: boolean) => void;
+        text?: string;
+        onClose: () => void;
     }
 
     let { title, text, onClose }: Props = $props();
 
     let open = $state(true);
-    let confirmed = false;
     function onOpenChange() {
-        onClose(confirmed);
+        onClose();
     }
 
-    function onCancelClick() {
+    function onOkClick() {
         open = false;
-        confirmed = false;
-    }
-
-    function onConfirmClick() {
-        open = false;
-        confirmed = true;
     }
 </script>
 
@@ -32,10 +25,9 @@
         <Dialog.Header class="font-bold text-lg w-full border-b">
             {title}
         </Dialog.Header>
-        <pre class="whitespace-pre-wrap">{text}</pre>
+        {text}
         <Dialog.Footer>
-            <Button onclick={onCancelClick}>Cancel</Button>
-            <Button onclick={onConfirmClick}>Confirm</Button>
+            <Button onclick={onOkClick}>OK</Button>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
