@@ -211,6 +211,8 @@ export namespace Stores {
     export interface TickInput {
         angle: AngleInput;
         jump: boolean;
+        isHoldingLeft: false;
+        isHoldingRight: false;
         _jumpKeyPressed: boolean;
     }
 
