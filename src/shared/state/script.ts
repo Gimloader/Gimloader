@@ -176,6 +176,7 @@ export default abstract class ScriptState<
         if(!script) return;
 
         for(const dep of script.dependencies) {
+            if(!dependents[dep.name]) continue;
             dependents[dep.name] = dependents[dep.name].filter(d => d !== name);
         }
     }
