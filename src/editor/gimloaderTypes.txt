@@ -7295,6 +7295,8 @@ namespace Stores {
     interface TickInput {
         angle: AngleInput;
         jump: boolean;
+        isHoldingLeft: false;
+        isHoldingRight: false;
         _jumpKeyPressed: boolean;
     }
     interface Physics {
@@ -8530,7 +8532,7 @@ namespace Stores {
     }
     interface ActionManager {
         depthSort: DepthSort;
-        multiSelect: MultiSelect;
+        multiselect: MultiSelect;
         platformerEditing: PlatformerEditing;
         removal: Removal;
         update(): void;
@@ -8898,7 +8900,7 @@ namespace Stores {
         nonDismissMessage: NonDismissMessage;
         phase: boolean;
         preferences: {
-            startGameWithMode: string;
+            startGameWithMode: SessionModeType;
         };
         properties: Map<string, any>;
         removing: Removing;
@@ -10346,13 +10348,13 @@ interface SentMessages2d {
         copyingFromExistingDevice?: string;
         depth?: number;
         deviceTypeId: string;
-        hooks: {
+        hooks?: {
             connections: any[];
         };
         id: string;
-        layerId: any;
-        name: string;
-        object: string;
+        layerId?: any;
+        name?: string;
+        options: string;
     };
     "REMOVE_DEVICE": {
         id: string;
@@ -10367,7 +10369,7 @@ interface SentMessages2d {
     "CREATE_CODE_GRID": {
         deviceId: string;
         triggerType: string;
-        triggerValue: string;
+        triggerValue?: string;
     };
     "SET_CODE_GRID_JSON": BaseGrid & {
         json: string;
@@ -10644,6 +10646,8 @@ abstract class NetTypeApi extends EventEmitter2 {
 class ColyseusApi extends NetTypeApi {
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]): void;
+    /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
+    sendDirect<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]): void;
     on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void): Listener | this;
     onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
     /** The colyseus room that the client is connected to, or null if there is no connection */
@@ -10670,6 +10674,8 @@ class ColyseusApi extends NetTypeApi {
 class BlueboatApi extends NetTypeApi {
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]): void;
+    /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
+    sendDirect<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]): void;
     on<C extends keyof Messages1d>(channel: C, listener: (data: Messages1d[C], editFn: EditFN<Messages1d[C]>) => void): Listener | this;
     onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
     /** The blueboat room that the client is connected to, or null if there is no connection */

@@ -197,13 +197,13 @@ export interface SentMessages2d {
         copyingFromExistingDevice?: string;
         depth?: number;
         deviceTypeId: string;
-        hooks: {
+        hooks?: {
             connections: any[];
         };
         id: string;
-        layerId: any;
-        name: string;
-        object: string;
+        layerId?: any;
+        name?: string;
+        options: string;
     };
     "REMOVE_DEVICE": {
         id: string;
@@ -218,7 +218,7 @@ export interface SentMessages2d {
     "CREATE_CODE_GRID": {
         deviceId: string;
         triggerType: string;
-        triggerValue: string;
+        triggerValue?: string;
     };
     "SET_CODE_GRID_JSON": BaseGrid & {
         json: string;

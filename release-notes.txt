@@ -1,1 +1,3 @@
+Added sendDirect method to net apis
 Fixed delete all plugins button sometimes breaking
+Fixed several issues with types

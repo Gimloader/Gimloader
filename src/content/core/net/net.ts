@@ -188,6 +188,7 @@ export default new class Net extends EventEmitter2 {
         });
     }
 
+    sendFn?: (channel: string, message?: any) => void;
     onColyseusRoom(room: any) {
         if(this.room) return;
         log("Colyseus room intercepted", room);
@@ -197,6 +198,7 @@ export default new class Net extends EventEmitter2 {
         gameState.inGame = true;
 
         // intercept outgoing messages
+        this.sendFn = room.send.bind(room);
         Patcher.before(null, room, "send", (_, args) => {
             const [channel, data] = args;
             this.emit(["send", channel], data, (newData: any) => {
@@ -246,6 +248,7 @@ export default new class Net extends EventEmitter2 {
         });
 
         // intercept outgoing messages
+        this.sendFn = room.send.bind(room);
         Patcher.before(null, room, "send", (_, args) => {
             const [channel, data] = args;
             this.emit(["send", channel], data, (newData: any) => {
@@ -341,6 +344,10 @@ export default new class Net extends EventEmitter2 {
 
     send(channel: string, message?: any) {
         this.room?.send(channel, message);
+    }
+
+    sendDirect(channel: string, message?: any) {
+        this.sendFn?.(channel, message);
     }
 
     onLoad(type: ConnectionType, gamemode: string, ...otherTriggers: string[]) {

@@ -69,6 +69,13 @@ export class ColyseusApi extends NetTypeApi {
         Net.send(channel, args[0]);
     }
 
+    /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
+    sendDirect<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]) {
+        validate("net.colyseus.send", arguments, ["channel", "string"]);
+
+        Net.sendDirect(channel, args[0]);
+    }
+
     override on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void) {
         return super.on(channel, listener);
     }
@@ -111,6 +118,13 @@ export class ColyseusApi extends NetTypeApi {
 export class BlueboatApi extends NetTypeApi {
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]) {
+        validate("net.blueboat.send", arguments, ["channel", "string"]);
+
+        Net.send(channel, args[0]);
+    }
+
+    /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
+    sendDirect<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]) {
         validate("net.blueboat.send", arguments, ["channel", "string"]);
 
         Net.send(channel, args[0]);

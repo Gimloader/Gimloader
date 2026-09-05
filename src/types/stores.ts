@@ -1533,7 +1533,7 @@ export namespace Stores {
 
     export interface ActionManager {
         depthSort: DepthSort;
-        multiSelect: MultiSelect;
+        multiselect: MultiSelect;
         platformerEditing: PlatformerEditing;
         removal: Removal;
         update(): void;
