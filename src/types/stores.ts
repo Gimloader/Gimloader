@@ -943,6 +943,7 @@ export namespace Stores {
         y: number;
         depth: number;
         tileIndex: number;
+        terrainOption: TerrainOption;
     }
 
     export interface TerrainAdditionOverlay {
@@ -1500,6 +1501,7 @@ export namespace Stores {
         selectedDevicesIds: string[];
         selectedDevicesOverlay: SelectedDevicesOverlay;
         selection: Rect | null;
+        mouseStartPos?: Vector;
         addDeviceToSelection(device: Device): void;
         endSelectionRect(): void;
         findSelectedDevices(): void;
@@ -1680,9 +1682,9 @@ export namespace Stores {
     export interface ExistingDevice {
         action: string;
         id: string;
-        shiftX: number;
-        shiftY: number;
         use: boolean;
+        shiftX?: number;
+        shiftY?: number;
     }
 
     export interface AddingDevices {

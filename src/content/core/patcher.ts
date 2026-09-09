@@ -24,54 +24,7 @@ export default class Patcher {
         if(!patches) return;
 
         delete object[property];
-
-        // reset the property to its original value
-        object[property] = patches.original;
-
-        // apply all patches
-        for(const patch of patches.patches) {
-            const original = object[property];
-            switch (patch.type) {
-                case "before":
-                    object[property] = function() {
-                        const cancel = patch.callback(this, arguments as any);
-                        if(cancel) return;
-                        return original.apply(this, arguments);
-                    };
-                    break;
-                case "after":
-                    object[property] = function() {
-                        const returnValue = original.apply(this, arguments);
-                        const newReturn = patch.callback(this, arguments as any, returnValue);
-
-                        if(newReturn) return newReturn;
-                        return returnValue;
-                    };
-                    break;
-                case "instead":
-                    object[property] = function() {
-                        return patch.callback(this, arguments as any);
-                    };
-                    break;
-                case "swap":
-                    object[property] = function() {
-                        return patch.callback.apply(this, arguments as any);
-                    };
-                    break;
-            }
-
-            // copy over prototypes and attributes
-            for(const key of Object.getOwnPropertyNames(patches.original)) {
-                try {
-                    object[property][key] = patches.original[key];
-                } catch {}
-            }
-
-            Object.setPrototypeOf(object[property], Object.getPrototypeOf(patches.original));
-
-            // copy toString from the original
-            object[property].toString = () => patches.original.toString();
-        }
+        object[property] = createPatch(patches.patches, patches.original);
     }
 
     static addPatch(id: string | null, object: any, property: PropertyKey, patch: Patch) {
@@ -148,4 +101,65 @@ export default class Patcher {
 
         return this.addPatch(id, object, property, patch);
     }
+}
+
+const originalSymbol = Symbol("originalFunction");
+const patchesSymbol = Symbol("patches");
+
+function createPatch(patches: Patch[], original: any) {
+    const newFunction = function PatchedFunction(this: any) {
+        let shouldRunOriginal = true;
+        let returnValue: any;
+        let patchIndex = patches.length - 1;
+
+        // Run patches in reverse order
+        for(; patchIndex >= 0; patchIndex--) {
+            const patch = patches[patchIndex];
+
+            if(patch.type === "before") {
+                const cancel = patch.callback(this, arguments as any);
+                if(cancel) return;
+            } else if(patch.type === "instead") {
+                returnValue = patch.callback(this, arguments as any);
+                shouldRunOriginal = false;
+                break;
+            } else if(patch.type === "swap") {
+                returnValue = patch.callback.apply(this, arguments as any);
+                shouldRunOriginal = false;
+                break;
+            }
+        }
+
+        if(shouldRunOriginal) returnValue = original.apply(this, arguments);
+        if(patchIndex < 0) patchIndex = 0;
+
+        // Go back up the stack for after patches
+        for(; patchIndex < patches.length; patchIndex++) {
+            const patch = patches[patchIndex];
+            if(patch.type !== "after") continue;
+
+            const newReturn = patch.callback(this, arguments as any, returnValue);
+            if(newReturn) returnValue = newReturn;
+        }
+
+        return returnValue;
+    } as any;
+
+    // copy over prototypes and attributes
+    for(const key of Object.getOwnPropertyNames(original)) {
+        try {
+            newFunction[key] = original[key];
+        } catch {}
+    }
+
+    Object.setPrototypeOf(newFunction, Object.getPrototypeOf(original));
+
+    // copy toString from the original
+    newFunction.toString = () => original.toString();
+
+    // Show what the patches/original were for debugging
+    newFunction[originalSymbol] = original;
+    newFunction[patchesSymbol] = patches;
+
+    return newFunction;
 }

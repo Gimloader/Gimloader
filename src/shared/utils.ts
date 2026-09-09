@@ -6,6 +6,10 @@ export function log(...args: any[]) {
     console.log("%c[GL]", "color:#5030f2", ...args);
 }
 
+export function warn(...args: any[]) {
+    console.warn("%c[GL]", "color:#5030f2", ...args);
+}
+
 export function error(...args: any[]) {
     console.error("%c[GL]", "color:#5030f2", ...args);
 }

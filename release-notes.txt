@@ -1,3 +1,4 @@
-Added sendDirect method to net apis
-Fixed delete all plugins button sometimes breaking
-Fixed several issues with types
+Added originalFunction and patches symbols on patched functions for debugging
+Fixed scripts not being able to override certain built-in hotkeys
+Fixed onStop events firing after cleanup
+Fixed more type issues

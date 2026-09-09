@@ -1,5 +1,5 @@
 import type { Messages, OnceMessageProps, OnceMessages, OnceResponder } from "$types/net/messages";
-import { log, nop } from "$shared/utils";
+import { log, nop, warn } from "$shared/utils";
 import StateManager from "$shared/state";
 
 type Port = chrome.runtime.Port;
@@ -49,7 +49,10 @@ export default new class Server {
         if(returnId) {
             // message with a response (not done with .sendMessage to avoid race conditions)
             const callback = this.messageListeners.get(type);
-            if(!callback) return;
+            if(!callback) {
+                warn(`No callback registered for message type ${type}`);
+                return;
+            }
 
             callback(message, (response: any) => {
                 port.postMessage({ returnId, response });

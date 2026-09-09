@@ -141,7 +141,7 @@ class Api {
 
     /** Run a callback when this script is disabled */
     onStop = (...callbacks: (() => void)[]) => {
-        for(const cb of callbacks) Cleanup.on(this.#id, cb);
+        for(const cb of callbacks) Cleanup.onStop(this.#id, cb);
     };
 
     /**

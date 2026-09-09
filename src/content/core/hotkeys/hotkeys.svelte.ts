@@ -12,13 +12,13 @@ export default new class Hotkeys {
     pressed = new Set<string>();
 
     init() {
-        window.addEventListener("keydown", (event) => {
+        document.addEventListener("keydown", (event) => {
             this.pressed.add(event.code);
             this.pressedKeys.add(event.key.toLowerCase());
             this.checkHotkeys(event);
         });
 
-        window.addEventListener("keyup", (event) => {
+        document.addEventListener("keyup", (event) => {
             this.pressed.delete(event.code);
             this.pressedKeys.delete(event.key.toLowerCase());
         });
