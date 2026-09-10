@@ -21,7 +21,7 @@ export interface HotkeyModifiers {
 }
 
 /** @inline */
-export interface HotkeyOptions extends HotkeyTrigger,  HotkeyModifiers {};
+export interface HotkeyOptions extends HotkeyTrigger, HotkeyModifiers {}
 
 /** @inline */
 export interface ConfigurableHotkeyOptions extends HotkeyModifiers {
