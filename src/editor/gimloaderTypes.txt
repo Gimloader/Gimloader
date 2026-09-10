@@ -7987,6 +7987,7 @@ namespace Stores {
         y: number;
         depth: number;
         tileIndex: number;
+        terrainOption: TerrainOption;
     }
     interface TerrainAdditionOverlay {
         showing: boolean;
@@ -8502,6 +8503,7 @@ namespace Stores {
         selectedDevicesIds: string[];
         selectedDevicesOverlay: SelectedDevicesOverlay;
         selection: Rect | null;
+        mouseStartPos?: Vector;
         addDeviceToSelection(device: Device): void;
         endSelectionRect(): void;
         findSelectedDevices(): void;
@@ -8665,9 +8667,9 @@ namespace Stores {
     interface ExistingDevice {
         action: string;
         id: string;
-        shiftX: number;
-        shiftY: number;
         use: boolean;
+        shiftX?: number;
+        shiftY?: number;
     }
     interface AddingDevices {
         currentlySelectedProp: string;
@@ -9631,15 +9633,23 @@ interface HotkeyTrigger {
     alt?: boolean;
 }
 /** @inline */
-interface HotkeyOptions extends HotkeyTrigger {
+interface HotkeyModifiers {
+    /** If set to false, the hotkey will still trigger default actions */
     preventDefault?: boolean;
+    /**
+     * If set to true, the hotkey will have propagation and immediate propagation stopped,
+     * which generally prevents Gimkit from detecting the keystroke
+     */
+    stopPropagation?: boolean;
 }
 /** @inline */
-interface ConfigurableHotkeyOptions {
+interface HotkeyOptions extends HotkeyTrigger, HotkeyModifiers {
+}
+/** @inline */
+interface ConfigurableHotkeyOptions extends HotkeyModifiers {
     category: string;
     /** There should be no duplicate titles within a category */
     title: string;
-    preventDefault?: boolean;
     default?: HotkeyTrigger;
 }
 

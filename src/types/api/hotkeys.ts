@@ -10,16 +10,24 @@ export interface HotkeyTrigger {
 }
 
 /** @inline */
-export interface HotkeyOptions extends HotkeyTrigger {
+export interface HotkeyModifiers {
+    /** If set to false, the hotkey will still trigger default actions */
     preventDefault?: boolean;
+    /**
+     * If set to true, the hotkey will have propagation and immediate propagation stopped,
+     * which generally prevents Gimkit from detecting the keystroke
+     */
+    stopPropagation?: boolean;
 }
 
 /** @inline */
-export interface ConfigurableHotkeyOptions {
+export interface HotkeyOptions extends HotkeyTrigger,  HotkeyModifiers {};
+
+/** @inline */
+export interface ConfigurableHotkeyOptions extends HotkeyModifiers {
     category: string;
     /** There should be no duplicate titles within a category */
     title: string;
-    preventDefault?: boolean;
     default?: HotkeyTrigger;
 }
 

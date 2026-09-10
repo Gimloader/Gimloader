@@ -16,13 +16,15 @@ const HotkeyTriggerSchema = z.union([
 }));
 
 const HotkeyOptionsSchema = HotkeyTriggerSchema.and(z.object({
-    preventDefault: z.boolean().optional()
+    preventDefault: z.boolean().optional(),
+    stopPropagation: z.boolean().optional()
 }));
 
 const ConfigurableHotkeyOptionsSchema = z.object({
     category: z.string(),
     title: z.string(),
     preventDefault: z.boolean().optional(),
+    stopPropagation: z.boolean().optional(),
     default: HotkeyTriggerSchema.optional()
 });
 
