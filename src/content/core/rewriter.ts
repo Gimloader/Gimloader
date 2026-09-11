@@ -260,7 +260,7 @@ export default class Rewriter {
     static async prepareJs(parsed: ParsedJs) {
         const imports = await Promise.all(parsed.imports.map(async (imported) => {
             const url = await this.fetchScript(imported.name, false);
-            return imported.text + `"${url}";`;
+            return `/* ${imported.name} */` + imported.text + `"${url}";`;
         }));
 
         return imports.join("") + parsed.code;
