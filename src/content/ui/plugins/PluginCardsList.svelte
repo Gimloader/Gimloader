@@ -9,8 +9,8 @@
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
     import PluginFolder from "./PluginFolder.svelte";
-    import StateManager from "$shared/state";
-    import Port from "$shared/net/port.svelte";
+    import { StateManager } from "@gimloader/ipc";
+    import Port from "@gimloader/ipc/port";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 

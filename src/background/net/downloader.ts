@@ -1,9 +1,9 @@
-import type { Dependency } from "$types/net/downloads";
-import type { OnceMessageProps, OnceResponder, ScriptType } from "$types/net/messages";
+import type { Dependency, ScriptType } from "@gimloader/ipc";
+import type { OnceMessageProps, OnceResponder } from "@gimloader/ipc";
 import Server from "$bg/net/server";
 import { parseDep, parseScriptHeaders } from "$shared/parseHeader";
 import { englishList } from "$shared/utils";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export default class Downloader {
     static maxDepth = 16;

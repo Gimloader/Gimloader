@@ -7,8 +7,8 @@
     import ScriptList from "../components/scripts/ScriptList.svelte";
     import Modals from "$core/modals.svelte";
     import { downloadScript } from "$core/net/download";
-    import Port from "$shared/net/port.svelte";
-    import StateManager from "$shared/state";
+    import Port from "@gimloader/ipc/port";
+    import { StateManager } from "@gimloader/ipc";
 
     function importLib() {
         readUserFile(".js", (code) => {

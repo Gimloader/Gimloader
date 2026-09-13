@@ -1,11 +1,10 @@
 <script lang="ts">
-    import type { PluginInfo } from "$types/net/state";
+    import type { PluginInfo } from "@gimloader/ipc";
     import { Switch } from "$shared/ui/switch";
     import DeleteOutline from "svelte-material-icons/DeleteOutline.svelte";
     import { createConfirmToast } from "$shared/toast/create";
-    import Port from "$shared/net/port.svelte";
     import { toast } from "svelte-sonner";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let waiting = false;
     let { plugin }: { plugin: PluginInfo } = $props();
@@ -57,7 +56,7 @@
 
 <div class="text-lg flex items-center px-1">
     <Switch bind:checked={() => plugin.enabled, (enabled) => tryToggle(enabled)} />
-    <div class="pl-2 grow whitespace-nowrap overflow-ellipsis overflow-x-hidden">
+    <div class="pl-2 grow whitespace-nowrap ellipsis overflow-x-hidden">
         {plugin.name}
     </div>
     <button onclick={() => tryDelete()}>

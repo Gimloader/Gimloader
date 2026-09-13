@@ -16,7 +16,7 @@
     import ScriptTextOutline from "svelte-material-icons/ScriptTextOutline.svelte";
     import AlertCircleOutline from "svelte-material-icons/AlertCircleOutline.svelte";
     import AlertTriangleOutline from "svelte-material-icons/AlertOutline.svelte";
-    import Port from "$shared/net/port.svelte";
+    import Port from "@gimloader/ipc/port";
 
     interface Props {
         script: Script;

@@ -1,5 +1,4 @@
-import type { ScriptType } from "$types/net/messages";
-import type { ScriptInfo } from "$types/net/state";
+import type { ScriptInfo, ScriptType } from "@gimloader/ipc";
 import { Script } from "./script.svelte";
 
 export class Library extends Script<ScriptInfo> {

@@ -1,8 +1,8 @@
-import Port from "$shared/net/port.svelte";
+import Port from "@gimloader/ipc/port";
 import { englishList } from "$shared/utils";
 import { createConfirmToast } from "$shared/toast/create";
 import { toast } from "svelte-sonner";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export default class UpdateNotifier {
     static init() {

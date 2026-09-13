@@ -3,7 +3,7 @@ import { clear, get, set } from "idb-keyval";
 import { englishList, error, log, nop } from "$shared/utils";
 import Modals from "./modals.svelte";
 import { glslTypes } from "$shared/consts";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import { toast } from "svelte-sonner";
 import Cleanup from "./scripts/cleanup";

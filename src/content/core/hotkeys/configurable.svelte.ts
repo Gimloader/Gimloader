@@ -1,4 +1,4 @@
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyTrigger } from "$types/api/hotkeys";
 
 export default class ConfigurableHotkey {

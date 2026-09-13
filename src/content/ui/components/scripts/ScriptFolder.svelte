@@ -1,6 +1,6 @@
 <script lang="ts">
     import ScriptManager from "$core/scripts/scriptManager.svelte";
-    import type { LayoutItem } from "$types/net/state";
+    import type { LayoutItem } from "@gimloader/ipc";
     import type { Snippet } from "svelte";
     import Modals from "$core/modals.svelte";
     import Storage from "$core/storage.svelte";
@@ -14,7 +14,7 @@
     import Delete from "svelte-material-icons/Delete.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte";
     import ArrowDownToLine from "@lucide/svelte/icons/arrow-down-to-line";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     interface Props {
         id: string;

@@ -2,7 +2,7 @@
     import ViewModule from "svelte-material-icons/ViewModule.svelte";
     import ViewList from "svelte-material-icons/ViewList.svelte";
     import Storage from "$core/storage.svelte";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     function setView(mode: string) {
         StateManager.apply("settingUpdate", { key: "menuView", value: mode });

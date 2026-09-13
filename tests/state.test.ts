@@ -1,21 +1,7 @@
-import type { State } from "$types/net/state";
-import StateManager from "$shared/state";
-import { defaultSettings } from "$shared/consts";
+import { defaultState } from "@gimloader/ipc";
+import { StateManager } from "@gimloader/ipc";
 import { describe, expect, test } from "bun:test";
 import { getScriptCode } from "./util";
-
-const defaultState: State = {
-    availableUpdates: [],
-    cacheInvalid: false,
-    hotkeys: {},
-    libraries: [],
-    plugins: [],
-    pluginLayout: { root: { contents: [] } },
-    libraryLayout: { root: { contents: [] } },
-    pluginSettings: {},
-    settings: defaultSettings,
-    pluginStorage: {}
-};
 
 StateManager.init(defaultState, {
     broadcast: () => {},

@@ -1,6 +1,6 @@
-import type { Messages, OnceMessageProps, OnceMessages, OnceResponder } from "$types/net/messages";
+import type { Messages, OnceMessageProps, OnceMessages, OnceResponder } from "@gimloader/ipc";
 import { log, nop, warn } from "$shared/utils";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 type Port = chrome.runtime.Port;
 

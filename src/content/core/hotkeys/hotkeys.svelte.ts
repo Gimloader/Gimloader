@@ -1,6 +1,6 @@
 import type { ConfigurableHotkeyOptions, HotkeyCallback, HotkeyOptions, HotkeyTrigger } from "$types/api/hotkeys";
 import ConfigurableHotkey from "./configurable.svelte";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import Cleanup from "$core/scripts/cleanup";
 
 type DefaultHotkey = HotkeyOptions & { callback: HotkeyCallback };

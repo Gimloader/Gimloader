@@ -1,10 +1,15 @@
 import type { ScriptHeaders } from "$types/scripts";
-import type { OnceMessageProps, OnceResponder } from "$types/net/messages";
-import type { Dependency, Update } from "$types/net/downloads";
+import type { Dependency, OnceMessageProps, OnceResponder } from "@gimloader/ipc";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
 import Downloader from "./downloader";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
+
+interface Update {
+    name: string;
+    code: string;
+    dependencies: Dependency[];
+}
 
 export default class Updater {
     static updates: Update[] = [];

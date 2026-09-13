@@ -11,7 +11,7 @@
     import RadioSetting from "./RadioSetting.svelte";
     import ColorSetting from "./ColorSetting.svelte";
     import CustomSetting from "./CustomSetting.svelte";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let { pluginName, setting }: { pluginName: string; setting: PluginSetting<string> } = $props();
 

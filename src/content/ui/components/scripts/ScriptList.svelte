@@ -1,6 +1,6 @@
 <script lang="ts">
     import type ScriptManager from "$core/scripts/scriptManager.svelte";
-    import type { LayoutItem } from "$types/net/state";
+    import type { LayoutItem } from "@gimloader/ipc";
     import type { Component, Snippet } from "svelte";
     import Storage from "$core/storage.svelte";
     import { dndzone, type DndEvent } from "svelte-dnd-action";
@@ -18,7 +18,7 @@
     import { flipDurationMs } from "$shared/consts";
     import FolderPlus from "@lucide/svelte/icons/folder-plus";
     import Eraser from "@lucide/svelte/icons/eraser";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     interface Props {
         buttons: Snippet;

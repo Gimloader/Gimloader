@@ -1,10 +1,9 @@
-import type { ScriptType } from "$types/net/messages";
+import type { PluginInfo, ScriptType } from "@gimloader/ipc";
 import type { ScriptHeaders } from "$types/scripts";
 import type { PluginSettingsDescription } from "$types/api/settings";
-import type { PluginInfo } from "$types/net/state";
 import { Script } from "./script.svelte";
 import Modals from "../modals.svelte";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export class Plugin extends Script<PluginInfo> {
     type: ScriptType = "plugin";

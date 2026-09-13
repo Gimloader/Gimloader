@@ -1,6 +1,6 @@
-import type { ScriptType } from "$types/net/messages";
+import type { ScriptType } from "@gimloader/ipc";
 import { toast } from "svelte-sonner";
-import Port from "$shared/net/port.svelte";
+import Port from "@gimloader/ipc/port";
 import Modals from "../modals.svelte";
 
 export async function downloadScript(url: string, folder: string, type?: ScriptType, confirmed = false) {

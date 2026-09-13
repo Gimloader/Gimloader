@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { PluginInfo } from "$types/net/state";
+    import type { PluginInfo } from "@gimloader/ipc";
     import Web from "svelte-material-icons/Web.svelte";
     import GithubIcon from "$assets/github-mark-white.svg";
     import Xml from "svelte-material-icons/Xml.svelte";
@@ -7,7 +7,7 @@
     import { parseScriptHeaders } from "$shared/parseHeader";
     import { toast, Toaster } from "svelte-sonner";
     import Plugin from "./Plugin.svelte";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let plugins: PluginInfo[] = $state([]);
     StateManager.plugin.scripts.bind(() => plugins, (value) => plugins = value);

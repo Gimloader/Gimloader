@@ -1,14 +1,14 @@
 <script lang="ts">
     import type ConfigurableHotkey from "$core/hotkeys/configurable.svelte";
     import type { HotkeyTrigger } from "$types/api/hotkeys";
+    import type { ConfigurableHotkeysState } from "@gimloader/ipc";
     import { Button } from "$shared/ui/button";
     import * as Popover from "$shared/ui/popover";
     import Undo from "svelte-material-icons/Undo.svelte";
     import { SvelteSet } from "svelte/reactivity";
     import Hotkeys from "$core/hotkeys/hotkeys.svelte";
     import Modals from "$core/modals.svelte";
-    import StateManager from "$shared/state";
-    import type { ConfigurableHotkeysState } from "$types/net/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let categories = $derived.by(() => {
         let categories: Record<string, ConfigurableHotkey[]> = {};

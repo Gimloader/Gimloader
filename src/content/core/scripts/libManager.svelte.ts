@@ -1,10 +1,10 @@
+import type { LibraryInfo } from "@gimloader/ipc";
 import ScriptManager from "./scriptManager.svelte";
 import { Library } from "./library.svelte";
-import type { LibraryInfo } from "$types/net/state";
 import Modals from "../modals.svelte";
 import { downloadScript } from "../net/download";
 import { scriptInstanceMap } from "./map";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export default new class LibraryManager extends ScriptManager<LibraryInfo, Library> {
     singular = "library";

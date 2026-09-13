@@ -1,8 +1,7 @@
 import type { Script } from "./script.svelte";
 import type { ScriptHeaders } from "$types/scripts";
-import type { LayoutItem, ScriptInfo, ScriptLayout } from "$types/net/state";
+import type { FolderExport, LayoutItem, ScriptInfo, ScriptLayout, ScriptType } from "@gimloader/ipc";
 import type { CommandContext } from "$types/api/commands";
-import type { FolderExport, ScriptType } from "$types/net/messages";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import { toast } from "svelte-sonner";
 import Commands from "../commands.svelte";
@@ -10,8 +9,8 @@ import { addUpdated } from "$content/ui/modals/Changelog.svelte";
 import Modals from "$core/modals.svelte";
 import { amountWithS, downloadJson } from "$shared/utils";
 import { readUserFile } from "$content/utils";
-import StateManager from "$shared/state";
-import Port from "$shared/net/port.svelte";
+import { StateManager } from "@gimloader/ipc";
+import Port from "@gimloader/ipc/port";
 
 export default abstract class ScriptManager<I extends ScriptInfo = any, T extends Script<I> = any> {
     abstract singular: string;

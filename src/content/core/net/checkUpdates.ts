@@ -1,7 +1,7 @@
-import { toast } from "svelte-sonner";
-import Port from "$shared/net/port.svelte";
-import type { UpdateResponse } from "$types/net/downloads";
+import type { UpdateResponse } from "@gimloader/ipc";
 import type { Script } from "../scripts/script.svelte";
+import { toast } from "svelte-sonner";
+import Port from "@gimloader/ipc/port";
 
 export async function checkUpdate(script: Script) {
     const updated = await Port.sendAndRecieve("updateSingle", {

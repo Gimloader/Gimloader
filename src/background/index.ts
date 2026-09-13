@@ -2,7 +2,7 @@ import Poller from "./net/poller";
 import Server from "./net/server";
 import Updater from "./net/updater";
 import Downloader from "./net/downloader";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import loadState from "./state";
 
 Server.init();

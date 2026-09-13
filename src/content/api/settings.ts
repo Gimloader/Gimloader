@@ -5,7 +5,7 @@ import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
 import * as z from "zod";
 import Modals from "$core/modals.svelte";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export type { PluginSettings };
 

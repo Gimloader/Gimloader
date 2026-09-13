@@ -17,23 +17,25 @@
     import Settings from "../Settings.svelte";
     import Hotkeys from "../Hotkeys.svelte";
     import OfficialPlugins from "../plugins/OfficialPlugins.svelte";
-    import Port from "$shared/net/port.svelte";
+    import Port from "@gimloader/ipc/port";
     import { toast } from "svelte-sonner";
     import PluginManager from "$core/scripts/pluginManager.svelte";
     import LibManager from "$core/scripts/libManager.svelte";
     import * as Dialog from "$shared/ui/dialog";
     import * as Tabs from "$shared/ui/tabs";
-
     import Wrench from "svelte-material-icons/Wrench.svelte";
     import Book from "svelte-material-icons/Book.svelte";
     import KeyboardOutline from "svelte-material-icons/KeyboardOutline.svelte";
     import Update from "svelte-material-icons/Update.svelte";
     import Cog from "svelte-material-icons/Cog.svelte";
     import FileUploadOutline from "svelte-material-icons/FileUploadOutline.svelte";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let modalDragCounter = $state(0);
     let canDrop = $derived(currentTab === "plugin" || currentTab === "library");
+
+    let disconnected = $state(false);
+    Port.disconnected.bind(() => disconnected, (val) => disconnected = val);
 
     async function onDrop(e: DragEvent) {
         if(!canDrop) return;
@@ -73,7 +75,7 @@
         ondrop={onDrop}
         style="max-width: min(1280px, calc(100% - 32px))"
     >
-        {#if Port.disconnected}
+        {#if disconnected}
             <div
                 class="
                     z-50 absolute left-0 top-0 w-full h-full bg-gray-500

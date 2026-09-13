@@ -1,13 +1,12 @@
 <script lang="ts">
     import type { CreateEditor, Editor } from "$types/editor";
-    import type { ScriptType } from "$types/net/messages";
-    import type { LibraryInfo, PluginInfo } from "$types/net/state";
+    import type { LibraryInfo, PluginInfo, ScriptType } from "@gimloader/ipc";
     import ContentSaveAlertOutline from "svelte-material-icons/ContentSaveAlertOutline.svelte";
     import ContentSaveOutline from "svelte-material-icons/ContentSaveOutline.svelte";
     import Close from "svelte-material-icons/Close.svelte";
     import { defaultLibraryScript, defaultPluginScript } from "./consts";
     import { parseScriptHeaders } from "$shared/parseHeader";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
 
     let { createEditor }: { createEditor: CreateEditor } = $props();
 

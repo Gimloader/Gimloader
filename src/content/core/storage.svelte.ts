@@ -1,7 +1,6 @@
 import type { SettingsChangeCallback } from "$types/api/settings";
-import type { PluginStorage, Settings } from "$types/net/state";
-import { defaultSettings } from "$shared/consts";
-import StateManager from "$shared/state";
+import type { PluginStorage, Settings } from "@gimloader/ipc";
+import { defaultSettings, StateManager } from "@gimloader/ipc";
 import Cleanup from "./scripts/cleanup";
 
 /** @inline */

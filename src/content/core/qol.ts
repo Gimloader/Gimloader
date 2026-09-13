@@ -1,5 +1,5 @@
 // biome-ignore-all lint/suspicious/noConsole: Used to disable other console logs
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import { nop } from "$shared/utils";
 import Rewriter from "./rewriter";
 

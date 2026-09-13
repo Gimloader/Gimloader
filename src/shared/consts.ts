@@ -1,5 +1,3 @@
-import type { Settings } from "$types/net/state";
-
 export const isFirefox = navigator.userAgent.includes("Firefox");
 
 export const officialUrlBase = "https://github.com/Gimloader/client-plugins/tree/main";
@@ -25,16 +23,6 @@ export const signaturePublicKey = /** @__PURE__ */ crypto.subtle.importKey(
     false,
     ["verify"]
 );
-
-export const defaultSettings: Settings = {
-    pollerEnabled: false,
-    autoUpdate: true,
-    autoDownloadMissingLibs: true,
-    autoDownloadMissingPlugins: false,
-    menuView: "grid",
-    showPluginButtons: true,
-    suppressGimkitLogs: false
-};
 
 export const flipDurationMs = 350;
 

@@ -6,7 +6,7 @@
     import InformationOutline from "svelte-material-icons/InformationOutline.svelte";
     import { version } from "../../../package.json";
     import { toast } from "svelte-sonner";
-    import Port from "$shared/net/port.svelte";
+    import Port from "@gimloader/ipc/port";
     import { englishList } from "$shared/utils";
     import Modals from "$core/modals.svelte";
     import { changelog } from "$content/utils";

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import type { Settings, State } from "$types/net/state";
+    import type { Settings, State } from "@gimloader/ipc";
     import { Button } from "$shared/ui/button";
     import { Switch } from "$shared/ui/switch";
     import Storage from "$core/storage.svelte";
-    import StateManager from "$shared/state";
+    import { StateManager } from "@gimloader/ipc";
     import { downloadJson } from "$shared/utils";
     import { readUserFile } from "$content/utils";
     import { toast } from "svelte-sonner";
-    import Port from "$shared/net/port.svelte";
+    import Port from "@gimloader/ipc/port";
     import Modals from "$core/modals.svelte";
     import * as Accordion from "$shared/ui/accordion";
     import Rewriter from "$core/rewriter";

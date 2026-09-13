@@ -1,6 +1,6 @@
 import Server from "$bg/net/server";
 import { parseScriptHeaders } from "$shared/parseHeader";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 
 export default class Poller {
     static enabled = false;

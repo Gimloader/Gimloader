@@ -1,10 +1,10 @@
-import type { PluginInfo } from "$types/net/state";
+import type { PluginInfo } from "@gimloader/ipc";
 import ScriptManager from "./scriptManager.svelte";
 import { Plugin } from "./plugin.svelte";
 import Modals from "../modals.svelte";
 import Commands from "../commands.svelte";
 import { downloadScript } from "../net/download";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import { pluginsLoaded, scriptInstanceMap } from "./map";
 
 export default new class PluginManager extends ScriptManager<PluginInfo, Plugin> {

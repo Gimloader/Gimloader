@@ -1,6 +1,5 @@
 import type { ScriptHeaders } from "$types/scripts";
-import type { ScriptType } from "$types/net/messages";
-import type { ScriptInfo } from "$types/net/state";
+import type { ScriptInfo, ScriptType } from "@gimloader/ipc";
 import { error } from "$shared/utils";
 import { log } from "$shared/utils";
 import { getDepName, parseScriptHeaders } from "$shared/parseHeader";
@@ -9,7 +8,7 @@ import Modals from "../modals.svelte";
 import { signaturePublicKey } from "$shared/consts";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import { scriptInstanceMap } from "./map";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import { deepFreeze } from "$content/utils";
 import Rewriter from "$core/rewriter";
 import Api from "$content/api/api";

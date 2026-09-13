@@ -1,8 +1,7 @@
-import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, PluginStorage, SavedState, ScriptLayout, Settings, State } from "$types/net/state";
-import type { ScriptType } from "$types/net/messages";
-import { defaultSettings } from "$shared/consts";
+import type { ConfigurableHotkeysState, LayoutItem, LibraryInfo, PluginInfo, PluginStorage, SavedState, ScriptLayout, ScriptType, Settings, State } from "@gimloader/ipc";
+import { defaultSettings } from "@gimloader/ipc";
 import debounce from "debounce";
-import StateManager from "$shared/state";
+import { StateManager } from "@gimloader/ipc";
 import Downloader from "./net/downloader";
 import Server from "./net/server";
 

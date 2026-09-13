@@ -1,7 +1,4 @@
 // biome-ignore-all lint/suspicious/noConsole: Used for intended logging
-import type EventEmitter from "node:events";
-import EventEmitter2 from "eventemitter2";
-
 export function log(...args: any[]) {
     console.log("%c[GL]", "color:#5030f2", ...args);
 }
@@ -40,8 +37,6 @@ export function downloadJson(json: any, name: string) {
 }
 
 export const nop = () => {};
-
-export const TypedEventEmitter = EventEmitter2 as unknown as typeof EventEmitter;
 
 // Because of some nonsense with the spec subclassing promises is wonky
 export class Deferred<T = void> extends Promise<T> {
