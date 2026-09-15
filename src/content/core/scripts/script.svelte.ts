@@ -103,7 +103,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
                 const id = this.headers.name;
 
                 apis.set(id, this);
-                const apiDeclaration = `const api = ${createApi}("${id}");\n`;
+                const apiDeclaration = `const api = ${createApi}("${id}");`;
 
                 const blob = new Blob([apiDeclaration, this.code, sourceUrl], { type: "application/javascript" });
                 const url = URL.createObjectURL(blob);
