@@ -209,7 +209,7 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
 
         // Make sure to finish loading to avoid race conditions
         await this.startPromise;
-        Cleanup.cleanup(this.headers.name, true);
+        Cleanup.cleanup(this.headers.name);
 
         for(const used of this.requires) used.unrequire?.(this, true);
         for(const used of this.optionalRequires) used.unrequire?.(this, false);

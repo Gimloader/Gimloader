@@ -1,8 +1,8 @@
 import type { Schema } from "$types/schema";
 import type { ReceivedMessages1d, ReceivedMessages2d, SentMessages1d, SentMessages2d } from "$types/net";
-import Net, { type ConnectionType, type RequesterOptions } from "$core/net/net";
+import type { ConnectionType, EditableEmitter, Listener, OnAnyListener, RequesterOptions } from "$core/net/net";
+import Net from "$core/net/net";
 import { validate } from "$content/utils";
-import EventEmitter2 from "eventemitter2";
 import * as z from "zod";
 import Cleanup from "$core/scripts/cleanup";
 
@@ -18,37 +18,53 @@ type TaggedSentMessages1d = {
 
 type Messages2d = ReceivedMessages2d & TaggedSentMessages2d;
 type Messages1d = ReceivedMessages1d & TaggedSentMessages1d;
-type EditFN<T> = (newValue: T | null) => void;
 
-const eventsConfig = {
-    wildcard: true,
-    delimiter: ":"
-};
+abstract class NetTypeApi<Send extends Record<string, any>> {
+    #id: string;
+    #emitter: EditableEmitter;
 
-abstract class NetTypeApi extends EventEmitter2 {
-    constructor(id: string, type: ConnectionType) {
-        super(eventsConfig);
+    constructor(id: string, emitter: EditableEmitter) {
+        this.#id = id;
+        this.#emitter = emitter;
+    }
 
-        const emit = (event: string | string[], ...args: any[]) => {
-            if(type !== Net.type) return;
-            this.emit(event, ...args);
-        };
+    /** Listens for an incoming or outgoing message on a specific channel */
+    on<C extends keyof Send>(channel: C, listener: Listener<Send[C]>) {
+        this.#emitter.on(channel, listener);
+        Cleanup.on(this.#id, () => this.#emitter.off(channel, listener));
+    }
 
-        Net.onAny(emit);
-        Cleanup.on(id, (final) => {
-            if(final) Net.offAny(emit);
-            this.removeAllListeners();
+    /** Listens for the next incoming or outgoing message on a specific channel */
+    once<C extends keyof Send>(channel: C, listener: Listener<Send[C]>) {
+        const cleanup = () => this.#emitter.off(channel, listener);
 
-            // @ts-expect-error The type is wrong, this clears onAny listeners
-            this.offAny();
+        this.#emitter.once(channel, (data, editFn) => {
+            Cleanup.off(this.#id, cleanup);
+            listener(data, editFn);
         });
+
+        Cleanup.on(this.#id, cleanup);
+    }
+
+    /** Removes a listener added by on or once */
+    off<C extends keyof Send>(channel: C, listener: Listener<Send[C]>) {
+        this.#emitter.off(channel, listener);
+    }
+
+    /** Listens for any messages on any channel */
+    onAny(listener: OnAnyListener) {
+        this.#emitter.onAny(listener);
+        Cleanup.on(this.#id, () => this.#emitter.offAny(listener));
+    }
+
+    /** Removes a listener added by onAny */
+    offAny(listener: OnAnyListener) {
+        this.#emitter.offAny(listener);
     }
 }
 
 /**
  * The colyseus api is for sending and recieving data in 2d modes.
- * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
  * ```js
  * // fired when data is recieved on a certain channel
  * api.net.colyseus.on("CHANNEL", (data, editFn) => {
@@ -61,7 +77,11 @@ abstract class NetTypeApi extends EventEmitter2 {
  * });
  * ```
  */
-export class ColyseusApi extends NetTypeApi {
+export class ColyseusApi extends NetTypeApi<Messages2d> {
+    constructor(id: string) {
+        super(id, Net.colyseusEvents);
+    }
+
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]) {
         validate("net.colyseus.send", arguments, ["channel", "string"]);
@@ -74,15 +94,6 @@ export class ColyseusApi extends NetTypeApi {
         validate("net.colyseus.send", arguments, ["channel", "string"]);
 
         Net.sendDirect(channel, args[0]);
-    }
-
-    override on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void) {
-        return super.on(channel, listener);
-    }
-
-    override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
-        // @ts-expect-error just gotta trust me
-        return super.onAny(listener);
     }
 
     /** The colyseus room that the client is connected to, or null if there is no connection */
@@ -101,8 +112,6 @@ export class ColyseusApi extends NetTypeApi {
 
 /**
  * The colyseus api is for sending and recieving data in non-2d (classic) modes.
- * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
  * ```js
  * // fired when data is recieved on a certain channel
  * api.net.blueboat.on("CHANNEL", (data, editFn) => {
@@ -115,7 +124,11 @@ export class ColyseusApi extends NetTypeApi {
  * });
  * ```
  */
-export class BlueboatApi extends NetTypeApi {
+export class BlueboatApi extends NetTypeApi<Messages1d> {
+    constructor(id: string) {
+        super(id, Net.blueboatEvents);
+    }
+
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]) {
         validate("net.blueboat.send", arguments, ["channel", "string"]);
@@ -130,15 +143,6 @@ export class BlueboatApi extends NetTypeApi {
         Net.send(channel, args[0]);
     }
 
-    override on<C extends keyof Messages1d>(channel: C, listener: (data: Messages1d[C], editFn: EditFN<Messages1d[C]>) => void) {
-        return super.on(channel, listener);
-    }
-
-    override onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void) {
-        // @ts-expect-error
-        return super.onAny(listener);
-    }
-
     /** The blueboat room that the client is connected to, or null if there is no connection */
     get room() {
         if(Net.type !== "Blueboat") return null;
@@ -147,7 +151,7 @@ export class BlueboatApi extends NetTypeApi {
 }
 
 /** Functions to interact with the current connection to the server */
-class NetApi extends EventEmitter2 {
+class NetApi {
     readonly #id: string;
     readonly #defaultGamemode: string[];
 
@@ -157,23 +161,10 @@ class NetApi extends EventEmitter2 {
     blueboat: BlueboatApi;
 
     constructor(id: string, defaultGamemode: string[]) {
-        super(eventsConfig);
-
         this.#id = id;
         this.#defaultGamemode = defaultGamemode;
-        this.colyseus = new ColyseusApi(id, "Colyseus");
-        this.blueboat = new BlueboatApi(id, "Blueboat");
-
-        const emit = this.emit.bind(this);
-        Net.onAny(emit);
-
-        Cleanup.on(id, (final) => {
-            if(final) Net.offAny(emit);
-            this.removeAllListeners();
-
-            // @ts-expect-error
-            this.offAny();
-        });
+        this.colyseus = new ColyseusApi(id);
+        this.blueboat = new BlueboatApi(id);
     }
 
     /** Which type of server the client is currently connected to */

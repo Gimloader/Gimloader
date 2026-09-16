@@ -19,6 +19,7 @@ import UI from "$core/ui/ui";
 import createSettingsApi from "./settings";
 import { addReloadNeeded } from "$content/ui/modals/ReloadConfirm.svelte";
 import Cleanup from "$core/scripts/cleanup";
+import { validate } from "$content/utils";
 
 export type { ScriptHeaders };
 
@@ -158,7 +159,13 @@ class Api {
     headers: Readonly<ScriptHeaders>;
 
     /** Cleans up everything performed through this script's api */
-    cleanup = () => Cleanup.cleanup(this.#id, false);
+    cleanup = () => Cleanup.cleanup(this.#id);
+
+    /** Runs the function provided immediately, with functions inside not being automatically cleaned up */
+    noCleanup<T>(fn: () => T): T {
+        validate("api.noCleanup", arguments, ["fn", "function"]);
+        return Cleanup.runWithoutCleanup(fn);
+    }
 }
 
 Object.freeze(Api);

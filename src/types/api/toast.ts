@@ -3,6 +3,7 @@ import type { MouseEventHandler } from "svelte/elements";
 
 type AnyComponent = Component<any, any, string>;
 type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
+type Position = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "top-center" | "bottom-center";
 
 interface ToastAction {
     label: string | AnyComponent;

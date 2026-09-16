@@ -38,7 +38,7 @@ const includeExternal = [
     "tailwind-variants",
     "svelte-toolbelt",
     "tailwind-merge",
-    "eventemitter2"
+    "@gimloader/ipc"
 ];
 
 if(!isNpmPackage) includeExternal.push("@dimforge/rapier2d-compat");

@@ -13,6 +13,7 @@ import * as Transition from 'svelte/transition';
 import { Tweens, GameObjects, Types, Input, Scene as BaseScene } from 'phaser';
 import * as react_dom_client from 'react-dom/client';
 import * as React from 'react';
+import { ScriptInfo, ScriptType } from '@gimloader/ipc';
 export {};
 
 declare global {
@@ -1249,6 +1250,8 @@ class TooltipRootState {
     constructor(opts: TooltipRootStateOpts, provider: TooltipProviderState);
     handleOpen: () => void;
     handleClose: () => void;
+    /** Stops a pending delayed open without touching the open state. */
+    cancelPendingOpen: () => void;
     onTriggerEnter: (triggerId: string) => void;
     onTriggerLeave: () => void;
     ensureActiveTrigger: () => void;
@@ -9622,44 +9625,6 @@ interface ScriptHeaders {
     signature: string | null;
 }
 
-/** @inline */
-interface HotkeyTrigger {
-    /** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
-    key?: string;
-    /** Should be keyboardevent [codes](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
-    keys?: ReadonlyArray<string>;
-    ctrl?: boolean;
-    shift?: boolean;
-    alt?: boolean;
-}
-/** @inline */
-interface HotkeyModifiers {
-    /** If set to false, the hotkey will still trigger default actions */
-    preventDefault?: boolean;
-    /**
-     * If set to true, the hotkey will have propagation and immediate propagation stopped,
-     * which generally prevents Gimkit from detecting the keystroke
-     */
-    stopPropagation?: boolean;
-}
-/** @inline */
-interface HotkeyOptions extends HotkeyTrigger, HotkeyModifiers {
-}
-/** @inline */
-interface ConfigurableHotkeyOptions extends HotkeyModifiers {
-    category: string;
-    /** There should be no duplicate titles within a category */
-    title: string;
-    default?: HotkeyTrigger;
-}
-
-interface ScriptInfo {
-    code: string;
-    name: string;
-}
-
-type ScriptType = "plugin" | "library";
-
 abstract class Script<T extends ScriptInfo = ScriptInfo> {
     abstract type: ScriptType;
     abstract warnAbout: boolean;
@@ -9713,6 +9678,37 @@ abstract class Script<T extends ScriptInfo = ScriptInfo> {
     delete(): void;
     signatureRegex: RegExp;
     verifySignature(): Promise<boolean>;
+}
+
+/** @inline */
+interface HotkeyTrigger {
+    /** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
+    key?: string;
+    /** Should be keyboardevent [codes](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
+    keys?: ReadonlyArray<string>;
+    ctrl?: boolean;
+    shift?: boolean;
+    alt?: boolean;
+}
+/** @inline */
+interface HotkeyModifiers {
+    /** If set to false, the hotkey will still trigger default actions */
+    preventDefault?: boolean;
+    /**
+     * If set to true, the hotkey will have propagation and immediate propagation stopped,
+     * which generally prevents Gimkit from detecting the keystroke
+     */
+    stopPropagation?: boolean;
+}
+/** @inline */
+interface HotkeyOptions extends HotkeyTrigger, HotkeyModifiers {
+}
+/** @inline */
+interface ConfigurableHotkeyOptions extends HotkeyModifiers {
+    category: string;
+    /** There should be no duplicate titles within a category */
+    title: string;
+    default?: HotkeyTrigger;
 }
 
 /** @inline */
@@ -9848,161 +9844,6 @@ class RewriterApi {
      * ```
      */
     exposeVar(prefix: string | boolean, exposer: Exposer): () => void;
-}
-
-type event = (symbol|string);
-type eventNS = string|event[];
-
-interface ConstructorOptions {
-    /**
-     * @default false
-     * @description set this to `true` to use wildcards.
-     */
-    wildcard?: boolean,
-    /**
-     * @default '.'
-     * @description the delimiter used to segment namespaces.
-     */
-    delimiter?: string,
-    /**
-     * @default false
-     * @description set this to `true` if you want to emit the newListener events.
-     */
-    newListener?: boolean,
-    /**
-     * @default false
-     * @description set this to `true` if you want to emit the removeListener events.
-     */
-    removeListener?: boolean,
-    /**
-     * @default 10
-     * @description the maximum amount of listeners that can be assigned to an event.
-     */
-    maxListeners?: number
-    /**
-     * @default false
-     * @description show event name in memory leak message when more than maximum amount of listeners is assigned, default false
-     */
-    verboseMemoryLeak?: boolean
-    /**
-     * @default false
-     * @description disable throwing uncaughtException if an error event is emitted and it has no listeners
-     */
-    ignoreErrors?: boolean
-}
-interface ListenerFn {
-    (...values: any[]): void;
-}
-interface EventAndListener {
-    (event: string | string[], ...values: any[]): void;
-}
-
-interface WaitForFilter { (...values: any[]): boolean }
-
-interface WaitForOptions {
-    /**
-     * @default 0
-     */
-    timeout: number,
-    /**
-     * @default null
-     */
-    filter: WaitForFilter,
-    /**
-     * @default false
-     */
-    handleError: boolean,
-    /**
-     * @default Promise
-     */
-    Promise: Function,
-    /**
-     * @default false
-     */
-    overload: boolean
-}
-
-interface CancelablePromise<T> extends Promise<T>{
-    cancel(reason: string): undefined
-}
-
-interface OnceOptions {
-    /**
-     * @default 0
-     */
-    timeout: number,
-    /**
-     * @default Promise
-     */
-    Promise: Function,
-    /**
-     * @default false
-     */
-    overload: boolean
-}
-
-interface ListenToOptions {
-    on?: { (event: event | eventNS, handler: ListenerFn): void },
-    off?: { (event: event | eventNS, handler: ListenerFn): void },
-    reducers: Function | Object
-}
-
-interface GeneralEventEmitter{
-    addEventListener(event: event, handler: ListenerFn): this,
-    removeEventListener(event: event, handler: ListenerFn): this,
-    addListener?(event: event, handler: ListenerFn): this,
-    removeListener?(event: event, handler: ListenerFn): this,
-    on?(event: event, handler: ListenerFn): this,
-    off?(event: event, handler: ListenerFn): this
-}
-
-interface OnOptions {
-    async?: boolean,
-    promisify?: boolean,
-    nextTick?: boolean,
-    objectify?: boolean
-}
-
-interface Listener {
-    emitter: EventEmitter2;
-    event: event|eventNS;
-    listener: ListenerFn;
-    off(): this;
-}
-
-class EventEmitter2 {
-    constructor(options?: ConstructorOptions)
-    emit(event: event | eventNS, ...values: any[]): boolean;
-    emitAsync(event: event | eventNS, ...values: any[]): Promise<any[]>;
-    addListener(event: event | eventNS, listener: ListenerFn): this|Listener;
-    on(event: event | eventNS, listener: ListenerFn, options?: boolean|OnOptions): this|Listener;
-    prependListener(event: event | eventNS, listener: ListenerFn, options?: boolean|OnOptions): this|Listener;
-    once(event: event | eventNS, listener: ListenerFn, options?: true|OnOptions): this|Listener;
-    prependOnceListener(event: event | eventNS, listener: ListenerFn, options?: boolean|OnOptions): this|Listener;
-    many(event: event | eventNS, timesToListen: number, listener: ListenerFn, options?: boolean|OnOptions): this|Listener;
-    prependMany(event: event | eventNS, timesToListen: number, listener: ListenerFn, options?: boolean|OnOptions): this|Listener;
-    onAny(listener: EventAndListener): this;
-    prependAny(listener: EventAndListener): this;
-    offAny(listener: ListenerFn): this;
-    removeListener(event: event | eventNS, listener: ListenerFn): this;
-    off(event: event | eventNS, listener: ListenerFn): this;
-    removeAllListeners(event?: event | eventNS): this;
-    setMaxListeners(n: number): void;
-    getMaxListeners(): number;
-    eventNames(nsAsArray?: boolean): (event|eventNS)[];
-    listenerCount(event?: event | eventNS): number
-    listeners(event?: event | eventNS): ListenerFn[]
-    listenersAny(): ListenerFn[]
-    waitFor(event: event | eventNS, timeout?: number): CancelablePromise<any[]>
-    waitFor(event: event | eventNS, filter?: WaitForFilter): CancelablePromise<any[]>
-    waitFor(event: event | eventNS, options?: WaitForOptions): CancelablePromise<any[]>
-    listenTo(target: GeneralEventEmitter, events: event | eventNS, options?: ListenToOptions): this;
-    listenTo(target: GeneralEventEmitter, events: event[], options?: ListenToOptions): this;
-    listenTo(target: GeneralEventEmitter, events: Object, options?: ListenToOptions): this;
-    stopListeningTo(target?: GeneralEventEmitter, event?: event | eventNS): Boolean;
-    hasListeners(event?: String): Boolean
-    static once(emitter: EventEmitter2, event: event | eventNS, options?: OnceOptions): CancelablePromise<any[]>;
-    static defaultMaxListeners: number;
 }
 
 namespace Schema {
@@ -10624,6 +10465,18 @@ interface RequesterOptions {
     both?: () => void;
     error?: (error: any) => void;
 }
+type EditFN<T> = (newValue: T | null) => void;
+type Listener<Data> = (data: Data, editFn: EditFN<Data | null>) => void | null | Data;
+type OnAnyListener = (channel: string, data: any, editFn: EditFN<any>) => any;
+class EditableEmitter {
+    #private;
+    emit(event: PropertyKey, data: any): any;
+    on(event: PropertyKey, listener: Listener<any>): void;
+    once(event: PropertyKey, listener: Listener<any>): void;
+    off(event: PropertyKey, listener: Listener<any>): void;
+    onAny(listener: OnAnyListener): void;
+    offAny(listener: OnAnyListener): void;
+}
 
 type TaggedSentMessages2d = {
     [K in keyof SentMessages2d as `send:${K}`]: SentMessages2d[K];
@@ -10633,14 +10486,22 @@ type TaggedSentMessages1d = {
 };
 type Messages2d = ReceivedMessages2d & TaggedSentMessages2d;
 type Messages1d = ReceivedMessages1d & TaggedSentMessages1d;
-type EditFN<T> = (newValue: T | null) => void;
-abstract class NetTypeApi extends EventEmitter2 {
-    constructor(id: string, type: ConnectionType);
+abstract class NetTypeApi<Send extends Record<string, any>> {
+    #private;
+    constructor(id: string, emitter: EditableEmitter);
+    /** Listens for an incoming or outgoing message on a specific channel */
+    on<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
+    /** Listens for the next incoming or outgoing message on a specific channel */
+    once<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
+    /** Removes a listener added by on or once */
+    off<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
+    /** Listens for any messages on any channel */
+    onAny(listener: OnAnyListener): void;
+    /** Removes a listener added by onAny */
+    offAny(listener: OnAnyListener): void;
 }
 /**
  * The colyseus api is for sending and recieving data in 2d modes.
- * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
  * ```js
  * // fired when data is recieved on a certain channel
  * api.net.colyseus.on("CHANNEL", (data, editFn) => {
@@ -10653,13 +10514,12 @@ abstract class NetTypeApi extends EventEmitter2 {
  * });
  * ```
  */
-class ColyseusApi extends NetTypeApi {
+class ColyseusApi extends NetTypeApi<Messages2d> {
+    constructor(id: string);
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]): void;
     /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
     sendDirect<C extends keyof SentMessages2d>(channel: C, ...args: SentMessages2d[C] extends undefined ? [] : [data: SentMessages2d[C]]): void;
-    on<C extends keyof Messages2d>(channel: C, listener: (data: Messages2d[C], editFn: EditFN<Messages2d[C]>) => void): Listener | this;
-    onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
     /** The colyseus room that the client is connected to, or null if there is no connection */
     get room(): any;
     /** Gimkit's internal Colyseus state */
@@ -10667,8 +10527,6 @@ class ColyseusApi extends NetTypeApi {
 }
 /**
  * The colyseus api is for sending and recieving data in non-2d (classic) modes.
- * It extends [EventEmitter2](https://github.com/EventEmitter2/EventEmitter2)
- * and uses wildcards with ":" as a delimiter.
  * ```js
  * // fired when data is recieved on a certain channel
  * api.net.blueboat.on("CHANNEL", (data, editFn) => {
@@ -10681,18 +10539,17 @@ class ColyseusApi extends NetTypeApi {
  * });
  * ```
  */
-class BlueboatApi extends NetTypeApi {
+class BlueboatApi extends NetTypeApi<Messages1d> {
+    constructor(id: string);
     /** Sends a message to the server on a specific channel */
     send<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]): void;
     /** Sends a message to the server on a specific channel, bypassing listeners added by plugins */
     sendDirect<C extends keyof SentMessages1d>(channel: C, ...args: SentMessages1d[C] extends undefined ? [] : [data: SentMessages1d[C]]): void;
-    on<C extends keyof Messages1d>(channel: C, listener: (data: Messages1d[C], editFn: EditFN<Messages1d[C]>) => void): Listener | this;
-    onAny(listener: (channel: string, data: any, editFn: EditFN<any>) => void): this;
     /** The blueboat room that the client is connected to, or null if there is no connection */
     get room(): any;
 }
 /** Functions to interact with the current connection to the server */
-class NetApi extends EventEmitter2 {
+class NetApi {
     #private;
     /** Tools for sending and receiving data and interacting with state in 2d modes */
     colyseus: ColyseusApi;
@@ -11083,6 +10940,7 @@ interface ModalOptions {
 
 type AnyComponent = Component<any, any, string>;
 type PromiseT<Data = unknown> = Promise<Data> | (() => Promise<Data>);
+type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center';
 interface ToastAction {
     label: string | AnyComponent;
     onClick: MouseEventHandler<HTMLButtonElement>;
@@ -11581,6 +11439,8 @@ class Api {
     headers: Readonly<ScriptHeaders>;
     /** Cleans up everything performed through this script's api */
     cleanup: () => void;
+    /** Runs the function provided immediately, with functions inside not being automatically cleaned up */
+    noCleanup<T>(fn: () => T): T;
 }
 
 interface Plugins {

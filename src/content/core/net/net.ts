@@ -1,7 +1,6 @@
 import type { WithSymbols } from "$types/util";
 import type { Stores } from "$types/stores";
 import Internals from "$core/internals";
-import EventEmitter2 from "eventemitter2";
 import { error, nop } from "$shared/utils";
 import { log } from "$shared/utils";
 import Patcher from "../patcher";
@@ -39,7 +38,69 @@ interface ResponseCallback {
     callback: (response: any, url: string) => any;
 }
 
-export default new class Net extends EventEmitter2 {
+export type EditFN<T> = (newValue: T | null) => void;
+export type Listener<Data> = (data: Data, editFn: EditFN<Data | null>) => void | null | Data;
+export type OnAnyListener = (channel: string, data: any, editFn: EditFN<any>) => any;
+
+export class EditableEmitter {
+    #listeners = new Map<PropertyKey, Set<Listener<any>>>();
+    #onceListeners = new Map<PropertyKey, Set<Listener<any>>>();
+    #anyListeners = new Set<OnAnyListener>();
+
+    emit(event: PropertyKey, data: any) {
+        const listeners = this.#listeners.get(event);
+        const onceListeners = this.#onceListeners.get(event);
+
+        if(listeners) {
+            for(const listener of listeners) {
+                const result = listener(data, (newData) => data = newData);
+                if(result !== undefined) data = result;
+                if(result === null) return null;
+            }
+        }
+
+        if(onceListeners) {
+            for(const listener of onceListeners) {
+                const result = listener(data, (newData) => data = newData);
+                if(result !== undefined) data = result;
+                if(result === null) return null;
+            }
+
+            this.#onceListeners.delete(event);
+        }
+
+        for(const listener of this.#anyListeners) {
+            const result = listener(event as string, data, (newData) => data = newData);
+            if(result !== undefined) data = result;
+            if(result === null) return null;
+        }
+
+        return data;
+    }
+
+    on(event: PropertyKey, listener: Listener<any>) {
+        this.#listeners.getOrInsertComputed(event, () => new Set()).add(listener);
+    }
+
+    once(event: PropertyKey, listener: Listener<any>) {
+        this.#onceListeners.getOrInsertComputed(event, () => new Set()).add(listener);
+    }
+
+    off(event: PropertyKey, listener: Listener<any>) {
+        this.#listeners.get(event)?.delete(listener);
+        this.#onceListeners.get(event)?.delete(listener);
+    }
+
+    onAny(listener: OnAnyListener) {
+        this.#anyListeners.add(listener);
+    }
+
+    offAny(listener: OnAnyListener) {
+        this.#anyListeners.delete(listener);
+    }
+}
+
+export default new class Net {
     type: ConnectionType = "None";
     room: any = null;
     loaded = false;
@@ -48,13 +109,8 @@ export default new class Net extends EventEmitter2 {
     responseCallbacks: ResponseCallback[] = [];
     gamemode: string | null = null;
     Callbacks: any;
-
-    constructor() {
-        super({
-            wildcard: true,
-            delimiter: ":"
-        });
-    }
+    colyseusEvents = new EditableEmitter();
+    blueboatEvents = new EditableEmitter();
 
     get isHost() {
         return location.pathname === "/host";
@@ -201,9 +257,7 @@ export default new class Net extends EventEmitter2 {
         this.sendFn = room.send.bind(room);
         Patcher.before(null, room, "send", (_, args) => {
             const [channel, data] = args;
-            this.emit(["send", channel], data, (newData: any) => {
-                args[1] = newData;
-            });
+            args[1] = this.colyseusEvents.emit(`send:${channel}`, data);
 
             if(args[1] === null) return true;
         });
@@ -211,9 +265,7 @@ export default new class Net extends EventEmitter2 {
         // intercept incoming messages
         Patcher.before(null, room, "dispatchMessage", (_, args) => {
             const [channel, data] = args;
-            this.emit(channel, data, (newData: any) => {
-                args[1] = newData;
-            });
+            args[1] = this.colyseusEvents.emit(channel, data);
 
             if(args[1] === null) return true;
         });
@@ -230,9 +282,7 @@ export default new class Net extends EventEmitter2 {
         // intercept incoming messages
         Patcher.before(null, room.onMessage, "call", (_, args) => {
             const [channel, data] = args;
-            this.emit(channel, data, (newData: any) => {
-                args[1] = newData;
-            });
+            args[1] = this.blueboatEvents.emit(channel, data);
 
             // Check if the message is the message with the gamemode type
             if(channel === "HOST_STATIC_STATE" || channel === "PLAYER_JOINS_STATIC_STATE") {
@@ -240,7 +290,6 @@ export default new class Net extends EventEmitter2 {
                 if(channel === "HOST_STATIC_STATE") gamemodeId = data?.options?.specialGameType?.[0];
                 else gamemodeId = data?.gameOptions?.specialGameType?.[0];
 
-                this.emit("load:blueboat");
                 this.onLoad("Blueboat", gamemodeId ?? "unknown", "1d", "official");
             }
 
@@ -251,9 +300,7 @@ export default new class Net extends EventEmitter2 {
         this.sendFn = room.send.bind(room);
         Patcher.before(null, room, "send", (_, args) => {
             const [channel, data] = args;
-            this.emit(["send", channel], data, (newData: any) => {
-                args[1] = newData;
-            });
+            args[1] = this.blueboatEvents.emit(`send:${channel}`, data);
 
             if(args[1] === null) return true;
         });
@@ -298,7 +345,6 @@ export default new class Net extends EventEmitter2 {
             }
 
             // Emit load events
-            this.emit("load:colyseus");
             this.onLoad("Colyseus", gamemodeId, "2d", ...(officialGamemode ? ["official", "official-2d"] : []));
         };
 
