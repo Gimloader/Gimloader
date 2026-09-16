@@ -77,18 +77,19 @@ export function addPluginButtons() {
 
     // Add the wrench button to the ingame 2d HUD
     Rewriter.addParseHook(null, "App", (code) => {
-        const index = code.indexOf(`tooltip:"Sound"`);
+        const index = code.indexOf(`tooltip:"Leaderboard"`);
         if(index === -1) return;
 
-        const start = code.lastIndexOf("[", index) + 1;
-        const end = code.indexOf("})}),", index) + 5;
+        const start = code.lastIndexOf("?", index) + 1;
+        const insertIndex = code.lastIndexOf("children:[", start) + 10;
+        const end = code.indexOf("})})", index) + 4;
         let insert = code.slice(start, end);
 
-        insert = insert.replace("Sound", "Plugins");
-        insert = insert.replace("fa-waveform", "fa-wrench gl-button5");
+        insert = insert.replace("Leaderboard", "Plugins");
+        insert = insert.replace("fa-award", "fa-wrench gl-button5");
         insert = Rewriter.replaceBetween(insert, "onClick:", ",", `onClick:()=>${openUI}(),`);
 
-        code = code.slice(0, start) + insert + code.slice(start);
+        code = code.slice(0, insertIndex) + insert + "," + code.slice(insertIndex);
         return code;
     });
 
