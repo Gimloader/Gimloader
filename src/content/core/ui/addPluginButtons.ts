@@ -94,22 +94,19 @@ export function addPluginButtons() {
 
     // Add the wrench button the pregame 2d HUD
     Rewriter.addParseHook(null, "App", (code) => {
-        const index = code.indexOf(`"#01579b",onClick:()=>`);
+        const index = code.indexOf(`"Game actions"`);
         if(index === -1) return;
 
-        const start = code.lastIndexOf(",", code.lastIndexOf(".jsx(", index));
-        const end = code.indexOf("})})", index) + 4;
-        let insert = code.slice(start, end);
+        const insertIndex = code.indexOf("children:[", index) + 10;
+        const startIndex = code.indexOf(":null,", code.indexOf("cosmos/sticker", insertIndex)) + 6;
+        const endIndex = code.indexOf("})})", startIndex) + 4;
+        let insert = code.slice(startIndex, endIndex);
 
-        insert = insert.replace("flex vc", "flex vc gl-button3");
-        insert = Rewriter.replaceBetween(insert, "onClick:", "}", `onClick:()=>${openUI}()`);
-        insert = Rewriter.replaceBetween(insert, "}),", "name]", `}),"Plugins"]`);
-        insert = Rewriter.replaceBetween(insert, "src:", "iconImage,", `src:${whiteWrench},`);
+        insert = insert.replace("Settings", "Plugins");
+        insert = insert.replace("fa-cog", "fa-wrench gl-button2");
+        insert = Rewriter.replaceBetween(insert, "onClick:", ",", `onClick:()=>${openUI}(),`);
 
-        code = code.slice(0, start) + insert + code.slice(start);
-        code = code.replace("space-between", "flex-start;\n  gap: 8px;");
-        code = Rewriter.insertAfter(code, "sticker}s`,", "style:{flexGrow:1},");
-
+        code = code.slice(0, insertIndex) + insert + "," + code.slice(insertIndex);
         return code;
     });
 

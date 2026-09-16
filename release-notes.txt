@@ -1,8 +1,9 @@
-Removed deprecated functions on api.net and removed unnecessary EventEmitter2 extension
 Added originalFunction and patches symbols on patched functions for debugging
 Added preventDefault option to hotkeys
 Added comments after blob imports whoing which file they map to
 Added api.noCleanup method to run code without automatic cleanup
+Removed deprecated functions on api.net and removed unnecessary EventEmitter2 extension
+Fixed Gimloader plugin button missing in new 2d lobby UI
 Fixed scripts not being able to override certain built-in hotkeys
 Fixed onStop events firing after cleanup
 Fixed more type issues
