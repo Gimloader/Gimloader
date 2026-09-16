@@ -22,6 +22,11 @@ if(!declarationsExist || !noRegenerate) {
         declarationDir,
         svelteShimsPath: require.resolve("svelte2tsx/svelte-shims-v4.d.ts")
     });
+
+    console.log("Modifying declaration files...");
+    let api = await readFile(join(declarationDir, "src/content/api/api.d.ts"), "utf-8");
+    api = api.replace(/\n\s*constructor.+;/g, "");
+    await writeFile(join(declarationDir, "src/content/api/api.d.ts"), api);
 }
 
 const paths = tsconfig.compilerOptions.paths;

@@ -1,4 +1,4 @@
-import type { Vector } from "@dimforge/rapier2d-compat";
+import type { Vector } from "rapier/math";
 import type { Stores } from "./stores";
 import type { ClassicStores } from "./classicStores";
 import type { Untyped } from "./util";
