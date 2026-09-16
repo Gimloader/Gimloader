@@ -1,6 +1,6 @@
 {
     "name": "@gimloader/types",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "description": "Type definitions for Gimloader scripts",
     "author": "TheLazySquid",
     "types": "index.d.ts",

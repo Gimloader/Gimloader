@@ -13,7 +13,6 @@ import * as Transition from 'svelte/transition';
 import { Tweens, GameObjects, Types, Input, Scene as BaseScene } from 'phaser';
 import * as react_dom_client from 'react-dom/client';
 import * as React from 'react';
-import { ScriptInfo, ScriptType } from '@gimloader/ipc';
 export {};
 
 declare global {
@@ -7298,8 +7297,8 @@ namespace Stores {
     interface TickInput {
         angle: AngleInput;
         jump: boolean;
-        isHoldingLeft: false;
-        isHoldingRight: false;
+        isHoldingLeft: boolean;
+        isHoldingRight: boolean;
         _jumpKeyPressed: boolean;
     }
     interface Physics {
@@ -9625,61 +9624,6 @@ interface ScriptHeaders {
     signature: string | null;
 }
 
-abstract class Script<T extends ScriptInfo = ScriptInfo> {
-    abstract type: ScriptType;
-    abstract warnAbout: boolean;
-    code: string;
-    headers: ScriptHeaders;
-    requires: Script[];
-    optionalRequires: Script[];
-    requiredBy: Script[];
-    optionalBy: Script[];
-    exported: any;
-    startError: Error | null;
-    constructor(info: T, headers?: ScriptHeaders);
-    abstract getInfo(): T;
-    updateHeaders(headers?: ScriptHeaders): void;
-    getHeaders(): {
-        name: string;
-        description: string;
-        author: string[];
-        version: string | null;
-        reloadRequired: string;
-        isLibrary: string;
-        downloadUrl: string | null;
-        webpage: string | null;
-        needsLib: string[];
-        optionalLib: string[];
-        deprecated: string | null;
-        gamemode: string[];
-        changelog: string[];
-        needsPlugin: string[];
-        hasSettings: string;
-        signature: string | null;
-    };
-    started: boolean;
-    startPromise: Promise<void> | null;
-    start(initial: boolean, loaded?: string[]): Promise<void>;
-    get reloadNeeded(): boolean;
-    checkReloadNeeded(): void;
-    require(by: Script, required: boolean, initial: boolean, loaded: string[]): Promise<void>;
-    unrequire(by: Script, required: boolean): void;
-    abstract getDependencyStrings(): Partial<Record<ScriptType, {
-        required?: string[];
-        optional?: string[];
-    }>>;
-    getDependencies(): {
-        required: Script<ScriptInfo>[];
-        optional: Script<ScriptInfo>[];
-    };
-    stop(): Promise<void>;
-    edit(code: string, headers?: ScriptHeaders): void;
-    deleteConfirm(confirmed?: boolean): Promise<void>;
-    delete(): void;
-    signatureRegex: RegExp;
-    verifySignature(): Promise<boolean>;
-}
-
 /** @inline */
 interface HotkeyTrigger {
     /** Should be a keyboardevent [code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) */
@@ -11422,7 +11366,6 @@ class Api {
     svelte_5_43_0: SvelteExport;
     /** Useful svelte components which can be used by scripts */
     Components: SvelteComponents;
-    constructor(id: string, script?: Script);
     /** A utility for creating persistent settings menus, only available to plugins */
     settings: PluginSettings;
     /** Run a callback when this script is disabled */
