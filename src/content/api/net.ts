@@ -177,26 +177,6 @@ class NetApi {
         return Net.gamemode;
     }
 
-    /**
-     * The room that the client is connected to, or null if there is no connection
-     * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
-     * @hidden
-     */
-    get room() {
-        return Net.room;
-    }
-
-    /**
-     * Gimkit's internal Colyseus state
-     * @deprecated use `net.colyseus.state` instead
-     * @hidden
-     */
-    get state(): Schema.GimkitSchema {
-        // We pretend that this is always defined for ease of use
-        if(Net.type !== "Colyseus") return undefined as any;
-        return Net.room?.state;
-    }
-
     /** Colyseus's Callbacks function for listening to state changes */
     get Callbacks() {
         return Net.Callbacks;

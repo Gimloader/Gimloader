@@ -423,6 +423,15 @@ export namespace Stores {
         device: Device;
         layer: string;
         options: Untyped;
+        forceDepthManually(depth: number): void;
+        getDepth(): number;
+        getDepthShift(): number;
+        getGlobalDepth(): number;
+        getLayer(): string;
+        getOptionsDepth(): number | null;
+        getOptionsLayer(): string | null;
+        isOnNaturalDepth(): boolean;
+        setDefaultLayer(layer: string): void;
     }
 
     export interface WirePoints {

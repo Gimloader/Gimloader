@@ -24,7 +24,12 @@ export default class Patcher {
         if(!patches) return;
 
         delete object[property];
-        object[property] = createPatch(patches.patches, patches.original);
+
+        if(patches.patches.length === 0) {
+            object[property] = patches.original;
+        } else {
+            object[property] = createPatch(patches.patches, patches.original);
+        }
     }
 
     static addPatch(id: string | null, object: any, property: PropertyKey, patch: Patch) {

@@ -1,2 +1,3 @@
-Fixed plugins button missing in-game in 2d modes
-Fixed some type issues
+Fixed patcher not fully unpatching functions
+Fixed padding in developer settings
+Fixed more type issues

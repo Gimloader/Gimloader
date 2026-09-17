@@ -143,14 +143,14 @@
                 />
                 Poll for plugins/libraries being served locally
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 mt-2!">
                 <Switch
                     bind:checked={Storage.settings.suppressGimkitLogs}
                     onCheckedChange={() => saveKey("suppressGimkitLogs")}
                 />
                 Suppress Gimkit's logs in the console
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 mt-2!">
                 <div class="w-11"></div>
                 Hash of Gimkit bundle to use
                 <input
