@@ -10,7 +10,7 @@
         "@codemirror/state": "^6.5.2",
         "@codemirror/theme-one-dark": "^6.1.2",
         "@codemirror/view": "^6.36.5",
-        "@gimloader/ipc": "github:Gimloader/ipc#c5e9334eafa62cac5f9c89fff7c5569f5fc959a9",
+        "@gimloader/ipc": "github:Gimloader/ipc#85d3e6d5ecf65f01ff489c85c81b1d1e9db9ef78",
         "@uiw/codemirror-extensions-hyper-link": "^4.23.10",
         "codemirror": "^6.0.1",
         "debounce": "^2.1.0",
@@ -184,7 +184,7 @@
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
-    "@gimloader/ipc": ["@gimloader/ipc@github:Gimloader/ipc#c5e9334", { "dependencies": { "eventemitter2": "^6.4.9" }, "peerDependencies": { "svelte": "5.43.0", "typescript": "^6" } }, "Gimloader-ipc-c5e9334"],
+    "@gimloader/ipc": ["@gimloader/ipc@github:Gimloader/ipc#85d3e6d", { "dependencies": { "eventemitter3": "^5.0.4" }, "peerDependencies": { "typescript": "^6" } }, "Gimloader-ipc-85d3e6d"],
 
     "@internationalized/date": ["@internationalized/date@3.12.4", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ=="],
 
@@ -363,8 +363,6 @@
     "esm-env": ["esm-env@1.2.2", "", {}, "sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA=="],
 
     "esrap": ["esrap@2.3.7", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.4.15" }, "peerDependencies": { "@typescript-eslint/types": "^8.2.0" }, "optionalPeers": ["@typescript-eslint/types"] }, "sha512-n2nf7fZR3c9yXf0BPEuHuXqT+KW0SJVj4cN5FMEkpCZ3scLjOQWpiccyCxVzCC2q1wubTghuEGzngJY/7Ah0Ow=="],
-
-    "eventemitter2": ["eventemitter2@6.4.9", "", {}, "sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg=="],
 
     "eventemitter3": ["eventemitter3@5.0.4", "", {}, "sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw=="],
 

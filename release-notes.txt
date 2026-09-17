@@ -1,3 +1,4 @@
+Added reconnect for if the connection with the extension silently disconnects
 Fixed patcher not fully unpatching functions
 Fixed padding in developer settings
 Fixed more type issues
