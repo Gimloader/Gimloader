@@ -6,6 +6,7 @@ export default class ConfigurableHotkey {
     category: string;
     title: string;
     preventDefault: boolean;
+    stopPropagation: boolean;
     callback: HotkeyCallback;
     trigger: HotkeyTrigger | null = $state(null);
     default?: HotkeyTrigger;
@@ -16,6 +17,7 @@ export default class ConfigurableHotkey {
         this.category = options.category;
         this.title = options.title;
         this.preventDefault = options.preventDefault ?? true;
+        this.stopPropagation = options.stopPropagation ?? false;
         this.default = options.default;
         this.callback = callback;
         this.pluginName = pluginName;

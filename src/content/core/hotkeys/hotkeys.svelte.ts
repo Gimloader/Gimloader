@@ -52,6 +52,10 @@ export default new class Hotkeys {
         for(const hotkey of this.hotkeys) {
             if(this.checkTrigger(e, hotkey)) {
                 if(hotkey.preventDefault || hotkey.preventDefault === undefined) e.preventDefault();
+                if(hotkey.stopPropagation) {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                }
                 hotkey.callback(e);
             }
         }
@@ -59,6 +63,10 @@ export default new class Hotkeys {
         for(const hotkey of this.configurableHotkeys) {
             if(hotkey.trigger && this.checkTrigger(e, hotkey.trigger)) {
                 if(hotkey.preventDefault) e.preventDefault();
+                if(hotkey.stopPropagation) {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                }
                 hotkey.callback(e);
             }
         }

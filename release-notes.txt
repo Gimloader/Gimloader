@@ -1,4 +1,5 @@
 Added reconnect for if the connection with the extension silently disconnects
+Fixed hotkeys stopPropagation option not doing anything
 Fixed patcher not fully unpatching functions
 Fixed padding in developer settings
 Fixed more type issues
