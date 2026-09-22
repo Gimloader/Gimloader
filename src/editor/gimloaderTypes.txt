@@ -7491,6 +7491,15 @@ namespace Stores {
         device: Device;
         layer: string;
         options: Untyped;
+        forceDepthManually(depth: number): void;
+        getDepth(): number;
+        getDepthShift(): number;
+        getGlobalDepth(): number;
+        getLayer(): string;
+        getOptionsDepth(): number | null;
+        getOptionsLayer(): string | null;
+        isOnNaturalDepth(): boolean;
+        setDefaultLayer(layer: string): void;
     }
     interface WirePoints {
         device: Device;
@@ -10410,7 +10419,9 @@ interface RequesterOptions {
     error?: (error: any) => void;
 }
 type EditFN<T> = (newValue: T | null) => void;
-type Listener<Data> = (data: Data, editFn: EditFN<Data | null>) => void | null | Data;
+/** @inline */
+type Listener<Data> = (data: Data, /** @deprecated */ editFn: EditFN<Data | null>) => void | null | Data;
+/** @inline */
 type OnAnyListener = (channel: string, data: any, editFn: EditFN<any>) => any;
 class EditableEmitter {
     #private;
@@ -10433,13 +10444,25 @@ type Messages1d = ReceivedMessages1d & TaggedSentMessages1d;
 abstract class NetTypeApi<Send extends Record<string, any>> {
     #private;
     constructor(id: string, emitter: EditableEmitter);
-    /** Listens for an incoming or outgoing message on a specific channel */
+    /**
+     * Listens for an incoming or outgoing message on a specific channel.
+     * Returning a value from the listener updates what is received.
+     * Returning null cancels the message entirely.
+     */
     on<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
-    /** Listens for the next incoming or outgoing message on a specific channel */
+    /**
+     * Listens for the next incoming or outgoing message on a specific channel.
+     * Returning a value from the listener updates what is received.
+     * Returning null cancels the message entirely.
+     */
     once<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
     /** Removes a listener added by on or once */
     off<C extends keyof Send>(channel: C, listener: Listener<Send[C]>): void;
-    /** Listens for any messages on any channel */
+    /**
+     * Listens for any messages on any channel.
+     * Returning a value from the listener updates what is sent.
+     * Returning null cancels the message entirely.
+     */
     onAny(listener: OnAnyListener): void;
     /** Removes a listener added by onAny */
     offAny(listener: OnAnyListener): void;
@@ -10448,13 +10471,13 @@ abstract class NetTypeApi<Send extends Record<string, any>> {
  * The colyseus api is for sending and recieving data in 2d modes.
  * ```js
  * // fired when data is recieved on a certain channel
- * api.net.colyseus.on("CHANNEL", (data, editFn) => {
- *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * api.net.colyseus.on("CHANNEL", (data) => {
+ *     return "new data"; // Replace the data with "new data" before Gimkit processes it
  * });
  *
  * // fired when data is sent on a certain channel
- * api.net.colyseus.on("send:CHANNEL", (data, editFn) => {
- *     editFn(null); // Cancel the data being sent
+ * api.net.colyseus.on("send:CHANNEL", (data) => {
+ *     return null; // Cancel the data being sent
  * });
  * ```
  */
@@ -10470,16 +10493,16 @@ class ColyseusApi extends NetTypeApi<Messages2d> {
     get state(): Schema.GimkitSchema;
 }
 /**
- * The colyseus api is for sending and recieving data in non-2d (classic) modes.
+ * The blueboat api is for sending and recieving data in non-2d (classic) modes.
  * ```js
  * // fired when data is recieved on a certain channel
- * api.net.blueboat.on("CHANNEL", (data, editFn) => {
- *     editFn("new data"); // Replace the data with "new data" before Gimkit processes it
+ * api.net.blueboat.on("CHANNEL", (data) => {
+ *     return "new data"; // Replace the data with "new data" before Gimkit processes it
  * });
  *
  * // fired when data is sent on a certain channel
- * api.net.blueboat.on("send:CHANNEL", (data, editFn) => {
- *     editFn(null); // Cancel the data being sent
+ * api.net.blueboat.on("send:CHANNEL", (data) => {
+ *     return null; // Cancel the data being sent
  * });
  * ```
  */
@@ -10504,18 +10527,6 @@ class NetApi {
     get type(): ConnectionType;
     /** The id of the gamemode the player is currently playing */
     get gamemode(): string | null;
-    /**
-     * The room that the client is connected to, or null if there is no connection
-     * @deprecated use `net.blueboat.room` or `net.colyseus.room` instead
-     * @hidden
-     */
-    get room(): any;
-    /**
-     * Gimkit's internal Colyseus state
-     * @deprecated use `net.colyseus.state` instead
-     * @hidden
-     */
-    get state(): Schema.GimkitSchema;
     /** Colyseus's Callbacks function for listening to state changes */
     get Callbacks(): any;
     /** Whether the user is the one hosting the current game */
@@ -10558,6 +10569,31 @@ class NetApi {
      * ```
      */
     modifyFetchResponse(path: string, callback: (response: any) => any): () => void;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    on(channel: string, listener: Listener<any>): void;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    once(channel: string, listener: Listener<any>): void;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    off(channel: string, listener: Listener<any>): void;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    onAny(listener: OnAnyListener): void;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    offAny(listener: OnAnyListener): void;
 }
 
 type NoticeType = "info" | "success" | "error" | "warning" | "loading";
@@ -10963,7 +10999,6 @@ interface Internals {
     message: AntdMessage;
     modal: AntdModal;
     classicStores: ClassicStores.ClassicStores;
-    platformerPhysics: Untyped;
 }
 
 const gimkitComponents: readonly ["notification", "message", "modal"];
@@ -11357,8 +11392,6 @@ class Api {
     get stores(): Stores.Stores;
     /** A variety of gimkit internal objects available in 1d gamemodes */
     get classicStores(): ClassicStores.ClassicStores;
-    /** Physics variables available in platformer gamemodes */
-    get platformerPhysics(): any;
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.

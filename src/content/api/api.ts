@@ -84,11 +84,6 @@ class Api {
         return GimkitInternals.classicStores;
     }
 
-    /** Physics variables available in platformer gamemodes */
-    get platformerPhysics() {
-        return GimkitInternals.platformerPhysics;
-    }
-
     /**
      * The exports of svelte v5.43.0, used internally by Gimloader and exposed to make scripts smaller.
      * Should never be used by hand.

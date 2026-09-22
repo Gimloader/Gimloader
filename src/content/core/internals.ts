@@ -1,8 +1,7 @@
-import { nop } from "$shared/utils";
 import type { AntdMessage, AntdModal, AntdNotification } from "$types/api/antd";
 import type { ClassicStores } from "$types/classicStores";
 import type { Stores } from "$types/stores";
-import type { Untyped } from "$types/util";
+import { nop } from "$shared/utils";
 import Rewriter from "./rewriter";
 import Cleanup from "./scripts/cleanup";
 
@@ -12,12 +11,11 @@ export interface Internals {
     message: AntdMessage;
     modal: AntdModal;
     classicStores: ClassicStores.ClassicStores;
-    platformerPhysics: Untyped;
 }
 
-interface LoadCallback<K extends keyof Internals> {
-    type: K;
-    callback: (value: Internals[K]) => void;
+interface LoadCallback {
+    type: string;
+    callback: (value: any) => void;
 }
 
 export default class GimkitInternals {
@@ -26,9 +24,8 @@ export default class GimkitInternals {
     static message: AntdMessage;
     static modal: AntdModal;
     static classicStores: ClassicStores.ClassicStores;
-    static platformerPhysics: any;
 
-    static loadCallbacks: LoadCallback<keyof Internals>[] = [];
+    static loadCallbacks: LoadCallback[] = [];
 
     static init() {
         // stores
@@ -64,13 +61,6 @@ export default class GimkitInternals {
             this.modal = modal;
 
             this.onLoaded("modal", modal);
-        });
-
-        // platformerPhysics
-        Rewriter.exposeObject("App", "platformerPhysics", "topDownBaseSpeed:", (phys) => {
-            this.platformerPhysics = phys;
-
-            this.onLoaded("platformerPhysics", phys);
         });
     }
 

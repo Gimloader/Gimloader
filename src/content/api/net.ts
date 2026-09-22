@@ -257,6 +257,76 @@ class NetApi {
 
         return Net.modifyFetchResponse(this.#id, path, callback);
     }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    on(channel: string, listener: Listener<any>) {
+        Net.colyseusEvents.on(channel, listener);
+        Net.blueboatEvents.on(channel, listener);
+        Cleanup.on(this.#id, () => {
+            Net.colyseusEvents.off(channel, listener);
+            Net.blueboatEvents.off(channel, listener);
+        });
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    once(channel: string, listener: Listener<any>) {
+        const cleanup = () => {
+            Net.colyseusEvents.off(channel, listener);
+            Net.blueboatEvents.off(channel, listener);
+        };
+
+        Net.colyseusEvents.once(channel, (data, editFn) => {
+            Cleanup.off(this.#id, cleanup);
+            Net.blueboatEvents.off(channel, listener);
+            listener(data, editFn);
+        });
+
+        Net.blueboatEvents.once(channel, (data, editFn) => {
+            Cleanup.off(this.#id, cleanup);
+            Net.colyseusEvents.off(channel, listener);
+            listener(data, editFn);
+        });
+
+        Cleanup.on(this.#id, cleanup);
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    off(channel: string, listener: Listener<any>) {
+        Net.colyseusEvents.off(channel, listener);
+        Net.blueboatEvents.off(channel, listener);
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    onAny(listener: OnAnyListener) {
+        Net.colyseusEvents.onAny(listener);
+        Net.colyseusEvents.offAny(listener);
+
+        Cleanup.onStop(this.#id, () => {
+            Net.colyseusEvents.offAny(listener);
+            Net.blueboatEvents.offAny(listener);
+        });
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    offAny(listener: OnAnyListener) {
+        Net.colyseusEvents.offAny(listener);
+        Net.blueboatEvents.offAny(listener);
+    }
 }
 
 Object.freeze(NetApi);
