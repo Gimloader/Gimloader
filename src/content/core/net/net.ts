@@ -39,7 +39,11 @@ interface ResponseCallback {
 }
 
 export type EditFN<T> = (newValue: T | null) => void;
-export type Listener<Data> = (data: Data, editFn: EditFN<Data | null>) => void | null | Data;
+
+/** @inline */
+export type Listener<Data> = (data: Data, /** @deprecated */ editFn: EditFN<Data | null>) => void | null | Data;
+
+/** @inline */
 export type OnAnyListener = (channel: string, data: any, editFn: EditFN<any>) => any;
 
 export class EditableEmitter {
