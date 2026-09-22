@@ -77,6 +77,7 @@ export namespace Stores {
 
     export interface NonMainCharacterState {
         grounded: boolean;
+        wallSliding: boolean;
     }
 
     export interface CharacterAnimation {
@@ -114,7 +115,10 @@ export namespace Stores {
         startX: number;
         startY: number;
         teleported: boolean;
-        usedTeleported: boolean;
+        usedTeleported?: boolean;
+        angle?: number;
+        wallSliding?: boolean;
+        grounded?: boolean;
     }
 
     export interface EndInfo {
@@ -129,9 +133,11 @@ export namespace Stores {
         currentPoint: Point;
         currentTime: number;
         nonMainCharacterGrounded: boolean;
+        nonMainCharacterWallSliding: boolean;
         pointMap: Point[];
         targetIsDirty: boolean;
         targetNonMainCharacterGrounded: boolean;
+        targetNonMainCharacterWallSliding: boolean;
         targetX: number;
         targetY: number;
         teleportCount: number;
@@ -242,6 +248,7 @@ export namespace Stores {
         sendToServer(): void;
         setServerPosition(serverPosition: ServerPosition): void;
         setupBody(x: number, y: number): void;
+        resetOnSpawn(): void;
         updateDebugGraphics(): void;
     }
 
@@ -786,6 +793,8 @@ export namespace Stores {
         appearance: string;
         ownerId: string;
         ownerTeamId: string;
+        sourceDeviceId: string;
+        canDamagePlayersWhenPvpDisabled: boolean;
         damage: number;
         hitPos?: Vector;
         hitTime?: number;
@@ -920,6 +929,7 @@ export namespace Stores {
         hitPos: Vector;
         hasShownFireSlash: boolean;
         hasPlayedFireSound: boolean;
+        lastUpdateAt: number;
         isDisposed: boolean;
         explode(explosion: Explosion): void;
         dispose(): void;
