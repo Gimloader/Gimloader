@@ -1,6 +1,6 @@
 {
   "name": "gimloader",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "A plugin loader and manager for Gimkit",
   "type": "module",
   "scripts": {

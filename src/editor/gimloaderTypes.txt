@@ -10573,6 +10573,16 @@ class NetApi {
      * @deprecated
      * @hidden
      */
+    get room(): any;
+    /**
+     * @deprecated
+     * @hidden
+     */
+    get state(): Schema.GimkitSchema;
+    /**
+     * @deprecated
+     * @hidden
+     */
     on(channel: string, listener: Listener<any>): void;
     /**
      * @deprecated

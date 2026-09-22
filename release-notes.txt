@@ -1,1 +1,1 @@
-Removed api.platformerPhysics as it has been removed from the game
+Restored several deprecated things which were prematurely removed

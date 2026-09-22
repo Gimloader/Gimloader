@@ -262,6 +262,24 @@ class NetApi {
      * @deprecated
      * @hidden
      */
+    get room() {
+        return Net.room;
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
+    get state(): Schema.GimkitSchema {
+        // We pretend that this is always defined for ease of use
+        if(Net.type !== "Colyseus") return undefined as any;
+        return Net.room?.state;
+    }
+
+    /**
+     * @deprecated
+     * @hidden
+     */
     on(channel: string, listener: Listener<any>) {
         Net.colyseusEvents.on(channel, listener);
         Net.blueboatEvents.on(channel, listener);
