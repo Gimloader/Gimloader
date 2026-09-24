@@ -189,11 +189,6 @@ class NetApi {
         return Net.gamemode;
     }
 
-    /** Colyseus's Callbacks function for listening to state changes */
-    get Callbacks() {
-        return Net.Callbacks;
-    }
-
     /** Whether the user is the one hosting the current game */
     get isHost() {
         return Net.isHost;

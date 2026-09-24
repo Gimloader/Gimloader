@@ -1,1 +1,1 @@
-Restored several deprecated things which were prematurely removed
+Removed net.Callbacks since Gimkit hasn't made the expected changes

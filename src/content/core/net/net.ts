@@ -112,7 +112,6 @@ export default new class Net {
     requestCallbacks: RequestCallback[] = [];
     responseCallbacks: ResponseCallback[] = [];
     gamemode: string | null = null;
-    Callbacks: any;
     colyseusEvents = new EditableEmitter();
     blueboatEvents = new EditableEmitter();
 
@@ -121,48 +120,6 @@ export default new class Net {
     }
 
     init() {
-        // Gimkit recently pushed and reverted an update that bumps the Colyseus version and breaks how we intercept it
-        // However, it was reverted, and presumably will be pushed again later
-        // Therefore both patches are left in, and once the update is pushed again the old patch will be removed
-        // Patch the Colyseus callbacks
-        const onColyseusCallbacks = Rewriter.createShared(null, "colyseusCallbacks", (Callbacks: any) => {
-            this.Callbacks = Callbacks;
-        });
-
-        Rewriter.addParseHook(null, "index", (code) => {
-            const index = code.indexOf("void 0,{instance");
-            if(index === -1) return;
-
-            const start = code.lastIndexOf("function", index) + 9;
-            const end = code.indexOf("(", start);
-            const name = code.slice(start, end);
-            const insertAt = code.indexOf("})}return", index) + 3;
-
-            return code.slice(0, insertAt) + `${onColyseusCallbacks}?.(${name});` + code.slice(insertAt);
-        });
-
-        // Patch the Colyseus client
-        const onColyseusClient = Rewriter.createShared(null, "colyseusClient", (client: any) => {
-            Patcher.after(null, client.prototype, "create", (_, __, roomPromise) => {
-                roomPromise.then((room: any) => this.onColyseusRoom(room));
-            });
-
-            Patcher.after(null, client.prototype, "joinById", (_, __, roomPromise) => {
-                roomPromise.then((room: any) => this.onColyseusRoom(room));
-            });
-        });
-
-        Rewriter.addParseHook(null, "index", (code) => {
-            const index = code.indexOf(`,"VERSION",`);
-            if(index === -1) return;
-
-            const start = code.lastIndexOf("(", index) + 1;
-            const name = code.slice(start, index);
-
-            return code + `${onColyseusClient}?.(${name});`;
-        });
-
-        // Patch the Blueboat client
         Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
             const proto = mod.Client.prototype;
 
