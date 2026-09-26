@@ -92,7 +92,7 @@ class HotkeysApi {
     addConfigurableHotkey(options: ConfigurableHotkeyOptions, callback: KeyboardCallback) {
         validate("hotkeys.addConfigurableHotkey", arguments, ["options", ConfigurableHotkeyOptionsSchema], ["callback", "function"]);
 
-        return Hotkeys.addConfigurableHotkey(`${this.#id}-${options.category}-${options.title}`, options, callback, this.#id);
+        return Hotkeys.addConfigurableHotkey(this.#id, `${this.#id}-${options.category}-${options.title}`, options, callback);
     }
 }
 
