@@ -78,13 +78,15 @@ export default new class Commands {
             key: "KeyP",
             ctrl: true,
             shift: true,
-            alt: false
+            alt: false,
+            meta: false
         };
         const firefoxDefault = {
             key: "KeyP",
             ctrl: false,
             shift: true,
-            alt: true
+            alt: true,
+            meta: false
         };
 
         Hotkeys.addConfigurableHotkey(null, "openCommandPalette", {

@@ -220,7 +220,7 @@ function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
         }
         if(hotkeys[id] === null) continue;
 
-        let { key, keys, ctrl, shift, alt } = hotkeys[id];
+        let { key, keys, ctrl, shift, alt, meta } = hotkeys[id];
 
         if(!key && !keys) {
             invalidate();
@@ -255,8 +255,9 @@ function sanitizeHotkeys(hotkeys: ConfigurableHotkeysState) {
         if(typeof ctrl !== "boolean") ctrl = undefined;
         if(typeof shift !== "boolean") shift = undefined;
         if(typeof alt !== "boolean") alt = undefined;
+        if(typeof meta !== "boolean") meta = undefined;
 
-        hotkeys[id] = { key, keys, ctrl, shift, alt };
+        hotkeys[id] = { key, keys, ctrl, shift, alt, meta };
     }
 
     return hotkeys;

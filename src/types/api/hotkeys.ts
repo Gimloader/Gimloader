@@ -7,6 +7,7 @@ export interface HotkeyTrigger {
     ctrl?: boolean;
     shift?: boolean;
     alt?: boolean;
+    meta?: boolean;
 }
 
 /** @inline */

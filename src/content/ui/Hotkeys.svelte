@@ -35,7 +35,8 @@
                 key: e.code,
                 ctrl: e.ctrlKey,
                 alt: e.altKey,
-                shift: e.shiftKey
+                shift: e.shiftKey,
+                meta: e.metaKey
             };
         }
     }
@@ -92,6 +93,7 @@
             if(trigger.ctrl && !trigger.key.startsWith("Control")) keys.push("Ctrl");
             if(trigger.alt && !trigger.key.startsWith("Alt")) keys.push("Alt");
             if(trigger.shift && !trigger.key.startsWith("Shift")) keys.push("Shift");
+            if(trigger.meta && !trigger.key.startsWith("Meta")) keys.push("Meta");
 
             if(trigger.key.startsWith("Key")) keys.push(trigger.key.slice(3));
             else if(trigger.key.startsWith("Digit")) keys.push(trigger.key.slice(5));
@@ -100,6 +102,7 @@
             if(trigger.ctrl && !trigger.keys.some(key => key.startsWith("Control"))) keys.push("Ctrl");
             if(trigger.alt && !trigger.keys.some(key => key.startsWith("Alt"))) keys.push("Alt");
             if(trigger.shift && !trigger.keys.some(key => key.startsWith("Shift"))) keys.push("Shift");
+            if(trigger.meta && !trigger.keys.some(key => key.startsWith("Meta"))) keys.push("Meta");
 
             for(let key of trigger.keys) {
                 if(key.startsWith("Key")) keys.push(key.slice(3));

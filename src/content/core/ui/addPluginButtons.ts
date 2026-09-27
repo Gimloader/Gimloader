@@ -20,7 +20,8 @@ export function addPluginButtons() {
         key: "KeyP",
         alt: true,
         shift: false,
-        ctrl: false
+        ctrl: false,
+        meta: false
     }, () => showMenu());
 
     addTabCommand("Open Gimloader Menu", "plugin", ["manager"]);
