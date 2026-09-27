@@ -12,7 +12,8 @@ const HotkeyTriggerSchema = z.union([
 ]).and(z.object({
     ctrl: z.boolean().optional(),
     shift: z.boolean().optional(),
-    alt: z.boolean().optional()
+    alt: z.boolean().optional(),
+    meta: z.boolean().optional()
 }));
 
 const HotkeyOptionsSchema = HotkeyTriggerSchema.and(z.object({

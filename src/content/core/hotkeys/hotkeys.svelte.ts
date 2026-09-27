@@ -87,6 +87,7 @@ export default new class Hotkeys {
             (trigger.ctrl === undefined || trigger.ctrl === e.ctrlKey)
             && (trigger.shift === undefined || trigger.shift === e.shiftKey)
             && (trigger.alt === undefined || trigger.alt === e.altKey)
+            && (trigger.meta === undefined || trigger.meta === e.metaKey)
         );
     }
 }();
