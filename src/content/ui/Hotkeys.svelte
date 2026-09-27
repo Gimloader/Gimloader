@@ -115,7 +115,7 @@
     }
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydowncapture={onKeydown} />
 
 <div class="flex flex-col max-h-full gap-2">
     <div class="grow overflow-y-auto grid gap-x-5 gap-y-1 pb-1" style="grid-template-columns: auto auto auto 1fr">
