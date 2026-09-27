@@ -87,7 +87,7 @@ export default new class Commands {
             alt: true
         };
 
-        Hotkeys.addConfigurableHotkey("openCommandPalette", {
+        Hotkeys.addConfigurableHotkey(null, "openCommandPalette", {
             category: "Gimloader",
             title: "Open Command Palette",
             preventDefault: true,

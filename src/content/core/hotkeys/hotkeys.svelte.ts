@@ -37,8 +37,8 @@ export default new class Hotkeys {
         return Cleanup.addCleanedUpItem(id, this.hotkeys, { ...options, callback });
     }
 
-    addConfigurableHotkey(id: string, options: ConfigurableHotkeyOptions, callback: HotkeyCallback, pluginName?: string) {
-        const obj = new ConfigurableHotkey(id, callback, options, pluginName);
+    addConfigurableHotkey(id: string | null, hotkeyId: string, options: ConfigurableHotkeyOptions, callback: HotkeyCallback) {
+        const obj = new ConfigurableHotkey(hotkeyId, callback, options);
 
         return Cleanup.addCleanedUpItem(id, this.configurableHotkeys, obj);
     }
