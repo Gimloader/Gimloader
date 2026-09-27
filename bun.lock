@@ -10,7 +10,7 @@
         "@codemirror/state": "^6.5.2",
         "@codemirror/theme-one-dark": "^6.1.2",
         "@codemirror/view": "^6.36.5",
-        "@gimloader/ipc": "github:Gimloader/ipc#85d3e6d5ecf65f01ff489c85c81b1d1e9db9ef78",
+        "@gimloader/ipc": "github:Gimloader/ipc#e91391c86e48600dfff8a15ea3c8b801a805c8d1",
         "@uiw/codemirror-extensions-hyper-link": "^4.23.10",
         "codemirror": "^6.0.1",
         "debounce": "^2.1.0",
@@ -184,7 +184,7 @@
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
-    "@gimloader/ipc": ["@gimloader/ipc@github:Gimloader/ipc#85d3e6d", { "dependencies": { "eventemitter3": "^5.0.4" }, "peerDependencies": { "typescript": "^6" } }, "Gimloader-ipc-85d3e6d"],
+    "@gimloader/ipc": ["@gimloader/ipc@github:Gimloader/ipc#e91391c", { "dependencies": { "eventemitter3": "^5.0.4" }, "peerDependencies": { "typescript": "^6" } }, "Gimloader-ipc-e91391c"],
 
     "@internationalized/date": ["@internationalized/date@3.12.4", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ=="],
 
