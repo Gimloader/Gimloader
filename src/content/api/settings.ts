@@ -90,7 +90,20 @@ const CustomSectionSchema = z.object({
     render: z.function()
 });
 
-const SettingSchema = z.discriminatedUnion("type", [
+// any type annotations needed so typescript doesn't explode from circular reference
+const GroupSchema = z.object({
+    type: z.literal("group"),
+    title: z.string(),
+    settings: z.array(z.lazy(() => SettingItemSchema))
+}) as any;
+
+const ToggleGroupSchema = BaseSchema.extend({
+    type: z.literal("togglegroup"),
+    settings: z.array(z.lazy(() => SettingItemSchema)),
+    default: z.boolean().optional()
+}) as any;
+
+const SettingItemSchema = z.discriminatedUnion("type", [
     DropdownSchema,
     MultiselectSchema,
     NumberSchema,
@@ -100,19 +113,12 @@ const SettingSchema = z.discriminatedUnion("type", [
     RadioSchema,
     ColorSchema,
     CustomSchema,
-    CustomSectionSchema
+    CustomSectionSchema,
+    GroupSchema,
+    ToggleGroupSchema
 ]);
 
-const GroupSchema = z.object({
-    type: z.literal("group"),
-    title: z.string(),
-    settings: z.array(SettingSchema)
-});
-
-const DescriptionSchema = z.array(z.discriminatedUnion("type", [
-    SettingSchema,
-    GroupSchema
-]));
+const DescriptionSchema = z.array(SettingItemSchema);
 
 function applyDefaults(id: string, settings: PluginSettingsDescription) {
     for(const setting of settings) {
@@ -132,8 +138,11 @@ function applyDefaults(id: string, settings: PluginSettingsDescription) {
         else if(setting.type === "text") defaultValue = "";
         else if(setting.type === "radio") defaultValue = setting.options[0].value;
         else if(setting.type === "color") defaultValue = setting.rgba ? "rgba(255,0,0,1)" : "#ff0000";
+        else if(setting.type === "togglegroup") defaultValue = false;
 
         Storage.pluginSettings[id][setting.id] = defaultValue;
+
+        if(setting.type === "togglegroup") applyDefaults(id, setting.settings);
     }
 }
 
@@ -144,8 +153,8 @@ function registerListeners(id: string, settings: PluginSettingsDescription) {
             continue;
         }
 
-        if(!setting.onChange) continue;
-        Storage.onPluginSettingUpdate(id, setting.id, setting.onChange);
+        if(setting.onChange) Storage.onPluginSettingUpdate(id, setting.id, setting.onChange);
+        if(setting.type === "togglegroup") registerListeners(id, setting.settings);
     }
 }
 
@@ -158,7 +167,12 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             validate("settings.create", arguments, ["description", DescriptionSchema]);
 
             plugin.settingsDescription = description;
-            plugin.openSettingsMenu.push(() => Modals.open("pluginSettings", { plugin }));
+            plugin.openSettingsMenu.push(() =>
+                Modals.open("pluginSettings", {
+                    pluginName: plugin.headers.name,
+                    settingsDescription: plugin.settingsDescription!
+                })
+            );
 
             Storage.pluginSettings[id] ??= {};
             applyDefaults(id, description);

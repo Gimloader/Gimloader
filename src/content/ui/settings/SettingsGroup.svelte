@@ -1,28 +1,33 @@
 <script lang="ts">
-    import type { SettingGroup } from "$types/api/settings";
-    import Setting from "./Setting.svelte";
-    import ChevronDown from "svelte-material-icons/ChevronDown.svelte";
-    import ChevronUp from "svelte-material-icons/ChevronUp.svelte";
+    import Modals from "$core/modals.svelte";
+    import type { SettingGroup, ToggleSettingGroup } from "$types/api/settings";
+    import PopOut from "@lucide/svelte/icons/square-arrow-out-up-right";
+    import type { Snippet } from "svelte";
 
-    let { pluginName, group }: { pluginName: string; group: SettingGroup } = $props();
+    interface Props {
+        pluginName: string;
+        group: SettingGroup | ToggleSettingGroup<string>;
+        children?: Snippet;
+    }
 
-    let expanded = $state(true);
+    let { pluginName, group, children }: Props = $props();
+
+    function showGroup() {
+        Modals.open("pluginSettings", {
+            pluginName,
+            settingsDescription: group.settings,
+            inGroup: group.title
+        });
+    }
 </script>
 
-<div class="text-xl flex items-center font-bold" class:border-b-2={!expanded}>
-    <button onclick={() => expanded = !expanded}>
-        {#if expanded}
-            <ChevronDown size={28} />
-        {:else}
-            <ChevronUp size={28} />
-        {/if}
-    </button>
-    {group.title}
-</div>
-{#if expanded}
-    <div class="pl-2 border-l-3 flex flex-col gap-2">
-        {#each group.settings as setting}
-            <Setting {pluginName} {setting} />
-        {/each}
+<div class="flex">
+    <div class="grow">
+        <button class="text-xl flex items-center font-bold gap-2" onclick={showGroup}>
+            {group.title}
+            <PopOut />
+        </button>
+        {group.description}
     </div>
-{/if}
+    {@render children?.()}
+</div>

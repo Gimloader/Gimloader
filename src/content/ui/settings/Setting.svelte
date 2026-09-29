@@ -22,11 +22,9 @@
 </script>
 
 {#if setting.type === "customsection"}
-    <div class="border-b border-gray-200">
-        <CustomSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
-    </div>
+    <CustomSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
 {:else}
-    <div class="border-b border-gray-200 flex items-start py-1">
+    <div class="flex items-start py-1">
         <div>
             <div class="font-semibold text-lg">
                 {setting.title}

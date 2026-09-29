@@ -45,7 +45,7 @@ export default new class Storage {
         });
 
         StateManager.storage.on("pluginSettingUpdate", (id, key, value, remote) => {
-            for(const listener of this.valueListeners) {
+            for(const listener of this.settingsListeners) {
                 if(listener.id === id && listener.key === key) {
                     listener.callback(value, remote);
                 }

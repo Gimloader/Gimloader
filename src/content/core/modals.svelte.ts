@@ -1,4 +1,4 @@
-import type { Plugin } from "./scripts/plugin.svelte";
+import type { PluginSettingsDescription } from "$types/api/settings";
 import type { Script } from "./scripts/script.svelte";
 import { mount, unmount, type Component } from "svelte";
 import { domLoaded } from "$content/utils";
@@ -29,12 +29,18 @@ export interface InputProps {
     otherButtons?: { text: string; onClick: () => void }[];
 }
 
+export interface PluginSettingsProps {
+    pluginName: string;
+    inGroup?: string;
+    settingsDescription: PluginSettingsDescription;
+}
+
 type ModalInfo<Type extends string, Props, Result = void> = { type: Type; props: Props; result: Result };
 type ModalTypes =
     | ModalInfo<"alert", { text?: string; title: string }>
     | ModalInfo<"error", { text: string; title: string }>
     | ModalInfo<"confirm", { text: string; title: string }, boolean>
-    | ModalInfo<"pluginSettings", { plugin: Plugin }>
+    | ModalInfo<"pluginSettings", PluginSettingsProps>
     | ModalInfo<"dependency", DependencyProps, boolean>
     | ModalInfo<"singleChangelog", SingleChangelogProps>
     | ModalInfo<"input", InputProps, string | null>;

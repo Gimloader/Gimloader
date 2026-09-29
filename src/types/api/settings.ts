@@ -68,6 +68,20 @@ export interface CustomSection<K extends string, T = any> extends BaseSetting<K,
     render(container: HTMLElement, currentValue: T, onChange: (newValue: T) => void): (() => void) | void;
 }
 
+export interface SettingGroup {
+    type: "group";
+    title: string;
+    description?: string;
+    settings: ReadonlyArray<SettingItem>;
+}
+
+export interface ToggleSettingGroup<K extends string> extends BaseSetting<K, boolean> {
+    type: "togglegroup";
+    title: string;
+    description?: string;
+    settings: ReadonlyArray<SettingItem>;
+}
+
 export type PluginSetting<K extends string = string> =
     | DropdownSetting<K>
     | MultiselectSetting<K>
@@ -79,14 +93,15 @@ export type PluginSetting<K extends string = string> =
     | ColorSetting<K>
     | CustomSetting<K>
     | CustomSection<K>;
+// | SettingGroup
+// | ToggleSettingGroup<K>;
 
-export interface SettingGroup {
-    type: "group";
-    title: string;
-    settings: ReadonlyArray<PluginSetting>;
-}
+export type SettingItem<K extends string = string> =
+    | PluginSetting<K>
+    | SettingGroup
+    | ToggleSettingGroup<K>;
 
-export type PluginSettingsDescription = ReadonlyArray<PluginSetting | SettingGroup>;
+export type PluginSettingsDescription = ReadonlyArray<SettingItem>;
 export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
 
 // There's probably some black magic that can be done to get rid of this
@@ -102,8 +117,9 @@ export type DescriptionToReturnType<T extends PluginSetting> = T extends Dropdow
     : T extends CustomSection<any, infer V> ? V
     : never;
 
-type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
-    : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
+type ExtractSettingObject<T> = T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
+    : T extends ToggleSettingGroup<infer Id> ? ExtractSettingObject<T["settings"][number]> | { [K in Id]: boolean }
+    : T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
     : never;
 
 type SettingsObject<T> = T & {
