@@ -1,4 +1,4 @@
-import type { UnionToIntersection } from "$types/util";
+import type { IsAny, IsUnion, UnionToIntersection } from "$types/util";
 
 export interface BaseSetting<K extends string, T> {
     id: K;
@@ -93,8 +93,6 @@ export type PluginSetting<K extends string = string> =
     | ColorSetting<K>
     | CustomSetting<K>
     | CustomSection<K>;
-// | SettingGroup
-// | ToggleSettingGroup<K>;
 
 export type SettingItem<K extends string = string> =
     | PluginSetting<K>
@@ -117,7 +115,9 @@ export type DescriptionToReturnType<T extends PluginSetting> = T extends Dropdow
     : T extends CustomSection<any, infer V> ? V
     : never;
 
-type ExtractSettingObject<T> = T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
+type ExtractSettingObject<T extends SettingItem> = IsAny<T> extends true ? { [key: string]: any }
+    : IsUnion<T> extends true ? { [key: string]: any }
+    : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
     : T extends ToggleSettingGroup<infer Id> ? ExtractSettingObject<T["settings"][number]> | { [K in Id]: boolean }
     : T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }
     : never;

@@ -163,11 +163,12 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
     const id = plugin.headers.name;
 
     let created = false;
-    const showModal = () =>
+    const showModal = () => {
         Modals.open("pluginSettings", {
             pluginName: plugin.headers.name,
             settingsDescription: plugin.settingsDescription!
         });
+    };
 
     const methods: SettingsMethods = {
         create(description) {

@@ -1755,6 +1755,8 @@ interface SvelteExport {
 
 type Untyped = any;
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+type IsUnion<T, U extends T = T> = (T extends any ? (U extends T ? false : true) : never) extends false ? false : true;
 
 namespace ClassicStores {
     interface LastDrawRound {
@@ -7176,6 +7178,7 @@ namespace Stores {
     }
     interface NonMainCharacterState {
         grounded: boolean;
+        wallSliding: boolean;
     }
     interface CharacterAnimation {
         availableAnimations: string[];
@@ -7211,7 +7214,10 @@ namespace Stores {
         startX: number;
         startY: number;
         teleported: boolean;
-        usedTeleported: boolean;
+        usedTeleported?: boolean;
+        angle?: number;
+        wallSliding?: boolean;
+        grounded?: boolean;
     }
     interface EndInfo {
         end: number;
@@ -7224,9 +7230,11 @@ namespace Stores {
         currentPoint: Point;
         currentTime: number;
         nonMainCharacterGrounded: boolean;
+        nonMainCharacterWallSliding: boolean;
         pointMap: Point[];
         targetIsDirty: boolean;
         targetNonMainCharacterGrounded: boolean;
+        targetNonMainCharacterWallSliding: boolean;
         targetX: number;
         targetY: number;
         teleportCount: number;
@@ -7327,6 +7335,7 @@ namespace Stores {
         sendToServer(): void;
         setServerPosition(serverPosition: ServerPosition): void;
         setupBody(x: number, y: number): void;
+        resetOnSpawn(): void;
         updateDebugGraphics(): void;
     }
     interface AppearanceVariation {
@@ -7850,6 +7859,8 @@ namespace Stores {
         appearance: string;
         ownerId: string;
         ownerTeamId: string;
+        sourceDeviceId: string;
+        canDamagePlayersWhenPvpDisabled: boolean;
         damage: number;
         hitPos?: Vector;
         hitTime?: number;
@@ -7969,6 +7980,7 @@ namespace Stores {
         hitPos: Vector;
         hasShownFireSlash: boolean;
         hasPlayedFireSound: boolean;
+        lastUpdateAt: number;
         isDisposed: boolean;
         explode(explosion: Explosion): void;
         dispose(): void;
@@ -9574,18 +9586,32 @@ interface CustomSection<K extends string, T = any> extends BaseSetting<K, T> {
     type: "customsection";
     render(container: HTMLElement, currentValue: T, onChange: (newValue: T) => void): (() => void) | void;
 }
-type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
 interface SettingGroup {
     type: "group";
     title: string;
-    settings: ReadonlyArray<PluginSetting>;
+    description?: string;
+    settings: ReadonlyArray<SettingItem>;
 }
-type PluginSettingsDescription = ReadonlyArray<PluginSetting | SettingGroup>;
+interface ToggleSettingGroup<K extends string> extends BaseSetting<K, boolean> {
+    type: "togglegroup";
+    title: string;
+    description?: string;
+    settings: ReadonlyArray<SettingItem>;
+}
+type PluginSetting<K extends string = string> = DropdownSetting<K> | MultiselectSetting<K> | NumberSetting<K> | ToggleSetting<K> | TextSetting<K> | SliderSetting<K> | RadioSetting<K> | ColorSetting<K> | CustomSetting<K> | CustomSection<K>;
+type SettingItem<K extends string = string> = PluginSetting<K> | SettingGroup | ToggleSettingGroup<K>;
+type PluginSettingsDescription = ReadonlyArray<SettingItem>;
 type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
 type DescriptionToReturnType<T extends PluginSetting> = T extends DropdownSetting<any> ? string : T extends MultiselectSetting<any> ? ReadonlyArray<string> : T extends NumberSetting<any> ? number : T extends ToggleSetting<any> ? boolean : T extends TextSetting<any> ? string : T extends SliderSetting<any> ? number : T extends RadioSetting<any> ? string : T extends ColorSetting<any> ? string : T extends CustomSetting<any, infer V> ? V : T extends CustomSection<any, infer V> ? V : never;
-type ExtractSettingObject<T> = T extends PluginSetting<infer Id> ? {
+type ExtractSettingObject<T extends SettingItem> = IsAny<T> extends true ? {
+    [key: string]: any;
+} : IsUnion<T> extends true ? {
+    [key: string]: any;
+} : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> : T extends ToggleSettingGroup<infer Id> ? ExtractSettingObject<T["settings"][number]> | {
+    [K in Id]: boolean;
+} : T extends PluginSetting<infer Id> ? {
     [K in Id]: DescriptionToReturnType<T>;
-} : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]> : never;
+} : never;
 type SettingsObject<T> = T & {
     listen<K extends keyof T>(key: K, callback: SettingsChangeCallback<T[K]>, immediate?: boolean): void;
 };
@@ -9642,6 +9668,7 @@ interface HotkeyTrigger {
     ctrl?: boolean;
     shift?: boolean;
     alt?: boolean;
+    meta?: boolean;
 }
 /** @inline */
 interface HotkeyModifiers {
@@ -10527,8 +10554,6 @@ class NetApi {
     get type(): ConnectionType;
     /** The id of the gamemode the player is currently playing */
     get gamemode(): string | null;
-    /** Colyseus's Callbacks function for listening to state changes */
-    get Callbacks(): any;
     /** Whether the user is the one hosting the current game */
     get isHost(): boolean;
     /**
