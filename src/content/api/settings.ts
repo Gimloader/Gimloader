@@ -162,17 +162,24 @@ function registerListeners(id: string, settings: PluginSettingsDescription) {
 export default function createSettingsApi(plugin: Plugin): PluginSettings {
     const id = plugin.headers.name;
 
+    let created = false;
+    const showModal = () =>
+        Modals.open("pluginSettings", {
+            pluginName: plugin.headers.name,
+            settingsDescription: plugin.settingsDescription!
+        });
+
     const methods: SettingsMethods = {
         create(description) {
             validate("settings.create", arguments, ["description", DescriptionSchema]);
 
+            if(created) Storage.removeSettingsUpdateListeners(id);
+            created = true;
             plugin.settingsDescription = description;
-            plugin.openSettingsMenu.push(() =>
-                Modals.open("pluginSettings", {
-                    pluginName: plugin.headers.name,
-                    settingsDescription: plugin.settingsDescription!
-                })
-            );
+
+            if(!plugin.openSettingsMenu.includes(showModal)) {
+                plugin.openSettingsMenu.push(showModal);
+            }
 
             Storage.pluginSettings[id] ??= {};
             applyDefaults(id, description);

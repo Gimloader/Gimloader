@@ -74,4 +74,11 @@ export default new class Storage {
     onPluginSettingUpdate(id: string, key: string, callback: SettingsChangeCallback) {
         return Cleanup.addCleanedUpItem(id, this.settingsListeners, { id, key, callback });
     }
+
+    removeSettingsUpdateListeners(id: string) {
+        for(let i = this.settingsListeners.length - 1; i >= 0; i--) {
+            if(this.settingsListeners[i].id !== id) continue;
+            this.settingsListeners.splice(i, 1);
+        }
+    }
 }();
