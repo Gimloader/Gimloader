@@ -1,6 +1,2 @@
-Removed net.Callbacks since Gimkit hasn't made the expected changes
-Fixed settings.listen not working
-Made settings groups pop out into their own modal
-Added togglegroup option to settings
-Allowed settings groups to contain other settings groups
-Made settings.create work properly if called multiple times
+Fixed inconsistent spacing and sizing of settings groups
+Fixed slider settings sometimes being cut off

@@ -23,7 +23,7 @@
 
 <div class="flex">
     <div class="grow">
-        <button class="text-xl flex items-center font-bold gap-2" onclick={showGroup}>
+        <button class="text-lg flex items-center font-semibold gap-2" onclick={showGroup}>
             {group.title}
             <PopOut />
         </button>

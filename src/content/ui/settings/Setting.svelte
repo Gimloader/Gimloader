@@ -24,7 +24,7 @@
 {#if setting.type === "customsection"}
     <CustomSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
 {:else}
-    <div class="flex items-start py-1">
+    <div class="flex items-start">
         <div>
             <div class="font-semibold text-lg">
                 {setting.title}

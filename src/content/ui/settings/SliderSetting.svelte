@@ -1,13 +1,32 @@
 <script lang="ts">
     import type { SliderSetting } from "$types/api/settings";
+    import { Portal } from "bits-ui";
+    import { onMount, tick } from "svelte";
 
     let { value = $bindable(), setting }: { value: number; setting: SliderSetting<string> } = $props();
     const ticks = $derived(setting.ticks ?? [setting.min, setting.max]);
     let thumbLeft = $derived((value - setting.min) / (setting.max - setting.min) * 100);
 
     let dragging = $state(false);
+    let hovered = $state(false);
+    let thumbX = $state(0);
+    let thumbY = $state(0);
+
+    let thumb: HTMLElement;
     let track: HTMLElement;
     let trackRect: DOMRect;
+
+    function onHover() {
+        hovered = true;
+        calculateThumb();
+    }
+
+    function calculateThumb() {
+        const rect = thumb.getBoundingClientRect();
+        thumbX = rect.left + rect.width / 2;
+        thumbY = rect.top;
+    }
+
     function startDragging() {
         dragging = true;
         document.body.style.cursor = "ew-resize";
@@ -32,7 +51,11 @@
         newValue = Math.round(newValue / step) * step;
 
         // Clamp, just in case
-        value = Math.min(Math.max(newValue, setting.min), setting.max);
+        let clampedValue = Math.min(Math.max(newValue, setting.min), setting.max);
+        if(clampedValue === value) return;
+
+        value = clampedValue;
+        tick().then(calculateThumb);
     }
 
     function roundValue(val: number) {
@@ -53,11 +76,21 @@
     const lastTickWidth = $derived(lastTick ? 4.4 * formatValue(lastTick).toString().length : 0);
 </script>
 
-<svelte:window onpointerup={stopDragging} onpointermove={onPointermove} />
+<svelte:window onpointerup={stopDragging} onpointermove={onPointermove} onresize={calculateThumb} />
+
+<Portal>
+    <div
+        class="absolute -translate-x-1/2 bg-accent rounded-md px-2 py-1 select-none value z-999999"
+        style:left="{thumbX}px"
+        style:top="{thumbY - 35}px"
+    >
+        {formatValue(roundValue(value))}
+    </div>
+</Portal>
 
 <!-- I wasn't able to find any slider components that did what I wanted -->
 <div
-    class="w-[250px] relative h-1 bg-gray-300 rounded-full mt-3 mr-1 mb-10 font-mono"
+    class="w-62.5 relative h-1 bg-gray-300 rounded-full mt-3 mr-1 mb-10 font-mono"
     class:dragging={dragging}
     bind:this={track}
     style:margin-right="{lastTickWidth + 8}px;"
@@ -66,13 +99,10 @@
         class="absolute top-1/2 -translate-1/2 size-5 rounded-full bg-primary-400 hover:bg-primary-500 z-20 cursor-ew-resize thumb"
         style:left="{thumbLeft}%"
         onpointerdown={startDragging}
+        onpointerover={onHover}
+        onpointerout={() => hovered = false}
+        bind:this={thumb}
     >
-    </div>
-    <div
-        class="absolute -translate-x-1/2 left-0 bottom-4 bg-accent rounded-md px-2 py-1 select-none value hidden z-30"
-        style:left="{thumbLeft}%"
-    >
-        {formatValue(roundValue(value))}
     </div>
     {#each ticks as tick}
         {@const left = ((tick - setting.min) / (setting.max - setting.min)) * 100}
@@ -82,13 +112,3 @@
         </div>
     {/each}
 </div>
-
-<style>
-    .dragging .value, :hover + .value {
-        display: block !important;
-    }
-
-    .dragging .thumb {
-        background-color: var(--color-primary);
-    }
-</style>
