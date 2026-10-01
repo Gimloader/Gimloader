@@ -1,2 +1,3 @@
 Fixed inconsistent spacing and sizing of settings groups
 Fixed slider settings sometimes being cut off
+Updated types in editor
