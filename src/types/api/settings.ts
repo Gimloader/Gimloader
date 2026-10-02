@@ -71,6 +71,7 @@ export interface CustomSection<K extends string, T = any> extends BaseSetting<K,
 export interface SettingGroup {
     type: "group";
     title: string;
+    id?: string;
     description?: string;
     settings: ReadonlyArray<SettingItem>;
 }
@@ -80,6 +81,14 @@ export interface ToggleSettingGroup<K extends string> extends BaseSetting<K, boo
     title: string;
     description?: string;
     settings: ReadonlyArray<SettingItem>;
+}
+
+export interface TranscludeSetting {
+    type: "transclude";
+    fromPlugin: string;
+    id: string;
+    label?: boolean;
+    hideIfMissing?: boolean;
 }
 
 export type PluginSetting<K extends string = string> =
@@ -97,7 +106,8 @@ export type PluginSetting<K extends string = string> =
 export type SettingItem<K extends string = string> =
     | PluginSetting<K>
     | SettingGroup
-    | ToggleSettingGroup<K>;
+    | ToggleSettingGroup<K>
+    | TranscludeSetting;
 
 export type PluginSettingsDescription = ReadonlyArray<SettingItem>;
 export type SettingsChangeCallback<T = any> = (value: T, remote: boolean) => void;
@@ -117,6 +127,8 @@ export type DescriptionToReturnType<T extends PluginSetting> = T extends Dropdow
 
 type ExtractSettingObject<T extends SettingItem> = IsAny<T> extends true ? { [key: string]: any }
     : IsUnion<T> extends true ? { [key: string]: any }
+    // biome-ignore lint/complexity/noBannedTypes: This behaves how we want
+    : T extends TranscludeSetting ? {}
     : T extends SettingGroup ? ExtractSettingObject<T["settings"][number]>
     : T extends ToggleSettingGroup<infer Id> ? ExtractSettingObject<T["settings"][number]> | { [K in Id]: boolean }
     : T extends PluginSetting<infer Id> ? { [K in Id]: DescriptionToReturnType<T> }

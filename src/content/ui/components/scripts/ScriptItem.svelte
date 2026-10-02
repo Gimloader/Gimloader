@@ -83,7 +83,7 @@
     {toggle}
 >
     {#snippet header()}
-        <h2 class="overflow-ellipsis overflow-hidden whitespace-nowrap grow text-xl font-bold! mb-0!">
+        <h2 class="ellipsis overflow-hidden whitespace-nowrap grow text-xl font-bold! mb-0!">
             {script?.headers.name}
             {#if script?.headers.version}
                 <span class="text-sm">

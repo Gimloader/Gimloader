@@ -4,6 +4,7 @@
     import Setting from "./Setting.svelte";
     import SettingsGroup from "./SettingsGroup.svelte";
     import ToggleSettingsGroup from "./ToggleSettingsGroup.svelte";
+    import TranscludeSetting from "./TranscludeSetting.svelte";
 
     interface Props {
         pluginName: string;
@@ -29,10 +30,12 @@
                     <SettingsGroup {pluginName} group={item} />
                 {:else if item.type === "togglegroup"}
                     <ToggleSettingsGroup {pluginName} group={item} />
+                {:else if item.type === "transclude"}
+                    <TranscludeSetting setting={item} addDivider={i !== settingsDescription.length - 1} />
                 {:else}
                     <Setting {pluginName} setting={item} />
                 {/if}
-                {#if i !== settingsDescription.length - 1}
+                {#if item.type !== "transclude" && i !== settingsDescription.length - 1}
                     <hr class="bg-black mb-2 mt-1" />
                 {/if}
             {/each}

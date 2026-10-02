@@ -1,6 +1,6 @@
 import type { PluginInfo, ScriptType } from "@gimloader/ipc";
 import type { ScriptHeaders } from "$types/scripts";
-import type { PluginSettingsDescription } from "$types/api/settings";
+import type { PluginSettingsDescription, SettingItem } from "$types/api/settings";
 import { Script } from "./script.svelte";
 import Modals from "../modals.svelte";
 import { StateManager } from "@gimloader/ipc";
@@ -11,6 +11,7 @@ export class Plugin extends Script<PluginInfo> {
     enabled: boolean = $state(false);
     openSettingsMenu: (() => void)[] = $state([]);
     settingsDescription?: PluginSettingsDescription;
+    settingIdMap?: Record<string, SettingItem>;
 
     constructor(info: PluginInfo, headers?: ScriptHeaders) {
         // The initial plugin.start call is handled externally

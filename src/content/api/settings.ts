@@ -1,5 +1,5 @@
 import type { Plugin } from "$core/scripts/plugin.svelte";
-import type { PluginSettings, PluginSettingsDescription, SettingsMethods } from "$types/api/settings";
+import type { PluginSettings, PluginSettingsDescription, SettingItem, SettingsMethods } from "$types/api/settings";
 import { validate } from "$content/utils";
 import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
@@ -94,6 +94,7 @@ const CustomSectionSchema = z.object({
 const GroupSchema = z.object({
     type: z.literal("group"),
     title: z.string(),
+    id: z.string().optional(),
     settings: z.array(z.lazy(() => SettingItemSchema))
 }) as any;
 
@@ -102,6 +103,14 @@ const ToggleGroupSchema = BaseSchema.extend({
     settings: z.array(z.lazy(() => SettingItemSchema)),
     default: z.boolean().optional()
 }) as any;
+
+const TranscludeSchema = z.object({
+    type: z.literal("transclude"),
+    fromPlugin: z.string(),
+    id: z.string(),
+    label: z.string().optional(),
+    hideIfMissing: z.boolean().optional()
+});
 
 const SettingItemSchema = z.discriminatedUnion("type", [
     DropdownSchema,
@@ -115,47 +124,43 @@ const SettingItemSchema = z.discriminatedUnion("type", [
     CustomSchema,
     CustomSectionSchema,
     GroupSchema,
-    ToggleGroupSchema
+    ToggleGroupSchema,
+    TranscludeSchema
 ]);
 
 const DescriptionSchema = z.array(SettingItemSchema);
 
-function applyDefaults(id: string, settings: PluginSettingsDescription) {
+function prepareSettings(id: string, settings: PluginSettingsDescription, idMap: Record<string, SettingItem>) {
     for(const setting of settings) {
+        if(setting.type === "transclude") continue;
         if(setting.type === "group") {
-            applyDefaults(id, setting.settings);
+            if(setting.id) idMap[setting.id] = setting;
+            prepareSettings(id, setting.settings, idMap);
             continue;
         }
 
-        if(Storage.pluginSettings[id][setting.id] !== undefined) continue;
+        if(Storage.pluginSettings[id][setting.id] === undefined) {
+            let defaultValue: any = null;
+            if(setting.default !== undefined) defaultValue = setting.default;
+            else if(setting.type === "dropdown") defaultValue = setting.allowNone ? null : setting.options[0].value;
+            else if(setting.type === "multiselect") defaultValue = [];
+            else if(setting.type === "number" || setting.type === "slider") defaultValue = setting.min ?? 0;
+            else if(setting.type === "toggle") defaultValue = false;
+            else if(setting.type === "text") defaultValue = "";
+            else if(setting.type === "radio") defaultValue = setting.options[0].value;
+            else if(setting.type === "color") defaultValue = setting.rgba ? "rgba(255,0,0,1)" : "#ff0000";
+            else if(setting.type === "togglegroup") defaultValue = false;
 
-        let defaultValue: any = null;
-        if(setting.default !== undefined) defaultValue = setting.default;
-        else if(setting.type === "dropdown") defaultValue = setting.allowNone ? null : setting.options[0].value;
-        else if(setting.type === "multiselect") defaultValue = [];
-        else if(setting.type === "number" || setting.type === "slider") defaultValue = setting.min ?? 0;
-        else if(setting.type === "toggle") defaultValue = false;
-        else if(setting.type === "text") defaultValue = "";
-        else if(setting.type === "radio") defaultValue = setting.options[0].value;
-        else if(setting.type === "color") defaultValue = setting.rgba ? "rgba(255,0,0,1)" : "#ff0000";
-        else if(setting.type === "togglegroup") defaultValue = false;
-
-        Storage.pluginSettings[id][setting.id] = defaultValue;
-
-        if(setting.type === "togglegroup") applyDefaults(id, setting.settings);
-    }
-}
-
-function registerListeners(id: string, settings: PluginSettingsDescription) {
-    for(const setting of settings) {
-        if(setting.type === "group") {
-            registerListeners(id, setting.settings);
-            continue;
+            Storage.pluginSettings[id][setting.id] = defaultValue;
         }
+
+        idMap[setting.id] = setting;
 
         if(setting.onChange) Storage.onPluginSettingUpdate(id, setting.id, setting.onChange);
-        if(setting.type === "togglegroup") registerListeners(id, setting.settings);
+        if(setting.type === "togglegroup") prepareSettings(id, setting.settings, idMap);
     }
+
+    return idMap;
 }
 
 /** @hidden */
@@ -183,8 +188,7 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             }
 
             Storage.pluginSettings[id] ??= {};
-            applyDefaults(id, description);
-            registerListeners(id, description);
+            plugin.settingIdMap = prepareSettings(id, description, {});
 
             return this as any;
         },
