@@ -69,6 +69,11 @@ export default class Rewriter {
             else StateManager.handle("cacheInvalid", { invalid: false });
         });
 
+        if(StateManager.cache.invalid.value) {
+            this.invalidate();
+            StateManager.apply("cacheInvalid", { invalid: false });
+        }
+
         Object.defineProperties(window, {
             "GLImport": {
                 value: this.import.bind(this),
