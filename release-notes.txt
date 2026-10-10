@@ -1,1 +1,3 @@
 Partial fix for a crash caused by internal Gimkit changes
+Some plugin buttons are still missing
+Some plugins may be broken, these will be fixed in the upcoming daysgit a
