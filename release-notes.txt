@@ -1,2 +1,1 @@
-Added way to transclude settings
-Fixed an issue where the cache could get stuck not clearing
+Partial fix for a crash caused by internal Gimkit changes

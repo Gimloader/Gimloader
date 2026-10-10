@@ -120,28 +120,48 @@ export default new class Net {
     }
 
     init() {
-        Rewriter.exposeObjectBefore("index", "blueboatClient", ".Client=", (mod) => {
-            const proto = mod.Client.prototype;
+        const wrapColyseus = Rewriter.createShared(null, "wrapColyseus", (client: any) => {
+            Patcher.after(null, client.prototype, "create", (_, __, roomPromise) => {
+                roomPromise.then((room: any) => this.onColyseusRoom(room));
+            });
 
-            if(proto.joinById) {
-                // Colyseus
-                Patcher.after(null, proto, "create", (_, __, roomPromise) => {
-                    roomPromise.then((room: any) => this.onColyseusRoom(room));
-                });
+            Patcher.after(null, client.prototype, "joinById", (_, __, roomPromise) => {
+                roomPromise.then((room: any) => this.onColyseusRoom(room));
+            });
 
-                Patcher.after(null, proto, "joinById", (_, __, roomPromise) => {
-                    roomPromise.then((room: any) => this.onColyseusRoom(room));
-                });
-            } else if(proto.createRoom && proto.joinRoom) {
-                // Blueboat
-                Patcher.after(null, proto, "createRoom", (_, __, room) => {
-                    this.onBlueboatRoom(room);
-                });
+            return client;
+        });
 
-                Patcher.after(null, proto, "joinRoom", (_, __, room) => {
-                    this.onBlueboatRoom(room);
-                });
-            }
+        Rewriter.addParseHook(null, "lib-", (code) => {
+            const index = code.indexOf(".Client=class{");
+            if(index === -1) return code;
+
+            const start = index + 8;
+            const end = code.indexOf("}}", code.indexOf("getEndpointPort()", start)) + 2;
+
+            return code.slice(0, start) + `${wrapColyseus}?.(` + code.slice(start, end) + ")" + code.slice(end);
+        });
+
+        const wrapBlueboat = Rewriter.createShared(null, "wrapBlueboat", (client: any) => {
+            Patcher.after(null, client.prototype, "createRoom", (_, __, room) => {
+                this.onBlueboatRoom(room);
+            });
+
+            Patcher.after(null, client.prototype, "joinRoom", (_, __, room) => {
+                this.onBlueboatRoom(room);
+            });
+
+            return client;
+        });
+
+        Rewriter.addParseHook(null, "ObjectListener-", (code) => {
+            const index = code.indexOf(".Client=");
+            if(index === -1) return code;
+
+            const start = index + 8;
+            const end = code.indexOf(",", start);
+
+            return code.slice(0, start) + `${wrapBlueboat}?.(` + code.slice(start, end) + ")" + code.slice(end);
         });
 
         // Patch the requester

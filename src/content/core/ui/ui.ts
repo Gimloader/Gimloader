@@ -12,11 +12,11 @@ export default class UI {
     static ReactDOM: typeof ReactDOM;
 
     static init() {
-        Rewriter.exposeObjectBefore(true, "React", ".useDebugValue=", (react) => {
+        Rewriter.exposeExports("react-", "React", ".version=", (react: typeof React) => {
             this.React = react;
         });
 
-        Rewriter.exposeObjectBefore(true, "ReactDOM", ".findDOMNode=", (reactDOM) => {
+        Rewriter.exposeExports("assertThisInitialized-", "ReactDOM", "HOOK__.checkDCE", (reactDOM: typeof ReactDOM) => {
             this.ReactDOM = reactDOM;
         });
 

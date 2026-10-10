@@ -29,35 +29,41 @@ export default class GimkitInternals {
 
     static init() {
         // stores
-        Rewriter.exposeObject("FixSpinePlugin", "stores", "assignment:new", (stores: Stores.Stores) => {
+        Rewriter.exposeObject("stores-", "stores", "assignment:new", (stores: Stores.Stores) => {
             this.stores = stores;
 
             this.onLoaded("stores", stores);
         });
 
         // classicStores
-        Rewriter.exposeObject("index", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
+        Rewriter.exposeObject("host-", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
+            this.classicStores = classicStores;
+
+            this.onLoaded("classicStores", classicStores);
+        });
+
+        Rewriter.exposeObject("play-", "classicStores", "gameValues:new", (classicStores: ClassicStores.ClassicStores) => {
             this.classicStores = classicStores;
 
             this.onLoaded("classicStores", classicStores);
         });
 
         // ant-design notifications
-        Rewriter.exposeObject("index", "notification", "useNotification:", (notifs: AntdNotification) => {
+        Rewriter.exposeObject("notification-", "notification", "useNotification:", (notifs: AntdNotification) => {
             this.notification = notifs;
 
             this.onLoaded("notification", notifs);
         });
 
         // ant-design message
-        Rewriter.exposeObject("index", "message", "useMessage:", (msgs: AntdMessage) => {
+        Rewriter.exposeObject("message-", "message", "useMessage:", (msgs: AntdMessage) => {
             this.message = msgs;
 
             this.onLoaded("message", msgs);
         });
 
         // ant-design modal
-        Rewriter.exposeObjectBefore(true, "modal", ".useModal=", (modal: AntdModal) => {
+        Rewriter.exposeObjectBefore("modal-", "modal", ".useModal=", (modal: AntdModal) => {
             this.modal = modal;
 
             this.onLoaded("modal", modal);

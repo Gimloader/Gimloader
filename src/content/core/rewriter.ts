@@ -407,6 +407,23 @@ export default class Rewriter {
         });
     }
 
+    static exposeExports(prefix: Prefix, id: string, find: string, callback: (val: any) => void) {
+        const cb = this.createShared(null, id, (val: any) => {
+            callback(val);
+            return val;
+        });
+
+        this.addParseHook(null, prefix, (code) => {
+            const index = code.indexOf(find);
+            if(index === -1) return code;
+
+            const start = code.indexOf(".exports=", index) + 9;
+            const end = code.indexOf(")", start) + 1;
+
+            return code.slice(0, start) + `${cb}?.(` + code.slice(start, end) + ")" + code.slice(end);
+        });
+    }
+
     static exposeObjectBefore(prefix: Prefix, id: string, substring: string, callback: (val: any) => void) {
         const cb = this.createShared(null, id, callback);
 
