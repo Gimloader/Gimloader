@@ -217,7 +217,7 @@ export default class Rewriter {
         }
     }
 
-    static importRegex = /(import(?:.+?from)?)"([^"]+)";/g;
+    static importRegex = /(import(?:[^;]+?from)?)"([^"]+)";/g;
     static constRegex = new RegExp(`([^\\w\\d$"]|^)const(?![\\w\\d$])(?!${glslTypes.map(t => " " + t).join("|")})`, "g");
     static parse(js: string, name: string, root: boolean, skipPluginHooks: boolean): ParsedJs {
         // Remove dependency preloading
