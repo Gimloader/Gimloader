@@ -69,7 +69,7 @@ export function addPluginButtons() {
 
         insert = insert.replace("Join Game", "Plugins");
         insert = insert.replace("fa-gamepad", "fa-wrench gl-listButton");
-        insert = insert.replace('window.open("/join","_self")', `${openUI}()`);
+        insert = insert.replace("window.open(`/join`,`_self`)", `${openUI}()`);
 
         code = code.slice(0, start) + insert + "," + code.slice(start);
 
