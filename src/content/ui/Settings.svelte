@@ -106,54 +106,36 @@
         Rewriter.setBundleHash(bundleHash);
         initialHash = bundleHash;
     }
+
+    type BooleanSettings = { [K in keyof Settings]: Settings[K] extends boolean ? K : never }[keyof Settings];
 </script>
 
+{#snippet switchSetting(key: BooleanSettings, label: string)}
+    <div class="flex items-center gap-2">
+        <Switch bind:checked={Storage.settings[key]} onCheckedChange={() => saveKey(key)} />
+        {label}
+    </div>
+{/snippet}
+
 <h2 class="text-xl font-bold! mb-0!">General Settings</h2>
-<div class="flex items-center gap-2">
-    <Switch bind:checked={Storage.settings.autoUpdate} onCheckedChange={() => saveKey("autoUpdate")} />
-    Automatically check for plugin updates
-</div>
-<div class="flex items-center gap-2 mt-2!">
-    <Switch bind:checked={() => Storage.settings.showPluginButtons, onShowButtonsChange} />
-    Show buttons to open Gimloader menu
-</div>
-<div class="flex items-center gap-2 mt-2!">
-    <Switch
-        bind:checked={Storage.settings.autoDownloadMissingLibs}
-        onCheckedChange={() => saveKey("autoDownloadMissingLibs")}
-    />
-    Attempt to automatically download missing libraries
-</div>
-<div class="flex items-center gap-2 mt-2!">
-    <Switch
-        bind:checked={Storage.settings.autoDownloadMissingPlugins}
-        onCheckedChange={() => saveKey("autoDownloadMissingPlugins")}
-    />
-    Attempt to automatically download missing plugins
+<div class="flex flex-col gap-2">
+    {@render switchSetting("autoUpdate", "Automatically check for plugin updates")}
+    <div class="flex items-center gap-2">
+        <Switch bind:checked={() => Storage.settings.showPluginButtons, onShowButtonsChange} />
+        Show buttons to open Gimloader menu
+    </div>
+    {@render switchSetting("autoDownloadMissingLibs", "Attempt to automatically download missing libraries")}
+    {@render switchSetting("autoDownloadMissingPlugins", "Attempt to automatically download missing plugins")}
 </div>
 
 <Accordion.Root type="single">
     <Accordion.Item>
         <Accordion.Trigger class="text-xl font-bold!">Developer Settings</Accordion.Trigger>
-        <Accordion.Content class="text-base">
-            <div class="flex items-center gap-2">
-                <Switch
-                    bind:checked={Storage.settings.pollerEnabled}
-                    onCheckedChange={() => saveKey("pollerEnabled")}
-                />
-                Poll for plugins/libraries being served locally
-            </div>
-            <div class="flex items-center gap-2 mt-2!">
-                <Switch
-                    bind:checked={Storage.settings.suppressGimkitLogs}
-                    onCheckedChange={() => saveKey("suppressGimkitLogs")}
-                />
-                Suppress Gimkit's logs in the console
-            </div>
-            <div class="flex items-center gap-2 mt-2!">
-                <Switch bind:checked={Storage.settings.disableCache} onCheckedChange={() => saveKey("disableCache")} />
-                Disable script caching
-            </div>
+        <Accordion.Content class="text-base flex flex-col gap-2">
+            {@render switchSetting("pollerEnabled", "Poll for plugins/libraries being served locally")}
+            {@render switchSetting("suppressGimkitLogs", "Suppress Gimkit's logs in the console")}
+            {@render switchSetting("disableCache", "Disable script caching")}
+            {@render switchSetting("ignoreReloadRequests", "Ignore scripts asking for a reload")}
             <div class="flex items-center gap-2 mt-2!">
                 <div class="w-11"></div>
                 Hash of Gimkit bundle to use

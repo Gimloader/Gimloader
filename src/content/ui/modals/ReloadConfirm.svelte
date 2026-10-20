@@ -12,13 +12,14 @@
 <script lang="ts">
     import * as AlertDialog from "$shared/ui/alert-dialog";
     import { englishList } from "$shared/utils";
+    import Storage from "$core/storage.svelte";
 
     function ignore() {
         reloadNeeded.clear();
     }
 </script>
 
-<AlertDialog.Root open={names.length > 0}>
+<AlertDialog.Root open={!Storage.settings.ignoreReloadRequests && names.length > 0}>
     <AlertDialog.Content>
         {englishList(names)}
         {names.length === 1 ? " requires" : " require"}
