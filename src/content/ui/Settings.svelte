@@ -136,7 +136,7 @@
             {@render switchSetting("suppressGimkitLogs", "Suppress Gimkit's logs in the console")}
             {@render switchSetting("disableCache", "Disable script caching")}
             {@render switchSetting("ignoreReloadRequests", "Ignore scripts asking for a reload")}
-            <div class="flex items-center gap-2 mt-2!">
+            <div class="flex items-center gap-2">
                 <div class="w-11"></div>
                 Hash of Gimkit bundle to use
                 <input

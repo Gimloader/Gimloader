@@ -5,6 +5,7 @@ import tailwindStyles from "$content/css/tailwind.css";
 import { domLoaded } from "$content/utils";
 import Rewriter from "../rewriter";
 import Cleanup from "$core/scripts/cleanup";
+import { log } from "$shared/utils";
 
 export default class UI {
     static React: typeof React;
@@ -95,6 +96,7 @@ export default class UI {
 
         // @ts-expect-error missing for some reason
         this.ReactDOM.flushSync(() => this.rootStateNode.forceUpdate());
+        log("Forced React update");
     }
 
     static markPaths(fiber: any) {
