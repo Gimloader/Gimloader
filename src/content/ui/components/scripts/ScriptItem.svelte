@@ -132,7 +132,7 @@
             </Tooltip.Provider>
         {/if}
         {#if script?.headers.webpage}
-            <a title="Open webpage for {script.type}" href={script.headers.webpage} target="_blank">
+            <a title="Open webpage for {script?.type}" href={script?.headers.webpage} target="_blank">
                 <ScriptTextOutline size={28} />
             </a>
         {/if}
@@ -148,7 +148,7 @@
             </button>
         {/if}
         {@render scriptButtons?.()}
-        <button title="Open {script.type} editor" onclick={showEditor}>
+        <button title="Open {script?.type} editor" onclick={showEditor}>
             <Pencil size={28} />
         </button>
         <button title="Delete" onclick={deleteScript}>
