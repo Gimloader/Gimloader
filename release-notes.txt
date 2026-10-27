@@ -1,5 +1,1 @@
-Made React use function.__overrideReact over the function itself
-Made forceReactUpdate non-destructive
-Added react versions of patches to the patcher api
-Fixed api functions not thowing if extra object properties were passed
-Fixed the plugin button when signed out not opening the menu
+Made command palette properly reset between actions

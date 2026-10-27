@@ -113,13 +113,20 @@
         selectedIndex = index;
     }
 
-    function onOpenChange(open: boolean) {
-        if(open) return;
-
+    function resetInputs() {
         searched = "";
         selectSearch = "";
         textInput = "";
         numberInput = undefined;
+        selectedIndex = 0;
+    }
+
+    watch(() => Commands.action, resetInputs, { lazy: true });
+
+    function onOpenChange(open: boolean) {
+        if(open) return;
+
+        resetInputs();
         Commands.onClosed();
     }
 
