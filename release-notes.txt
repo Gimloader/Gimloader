@@ -1,1 +1,1 @@
-Fixed command palette not properly resetting between actions
+Fixed joining Blastball causing a crash
