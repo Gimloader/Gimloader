@@ -231,6 +231,7 @@ export default class Rewriter {
     }
 
     static importRegex = /(import(?:[^;]+?from)?)"([^"]+)";/g;
+    static exportRegex = /(export[^;]+?from)"([^"]+)";/g;
     static constRegex = new RegExp(`([^\\w\\d$"]|^)const(?![\\w\\d$])(?!${glslTypes.map(t => " " + t).join("|")})`, "g");
     static parse(js: string, name: string, root: boolean, skipPluginHooks: boolean): ParsedJs {
         // Remove dependency preloading
@@ -242,13 +243,18 @@ export default class Rewriter {
         // Replace dynamic imports
         js = js.replaceAll("import(", "GLImport(");
 
-        // Replace static imports
+        // Replace static imports/exports
         const imports: Import[] = [];
         for(const match of js.matchAll(this.importRegex)) {
             imports.push({ text: match[1], name: this.getName(match[2]) });
         }
 
+        for(const match of js.matchAll(this.exportRegex)) {
+            imports.push({ text: match[1], name: this.getName(match[2]) });
+        }
+
         js = js.replace(this.importRegex, "");
+        js = js.replace(this.exportRegex, "");
 
         // Replace all instances of const with let for easier reassignment
         js = js.replace(this.constRegex, "$1let");
