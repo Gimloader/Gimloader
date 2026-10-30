@@ -1,1 +1,1 @@
-Fixed joining Blastball causing a crash
+Fixed another crash when on the join screen
