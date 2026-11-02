@@ -1,1 +1,1 @@
-Fixed another crash when on the join screen
+Added prefix to Gimloader commands in the command palette

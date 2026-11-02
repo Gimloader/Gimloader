@@ -151,7 +151,7 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
 
         // Add plugin settings command
         Commands.addCommand(null, {
-            text: "Open plugin settings",
+            text: "Gimloader: Open plugin settings",
             keywords: ["preferences", "options", "configure"],
             hidden: () => this.scripts.filter(hasSettings).length === 0
         }, async (context) => {
@@ -161,7 +161,7 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
 
         // Add plugin enable command
         Commands.addCommand(null, {
-            text: "Enable plugin",
+            text: "Gimloader: Enable plugin",
             hidden: () => this.scripts.filter(isDisabled).length === 0
         }, async (context) => {
             const plugin = await this.selectScript(context, "Select plugin to enable", isDisabled);
@@ -170,7 +170,7 @@ export default new class PluginManager extends ScriptManager<PluginInfo, Plugin>
 
         // Add plugin disable command
         Commands.addCommand(null, {
-            text: "Disable plugin",
+            text: "Gimloader: Disable plugin",
             hidden: () => this.scripts.filter(isEnabled).length === 0
         }, async (context) => {
             const plugin = await this.selectScript(context, "Select plugin to disable", isEnabled);

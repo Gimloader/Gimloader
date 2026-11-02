@@ -111,7 +111,7 @@ export default abstract class ScriptManager<I extends ScriptInfo = any, T extend
 
     addCommands() {
         Commands.addCommand(null, {
-            text: `Delete ${this.singular}`,
+            text: `Gimloader: Delete ${this.singular}`,
             keywords: ["remove", "uninstall"],
             hidden: () => this.scripts.length === 0
         }, async (context) => {
@@ -120,7 +120,7 @@ export default abstract class ScriptManager<I extends ScriptInfo = any, T extend
         });
 
         Commands.addCommand(null, {
-            text: `Edit ${this.singular}`,
+            text: `Gimloader: Edit ${this.singular}`,
             hidden: () => this.scripts.length === 0
         }, async (context) => {
             const script = await this.selectScript(context, `Select ${this.singular} to edit`);

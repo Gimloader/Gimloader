@@ -24,13 +24,13 @@ export function addPluginButtons() {
         meta: false
     }, () => showMenu());
 
-    addTabCommand("Open Gimloader Menu", "plugin", ["manager"]);
-    addTabCommand("View Plugins", "plugin");
-    addTabCommand("View Official Plugins", "plugin", [], true);
-    addTabCommand("View Libraries", "library", ["libs"]);
-    addTabCommand("View Hotkeys", "hotkeys", ["binds"]);
-    addTabCommand("View Updates", "updates", ["versions"]);
-    addTabCommand("View Settings", "settings", ["options", "prefs"]);
+    addTabCommand("Gimloader: Open Gimloader Menu", "plugin", ["manager"]);
+    addTabCommand("Gimloader: View Plugins", "plugin");
+    addTabCommand("Gimloader: View Official Plugins", "plugin", [], true);
+    addTabCommand("Gimloader: View Libraries", "library", ["libs"]);
+    addTabCommand("Gimloader: View Hotkeys", "hotkeys", ["binds"]);
+    addTabCommand("Gimloader: View Updates", "updates", ["versions"]);
+    addTabCommand("Gimloader: View Settings", "settings", ["options", "prefs"]);
 
     const whiteWrench = Rewriter.createMemoized("whiteWrenchSvg", () => {
         const wrenchBlob = new Blob([whiteWrenchSvg], { type: "image/svg+xml" });
