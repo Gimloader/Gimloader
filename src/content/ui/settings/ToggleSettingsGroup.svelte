@@ -4,7 +4,7 @@
     import { StateManager } from "@gimloader/ipc";
     import { watch } from "runed";
     import SettingsGroup from "./SettingsGroup.svelte";
-    import ToggleSetting from "./ToggleSetting.svelte";
+    import { Switch } from "$shared/ui/switch";
 
     let { pluginName, group }: { pluginName: string; group: ToggleSettingGroup<string> } = $props();
 
@@ -15,5 +15,5 @@
 </script>
 
 <SettingsGroup {pluginName} {group}>
-    <ToggleSetting bind:value={Storage.pluginSettings[pluginName][group.id]} />
+    <Switch bind:checked={Storage.pluginSettings[pluginName][group.id]} />
 </SettingsGroup>

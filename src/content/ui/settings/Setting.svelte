@@ -43,7 +43,7 @@
         {:else if setting.type === "number"}
             <NumberSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
         {:else if setting.type === "toggle"}
-            <ToggleSetting bind:value={Storage.pluginSettings[pluginName][setting.id]} />
+            <ToggleSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} id={pluginName} />
         {:else if setting.type === "text"}
             <TextSetting {setting} bind:value={Storage.pluginSettings[pluginName][setting.id]} />
         {:else if setting.type === "slider"}

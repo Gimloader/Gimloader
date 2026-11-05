@@ -1,5 +1,5 @@
 import type { Plugin } from "$core/scripts/plugin.svelte";
-import type { PluginSettings, PluginSettingsDescription, SettingItem, SettingsMethods } from "$types/api/settings";
+import type { PluginSettings, PluginSettingsDescription, SettingItem, SettingsMethods, ToggleSetting } from "$types/api/settings";
 import { validate } from "$content/utils";
 import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
@@ -44,7 +44,9 @@ const NumberSchema = BaseSchema.extend({
 
 const ToggleSchema = BaseSchema.extend({
     type: z.literal("toggle"),
-    default: z.boolean().optional()
+    default: z.boolean().optional(),
+    needsLibs: z.array(z.string().nonempty()).optional(),
+    needsPlugins: z.array(z.string().nonempty()).optional()
 });
 
 const TextSchema = BaseSchema.extend({
@@ -155,12 +157,22 @@ function prepareSettings(id: string, settings: PluginSettingsDescription, idMap:
         }
 
         idMap[setting.id] = setting;
-
+        if(setting.type === "toggle" && Storage.pluginSettings[id][setting.id]) checkToggleDeps(id, setting);
         if(setting.onChange) Storage.onPluginSettingUpdate(id, setting.id, setting.onChange);
         if(setting.type === "togglegroup") prepareSettings(id, setting.settings, idMap);
     }
 
     return idMap;
+}
+
+export function checkToggleDeps(id: string, setting: ToggleSetting<string>) {
+    const needsLib = setting.needsLibs ?? [];
+    const needsPlugin = setting.needsPlugins ?? [];
+    const deps = StateManager.plugin.getDependencies({ needsLib, needsPlugin });
+    const { error, willDownload, willEnable } = StateManager.plugin.checkDependencies(id, deps);
+
+    const canStayEnabled = !error && willDownload.length === 0 && willEnable.length === 0;
+    Storage.pluginSettings[id][setting.id] = canStayEnabled;
 }
 
 /** @hidden */

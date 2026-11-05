@@ -70,7 +70,7 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.5",
-    "@gimloader/ipc": "github:Gimloader/ipc#df05b44777110c1e8136aca95c18fc90be8d632e",
+    "@gimloader/ipc": "github:Gimloader/ipc#5c8195f87c265690cac60883359c226f06021c32",
     "@uiw/codemirror-extensions-hyper-link": "^4.23.10",
     "codemirror": "^6.0.1",
     "debounce": "^2.1.0",

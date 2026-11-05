@@ -25,7 +25,7 @@ export class Library extends Script<ScriptInfo> {
     override unrequire(by: Script, required: boolean) {
         super.unrequire(by, required);
 
-        if(this.requiredBy.length === 0 && this.optionalBy.length === 0) {
+        if(this.requiredBy.size === 0 && this.optionalBy.size === 0) {
             this.stop();
         }
     }

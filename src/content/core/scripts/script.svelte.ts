@@ -28,10 +28,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     abstract warnAbout: boolean;
     code: string;
     headers: ScriptHeaders = $state({} as ScriptHeaders);
-    requires: Script[] = [];
-    optionalRequires: Script[] = [];
-    requiredBy: Script[] = [];
-    optionalBy: Script[] = [];
+    requires = new Set<Script>();
+    optionalRequires = new Set<Script>();
+    requiredBy = new Set<Script>();
+    optionalBy = new Set<Script>();
     exported: any;
     startError: Error | null = $state(null);
 
@@ -86,13 +86,13 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
                     return;
                 }
 
-                this.requires = required;
+                for(const dep of required) this.requires.add(dep);
 
                 // Log any error with optional dependencies
                 for(let i = 0; i < optionalRes.length; i++) {
                     const res = optionalRes[i];
                     if(res.status === "fulfilled") {
-                        this.optionalRequires.push(optional[i]);
+                        this.optionalRequires.add(optional[i]);
                     } else {
                         error(`Failed to load optional dependency for ${this.headers.name}:`, res.reason);
                     }
@@ -150,20 +150,15 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
     }
 
     require(by: Script, required: boolean, initial: boolean, loaded: string[]) {
-        if(required) this.requiredBy.push(by);
-        else this.optionalBy.push(by);
+        if(required) this.requiredBy.add(by);
+        else this.optionalBy.add(by);
 
         return this.start(initial, loaded);
     }
 
     unrequire(by: Script, required: boolean) {
-        if(required) {
-            const index = this.requiredBy.indexOf(by);
-            if(index !== -1) this.requiredBy.splice(index, 1);
-        } else {
-            const index = this.optionalBy.indexOf(by);
-            if(index !== -1) this.optionalBy.splice(index, 1);
-        }
+        if(required) this.requiredBy.delete(by);
+        else this.optionalBy.delete(by);
     }
 
     abstract getDependencyStrings(): Partial<Record<ScriptType, { required?: string[]; optional?: string[] }>>;
@@ -218,10 +213,10 @@ export abstract class Script<T extends ScriptInfo = ScriptInfo> {
         this.startPromise = null;
         this.exported = null;
         this.startError = null;
-        this.requires = [];
-        this.optionalRequires = [];
-        this.requiredBy = [];
-        this.optionalBy = [];
+        this.requires.clear();
+        this.optionalRequires.clear();
+        this.requiredBy.clear();
+        this.optionalBy.clear();
 
         log(`Stopped ${this.type} ${this.headers.name}`);
     }

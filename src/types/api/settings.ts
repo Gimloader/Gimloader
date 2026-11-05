@@ -31,6 +31,8 @@ export interface NumberSetting<K extends string> extends NamedSetting<K, number>
 
 export interface ToggleSetting<K extends string> extends NamedSetting<K, boolean> {
     type: "toggle";
+    needsLibs?: string[];
+    needsPlugins?: string[];
 }
 
 export interface TextSetting<K extends string> extends NamedSetting<K, string> {

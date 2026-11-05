@@ -9553,6 +9553,8 @@ interface NumberSetting<K extends string> extends NamedSetting<K, number> {
 }
 interface ToggleSetting<K extends string> extends NamedSetting<K, boolean> {
     type: "toggle";
+    needsLibs?: string[];
+    needsPlugins?: string[];
 }
 interface TextSetting<K extends string> extends NamedSetting<K, string> {
     type: "text";
@@ -11293,7 +11295,7 @@ class PatcherApi {
      * @returns A function to remove the patch
      * @example
      * ```js
-     * const ReactComponent = () => {...}; // A React component used by Gimkit
+     * const ReactComponent = () => {...}; // A React component used by Gimkit, likely gotten through `api.rewriter.exposeVar`
      * api.patcher.afterReact(ReactComponent, (thisVal, args, returnVal) => {
      *     console.log("Came after:", returnVal); // Logs once the component is rendered
      * });
@@ -11306,7 +11308,7 @@ class PatcherApi {
      * @returns A function to remove the patch
      * @example
      * ```js
-     * const ReactComponent = () => {...}; // A React component used by Gimkit
+     * const ReactComponent = () => {...}; // A React component used by Gimkit, likely gotten through `api.rewriter.exposeVar`
      * api.patcher.beforeReact(ReactComponent, (thisVal, args) => {
      *     console.log("Came before:", args); // Logs before the component is rendered
      * });
@@ -11318,7 +11320,7 @@ class PatcherApi {
      * @returns A function to remove the patch
      * @example
      * ```js
-     * const ReactComponent = () => {...}; // A React component used by Gimkit
+     * const ReactComponent = () => {...}; // A React component used by Gimkit, likely gotten through `api.rewriter.exposeVar`
      * api.patcher.insteadReact(ReactComponent, (thisVal, args) => {
      *     return GL.React.createElement("div", null, "New component!");
      * });
@@ -11330,7 +11332,7 @@ class PatcherApi {
      * @returns A function to remove the patch
      * @example
      * ```js
-     * const ReactComponent = () => {...}; // A React component used by Gimkit
+     * const ReactComponent = () => {...}; // A React component used by Gimkit, likely gotten through `api.rewriter.exposeVar`
      * api.patcher.insteadReact(ReactComponent, (arg1, arg2) => {
      *     return GL.React.createElement("div", null, "New component!");
      * });

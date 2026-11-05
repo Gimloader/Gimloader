@@ -39,7 +39,7 @@ export default new class LibraryManager extends ScriptManager<LibraryInfo, Libra
             if(existing.exported) return existing.exported;
 
             // Require the script
-            if(!requirerScript.requires.includes(existing)) requirerScript.requires.push(existing);
+            requirerScript.requires.add(existing);
             await existing.require(requirerScript, true, false, [requirer]);
 
             return existing.exported;
@@ -61,7 +61,7 @@ export default new class LibraryManager extends ScriptManager<LibraryInfo, Libra
         if(!script) throw new Error(`Failed to download dependency ${name}`);
 
         // Require the script
-        if(!requirerScript.requires.includes(script)) requirerScript.requires.push(script);
+        requirerScript.requires.add(script);
         await script.require(requirerScript, true, false, [requirer]);
 
         return script.exported;
