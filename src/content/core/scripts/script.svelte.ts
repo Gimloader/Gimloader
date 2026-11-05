@@ -1,4 +1,4 @@
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 import type { ScriptInfo, ScriptType } from "@gimloader/ipc";
 import { error } from "$shared/utils";
 import { log } from "$shared/utils";

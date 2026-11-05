@@ -1,4 +1,4 @@
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 import type { Dependency, OnceMessageProps, OnceResponder } from "@gimloader/ipc";
 import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";

@@ -1,5 +1,5 @@
 import type { Script } from "./script.svelte";
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 import type { FolderExport, LayoutItem, ScriptInfo, ScriptLayout, ScriptType } from "@gimloader/ipc";
 import type { CommandContext } from "$types/api/commands";
 import { parseScriptHeaders } from "$shared/parseHeader";

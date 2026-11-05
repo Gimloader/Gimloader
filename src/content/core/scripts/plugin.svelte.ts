@@ -1,5 +1,5 @@
 import type { PluginInfo, ScriptType } from "@gimloader/ipc";
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 import type { PluginSettingsDescription, SettingItem } from "$types/api/settings";
 import { Script } from "./script.svelte";
 import Modals from "../modals.svelte";

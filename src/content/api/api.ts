@@ -1,5 +1,5 @@
 import type { PluginSettings } from "$types/api/settings";
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 import type { Script } from "$core/scripts/script.svelte";
 import type { Plugin } from "$core/scripts/plugin.svelte";
 import HotkeysApi from "./hotkeys";

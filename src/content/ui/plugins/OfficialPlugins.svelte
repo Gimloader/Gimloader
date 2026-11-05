@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { OfficialScriptInfo } from "$types/scripts";
     import { onMount } from "svelte";
     import Card from "../components/Card.svelte";
     import { Button } from "$shared/ui/button";
@@ -14,6 +13,13 @@
     import { officialUrlBase } from "$shared/consts";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
+
+    interface OfficialScriptInfo {
+        title: string;
+        description: string;
+        downloadUrl: string;
+        webpage: string;
+    }
 
     let officialPlugins: OfficialScriptInfo[] = $state([]);
     let searchValue = $state("");

@@ -1,4 +1,4 @@
-import type { ScriptHeaders } from "$types/scripts";
+import type { ScriptHeaders } from "@gimloader/ipc";
 
 export function parseScriptHeaders(code: string): ScriptHeaders {
     const baseHeaders: ScriptHeaders = {
