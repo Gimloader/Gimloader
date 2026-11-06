@@ -11208,7 +11208,18 @@ class StorageApi {
      * });
      * ```
      */
-    onChange(key: string, callback: ValueChangeCallback): () => void;
+    onChange(key: any, callback: ValueChangeCallback): () => void;
+    /** Gets a value from the script's IndexedDB store */
+    idbGet(key: any): Promise<any>;
+    /**
+     * Sets a value in the script's IndexedDB store. Can be anything which is structured-clonable,
+     * including files, objects, arrays, etc.
+     */
+    idbSet(key: any, value: any): Promise<void>;
+    /** Deletes a value from the script's IndexedDB store */
+    idbDelete(key: any): Promise<void>;
+    /** Clears the script's IndexedDB storage */
+    idbClear(): Promise<void>;
 }
 
 /** @inline */

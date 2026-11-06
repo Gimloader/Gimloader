@@ -2,6 +2,7 @@ import type { SettingsChangeCallback } from "$types/api/settings";
 import type { PluginStorage, Settings } from "@gimloader/ipc";
 import { defaultSettings, StateManager } from "@gimloader/ipc";
 import Cleanup from "./scripts/cleanup";
+import { clear, createStore, del, get, set, type UseStore } from "idb-keyval";
 
 /** @inline */
 export type ValueChangeCallback = (value: any, remote: boolean) => void;
@@ -65,6 +66,38 @@ export default new class Storage {
 
     deletePluginValue(id: string, key: string) {
         StateManager.apply("pluginValueDelete", { id, key });
+    }
+
+    stores = new Map<string, UseStore>();
+    getIdbStore(id: string) {
+        const existing = this.stores.get(id);
+        if(existing) return existing;
+
+        const customStore = createStore(`gl-${id}`, "keyval");
+        this.stores.set(id, customStore);
+
+        Cleanup.on(id, () => this.stores.delete(id));
+        return customStore;
+    }
+
+    idbGet(id: string, key: string) {
+        const store = this.getIdbStore(id);
+        return get(key, store);
+    }
+
+    idbSet(id: string, key: string, value: any) {
+        const store = this.getIdbStore(id);
+        return set(key, value, store);
+    }
+
+    idbDelete(id: string, key: string) {
+        const store = this.getIdbStore(id);
+        return del(key, store);
+    }
+
+    idbClear(id: string) {
+        const store = this.getIdbStore(id);
+        return clear(store);
     }
 
     onPluginValueUpdate(id: string, key: string, callback: ValueChangeCallback) {

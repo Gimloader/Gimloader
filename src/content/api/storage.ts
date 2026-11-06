@@ -41,8 +41,37 @@ class StorageApi {
      * });
      * ```
      */
-    onChange(key: string, callback: ValueChangeCallback) {
+    onChange(key: any, callback: ValueChangeCallback) {
         return Storage.onPluginValueUpdate(this.#id, key, callback);
+    }
+
+    /** Gets a value from the script's IndexedDB store */
+    idbGet(key: any) {
+        validate("storage.idbGet", arguments, ["key", "any"]);
+
+        return Storage.idbGet(this.#id, key);
+    }
+
+    /**
+     * Sets a value in the script's IndexedDB store. Can be anything which is structured-clonable,
+     * including files, objects, arrays, etc.
+     */
+    idbSet(key: any, value: any) {
+        validate("storage.idbSet", arguments, ["key", "any"], ["value", "any"]);
+
+        return Storage.idbSet(this.#id, key, value);
+    }
+
+    /** Deletes a value from the script's IndexedDB store */
+    idbDelete(key: any) {
+        validate("storage.idbDelete", arguments, ["key", "any"]);
+
+        return Storage.idbDelete(this.#id, key);
+    }
+
+    /** Clears the script's IndexedDB storage */
+    idbClear() {
+        return Storage.idbClear(this.#id);
     }
 }
 
