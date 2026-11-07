@@ -2,7 +2,7 @@ import type { SettingsChangeCallback } from "$types/api/settings";
 import type { PluginStorage, Settings } from "@gimloader/ipc";
 import { defaultSettings, StateManager } from "@gimloader/ipc";
 import Cleanup from "./scripts/cleanup";
-import { clear, createStore, del, get, set, type UseStore } from "idb-keyval";
+import { clear, createStore, del, get, keys, set, type UseStore } from "idb-keyval";
 
 /** @inline */
 export type ValueChangeCallback = (value: any, remote: boolean) => void;
@@ -98,6 +98,11 @@ export default new class Storage {
     idbClear(id: string) {
         const store = this.getIdbStore(id);
         return clear(store);
+    }
+
+    idbKeys(id: string): Promise<any[]> {
+        const store = this.getIdbStore(id);
+        return keys(store);
     }
 
     onPluginValueUpdate(id: string, key: string, callback: ValueChangeCallback) {

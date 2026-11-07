@@ -11218,6 +11218,8 @@ class StorageApi {
     idbSet(key: any, value: any): Promise<void>;
     /** Deletes a value from the script's IndexedDB store */
     idbDelete(key: any): Promise<void>;
+    /** Gets all keys from the script's IndexedDB storage */
+    idbKeys(): Promise<any[]>;
     /** Clears the script's IndexedDB storage */
     idbClear(): Promise<void>;
 }

@@ -69,6 +69,11 @@ class StorageApi {
         return Storage.idbDelete(this.#id, key);
     }
 
+    /** Gets all keys from the script's IndexedDB storage */
+    idbKeys() {
+        return Storage.idbKeys(this.#id);
+    }
+
     /** Clears the script's IndexedDB storage */
     idbClear() {
         return Storage.idbClear(this.#id);
