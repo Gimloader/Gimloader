@@ -5,7 +5,8 @@ import { error } from "$shared/utils";
 import Storage from "$core/storage.svelte";
 import * as z from "zod";
 import Modals from "$core/modals.svelte";
-import { StateManager } from "@gimloader/ipc";
+import { parseDep, StateManager } from "@gimloader/ipc";
+import Cleanup from "$core/scripts/cleanup";
 
 export type { PluginSettings };
 
@@ -165,7 +166,7 @@ function prepareSettings(id: string, settings: PluginSettingsDescription, idMap:
     return idMap;
 }
 
-export function checkToggleDeps(id: string, setting: ToggleSetting<string>) {
+function checkToggleDeps(id: string, setting: ToggleSetting<string>) {
     const needsLib = setting.needsLibs ?? [];
     const needsPlugin = setting.needsPlugins ?? [];
     const deps = StateManager.plugin.getDependencies({ needsLib, needsPlugin });
@@ -211,6 +212,29 @@ export default function createSettingsApi(plugin: Plugin): PluginSettings {
             return Storage.onPluginSettingUpdate(id, key, callback);
         }
     };
+
+    // Watch for if we need to disable toggle settings
+    const checkShouldDisable = (disabledId: string, enabled?: boolean) => {
+        if(enabled || !plugin.settingIdMap) return;
+        for(const settingId in plugin.settingIdMap) {
+            const setting = plugin.settingIdMap[settingId];
+            if(setting.type !== "toggle" || !Storage.pluginSettings[id][setting.id]) continue;
+            if(!setting.needsLibs?.some(l => parseDep(l)[0] === disabledId) && !setting.needsPlugins?.some(p => parseDep(p)[0] === disabledId)) continue;
+
+            Storage.pluginSettings[id][setting.id] = false;
+            StateManager.apply("pluginSettingUpdate", { id, key: settingId, value: false });
+        }
+    };
+
+    StateManager.plugin.on("scriptDelete", checkShouldDisable);
+    StateManager.library.on("scriptDelete", checkShouldDisable);
+    StateManager.plugin.on("pluginToggled", checkShouldDisable);
+
+    Cleanup.on(id, () => {
+        StateManager.plugin.off("scriptDelete", checkShouldDisable);
+        StateManager.library.off("scriptDelete", checkShouldDisable);
+        StateManager.plugin.off("pluginToggled", checkShouldDisable);
+    });
 
     const settings = new Proxy(methods, {
         get(target, prop, receiver) {
