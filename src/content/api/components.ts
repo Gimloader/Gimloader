@@ -1,6 +1,7 @@
 import * as Accordion from "$shared/ui/accordion";
 import * as Dialog from "$shared/ui/dialog";
 import * as AlertDialog from "$shared/ui/alert-dialog";
+import * as ContextMenu from "$shared/ui/context-menu";
 import * as DropdownMenu from "$shared/ui/dropdown-menu";
 import * as Popover from "$shared/ui/popover";
 import * as RadioGroup from "$shared/ui/radio-group";
@@ -17,6 +18,7 @@ export interface SvelteComponents {
     Accordion: typeof Accordion;
     Dialog: typeof Dialog;
     AlertDialog: typeof AlertDialog;
+    ContextMenu: typeof ContextMenu;
     DropdownMenu: typeof DropdownMenu;
     Popover: typeof Popover;
     RadioGroup: typeof RadioGroup;
@@ -35,6 +37,7 @@ const Components: SvelteComponents = {
     Accordion,
     Dialog,
     AlertDialog,
+    ContextMenu,
     DropdownMenu,
     Popover,
     RadioGroup,

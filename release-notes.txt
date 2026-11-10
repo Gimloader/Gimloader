@@ -1,2 +1,3 @@
 Added prefix to Gimloader commands in the command palette
 Added storage commands for interacting with an IndexedDB store
+Added context menu component for plugins
