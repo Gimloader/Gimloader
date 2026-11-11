@@ -38,7 +38,7 @@
         {#if options.title}
             <Dialog.Header class="text-2xl font-bold!">{options.title}</Dialog.Header>
         {/if}
-        <div class="grow" use:mountContent></div>
+        <div class="grow min-h-0 overflow-auto" use:mountContent></div>
         <Dialog.Footer class="preflight">
             {#each options.buttons ?? [] as button}
                 <Button
