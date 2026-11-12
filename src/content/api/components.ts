@@ -13,6 +13,7 @@ import { Progress } from "$shared/ui/progress";
 import { Slider } from "$shared/ui/slider";
 import { Spinner } from "$shared/ui/spinner";
 import { Switch } from "$shared/ui/switch";
+import ColorPicker from "svelte-awesome-color-picker";
 
 export interface SvelteComponents {
     Accordion: typeof Accordion;
@@ -30,6 +31,7 @@ export interface SvelteComponents {
     Slider: typeof Slider;
     Spinner: typeof Spinner;
     Switch: typeof Switch;
+    ColorPicker: typeof ColorPicker;
 }
 
 /** @hidden */
@@ -48,7 +50,8 @@ const Components: SvelteComponents = {
     Progress,
     Slider,
     Spinner,
-    Switch
+    Switch,
+    ColorPicker
 };
 
 export default Components;

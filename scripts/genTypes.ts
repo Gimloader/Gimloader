@@ -43,6 +43,7 @@ const includeExternal = [
     "tailwind-variants",
     "svelte-toolbelt",
     "tailwind-merge",
+    "svelte-awesome-color-picker",
     "@gimloader/ipc"
 ];
 
