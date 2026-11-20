@@ -38,7 +38,7 @@ export interface PluginSettingsProps {
 type ModalInfo<Type extends string, Props, Result = void> = { type: Type; props: Props; result: Result };
 type ModalTypes =
     | ModalInfo<"alert", { text?: string; title: string }>
-    | ModalInfo<"error", { text: string; title: string }>
+    | ModalInfo<"error", { text: string; title: string; checkUpdates?: boolean }>
     | ModalInfo<"confirm", { text: string; title: string }, boolean>
     | ModalInfo<"pluginSettings", PluginSettingsProps>
     | ModalInfo<"dependency", DependencyProps, boolean>
