@@ -124,12 +124,10 @@ export class Plugin extends Script<PluginInfo> {
     }
 
     showEnableError(text: string) {
-        text +=
-            "\n\nThis may be caused by an outdated version of Gimloader. You can force an update by going to chrome://extensions, turning on developer mode, and clicking Update, or uninstalling and reinstalling if that isn't possible.";
-
         Modals.open("error", {
             text,
-            title: `Error starting ${this.headers.name}`
+            title: `Error starting ${this.headers.name}`,
+            checkUpdates: true
         }, `${this.headers.name}-error`);
     }
 }

@@ -62,3 +62,19 @@ export class Deferred<T = void> extends Promise<T> {
         return new Deferred<T>(nop);
     }
 }
+
+export function shouldUpdate(oldVersion: string, newVersion: string) {
+    const oldParts = oldVersion.split(".").map((n) => parseInt(n, 10));
+    const newParts = newVersion.split(".").map((n) => parseInt(n, 10));
+
+    for(let i = 0; i < newParts.length; i++) {
+        const oldPart = oldParts[i];
+        const newPart = newParts[i];
+
+        if(newPart > oldPart) return true;
+        if(newPart < oldPart) return false;
+    }
+
+    if(newParts.length > oldParts.length) return true;
+    return false;
+}

@@ -4,6 +4,7 @@ import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
 import Downloader from "./downloader";
 import { StateManager } from "@gimloader/ipc";
+import { shouldUpdate } from "$shared/utils";
 
 interface Update {
     name: string;
@@ -95,19 +96,7 @@ export default class Updater {
         if(!oldHeaders.version) return true;
         if(!newHeaders.version) return false;
 
-        const oldParts = oldHeaders.version.split(".").map((n) => parseInt(n, 10));
-        const newParts = newHeaders.version.split(".").map((n) => parseInt(n, 10));
-
-        for(let i = 0; i < newParts.length; i++) {
-            const oldPart = oldParts[i];
-            const newPart = newParts[i];
-
-            if(newPart > oldPart) return true;
-            if(newPart < oldPart) return false;
-        }
-
-        if(newParts.length > oldParts.length) return true;
-        return false;
+        return shouldUpdate(oldHeaders.version, newHeaders.version);
     }
 
     static async applyUpdates(apply: boolean) {
