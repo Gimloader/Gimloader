@@ -4,7 +4,7 @@ import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
 import Downloader from "./downloader";
 import { StateManager } from "@gimloader/ipc";
-import { shouldUpdate } from "$shared/utils";
+import { isVersionGreater } from "$shared/utils";
 
 interface Update {
     name: string;
@@ -42,7 +42,7 @@ export default class Updater {
                 return async () => {
                     try {
                         const response = await Downloader.fetchScript(downloadUrl);
-                        if(!this.shouldUpdate(headers, response.headers)) return;
+                        if(!isVersionGreater(headers.version, response.headers.version)) return;
 
                         this.updates.push({
                             name: headers.name,
@@ -92,13 +92,6 @@ export default class Updater {
         });
     }
 
-    static shouldUpdate(oldHeaders: ScriptHeaders, newHeaders: ScriptHeaders) {
-        if(!oldHeaders.version) return true;
-        if(!newHeaders.version) return false;
-
-        return shouldUpdate(oldHeaders.version, newHeaders.version);
-    }
-
     static async applyUpdates(apply: boolean) {
         if(apply) {
             for(const update of this.updates) {
@@ -134,7 +127,7 @@ export default class Updater {
 
         try {
             const result = await Downloader.fetchScript(headers.downloadUrl);
-            if(!this.shouldUpdate(headers, result.headers)) return respond({ updated: false });
+            if(!isVersionGreater(headers.version, result.headers.version)) return respond({ updated: false });
 
             await this.applyUpdate(message.name, result.text, result.dependencies);
 
