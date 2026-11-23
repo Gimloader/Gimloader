@@ -126,7 +126,8 @@ export class Plugin extends Script<PluginInfo> {
     showEnableError(text: string) {
         Modals.open("error", {
             text,
-            title: `Error starting ${this.headers.name}`
+            title: `Error starting ${this.headers.name}`,
+            checkUpdates: true
         }, `${this.headers.name}-error`);
     }
 }

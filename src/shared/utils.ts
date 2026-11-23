@@ -38,6 +38,25 @@ export function downloadJson(json: any, name: string) {
 
 export const nop = () => {};
 
+export function isVersionGreater(oldVersion: string | null, newVersion: string | null) {
+    if(!oldVersion) return true;
+    if(!newVersion) return false;
+
+    const oldParts = oldVersion.split(".").map((n) => parseInt(n, 10));
+    const newParts = newVersion.split(".").map((n) => parseInt(n, 10));
+
+    for(let i = 0; i < newParts.length; i++) {
+        const oldPart = oldParts[i];
+        const newPart = newParts[i];
+
+        if(newPart > oldPart) return true;
+        if(newPart < oldPart) return false;
+    }
+
+    if(newParts.length > oldParts.length) return true;
+    return false;
+}
+
 // Because of some nonsense with the spec subclassing promises is wonky
 export class Deferred<T = void> extends Promise<T> {
     resolve: (value?: T) => void;

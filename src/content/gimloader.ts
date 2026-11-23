@@ -45,7 +45,7 @@ if(document.contentType === "text/html") {
 
         const versionChanged = version !== lastVersion;
         const updated = lastVersion && versionChanged;
-        if(updated) addUpdated("Gimloader", version, changelog);
+        if(updated) addUpdated("Gimloader", version, null, changelog);
 
         Storage.init();
         LibManager.init();

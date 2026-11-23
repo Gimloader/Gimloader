@@ -4,6 +4,7 @@ import { parseScriptHeaders } from "$shared/parseHeader";
 import Server from "$bg/net/server";
 import Downloader from "./downloader";
 import { StateManager } from "@gimloader/ipc";
+import { isVersionGreater } from "$shared/utils";
 
 interface Update {
     name: string;
@@ -41,7 +42,7 @@ export default class Updater {
                 return async () => {
                     try {
                         const response = await Downloader.fetchScript(downloadUrl);
-                        if(!this.shouldUpdate(headers, response.headers)) return;
+                        if(!isVersionGreater(headers.version, response.headers.version)) return;
 
                         this.updates.push({
                             name: headers.name,
@@ -91,25 +92,6 @@ export default class Updater {
         });
     }
 
-    static shouldUpdate(oldHeaders: ScriptHeaders, newHeaders: ScriptHeaders) {
-        if(!oldHeaders.version) return true;
-        if(!newHeaders.version) return false;
-
-        const oldParts = oldHeaders.version.split(".").map((n) => parseInt(n, 10));
-        const newParts = newHeaders.version.split(".").map((n) => parseInt(n, 10));
-
-        for(let i = 0; i < newParts.length; i++) {
-            const oldPart = oldParts[i];
-            const newPart = newParts[i];
-
-            if(newPart > oldPart) return true;
-            if(newPart < oldPart) return false;
-        }
-
-        if(newParts.length > oldParts.length) return true;
-        return false;
-    }
-
     static async applyUpdates(apply: boolean) {
         if(apply) {
             for(const update of this.updates) {
@@ -145,7 +127,7 @@ export default class Updater {
 
         try {
             const result = await Downloader.fetchScript(headers.downloadUrl);
-            if(!this.shouldUpdate(headers, result.headers)) return respond({ updated: false });
+            if(!isVersionGreater(headers.version, result.headers.version)) return respond({ updated: false });
 
             await this.applyUpdate(message.name, result.text, result.dependencies);
 

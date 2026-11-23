@@ -73,9 +73,10 @@ export default abstract class ScriptManager<I extends ScriptInfo = any, T extend
         const script = this.getScript(name);
         if(!script) return;
 
+        const oldVersion = script.headers.version;
         const headers = parseScriptHeaders(code);
         if(updated && headers.version && headers.changelog.length > 0) {
-            addUpdated(newName, headers.version, headers.changelog);
+            addUpdated(newName, headers.version, oldVersion, headers.changelog);
         }
 
         script.edit(code, headers);

@@ -8,14 +8,28 @@
     let open = $state(false);
     let updates: Update[] = $state([]);
 
-    export function addUpdated(name: string, version: string, changes: string[]) {
-        updates.push({ name, version, changes });
+    const versionRegex = /^\s*\[(\d+(?:\.\d+)*)\]\s*/;
+    function checkChangeVersion(change: string, oldVersion: string | null) {
+        if(!oldVersion) return true;
+
+        const version = change.match(versionRegex);
+        if(!version) return true;
+
+        return isVersionGreater(oldVersion, version[1]);
+    }
+
+    export function addUpdated(name: string, version: string, oldVersion: string | null, changes: string[]) {
+        const showChanges = changes.filter((change) => checkChangeVersion(change, oldVersion))
+            .map((change) => change.replace(versionRegex, ""));
+
+        updates.push({ name, version, changes: showChanges });
         open = true;
     }
 </script>
 
 <script lang="ts">
     import * as Dialog from "$shared/ui/dialog";
+    import { isVersionGreater } from "$shared/utils";
 
     function onOpenChangeComplete(isOpen: boolean) {
         if(!isOpen) updates = [];

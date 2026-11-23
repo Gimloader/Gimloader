@@ -10,7 +10,7 @@
     import { error } from "$shared/utils";
     import * as Tooltip from "$shared/ui/tooltip";
     import BadgeCheck from "@lucide/svelte/icons/badge-check";
-    import { officialUrlBase } from "$shared/consts";
+    import { officialPluginsUrl, officialUrlBase } from "$shared/consts";
 
     let { officialPluginsOpen = $bindable() }: { officialPluginsOpen: boolean } = $props();
 
@@ -48,7 +48,7 @@
         if(now - lastFetch < delay) return;
 
         try {
-            const res = await fetch("https://gimloader.github.io/plugins.json");
+            const res = await fetch(officialPluginsUrl);
             officialPlugins = await res.json();
             localStorage.setItem("gl-officialPlugins", JSON.stringify(officialPlugins));
             localStorage.setItem("gl-lastOfficialFetch", Date.now().toString());
