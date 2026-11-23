@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { gimloaderPackageUrl } from "$shared/consts";
     import * as Dialog from "$shared/ui/dialog";
-    import { shouldUpdate } from "$shared/utils";
+    import { isVersionGreater } from "$shared/utils";
     import { version } from "../../../../package.json";
 
     interface Props {
@@ -12,42 +13,26 @@
 
     let { title, text, onClose, checkUpdates }: Props = $props();
 
-    interface VersionFetchInfo {
-        lastFetch: number;
-        version: string;
-    }
-
-    async function isOutdated(): Promise<false | string> {
-        const delay = 1000 * 60 * 60; // 1 hour
+    async function isOutdated(): Promise<string | null> {
+        const lastFetch = parseInt(localStorage.getItem("gl-lastVersionFetch") ?? "0", 10);
+        const latestVersion = localStorage.getItem("latestVersion");
+        const delay = 1000 * 60 * 20; // 20 minutes
         const now = Date.now();
 
-        const versionFetchInfo = localStorage.getItem("gl-lastVersionFetch");
-        if(versionFetchInfo) {
-            const info: VersionFetchInfo = JSON.parse(versionFetchInfo);
-
-            if(now - info.lastFetch < delay && shouldUpdate(version, info.version)) {
-                return false;
-            }
+        if(now - lastFetch < delay && latestVersion) {
+            if(isVersionGreater(version, latestVersion)) return latestVersion;
+            return null;
         }
 
-        const fetchedVersion: string = await fetch(
-            "https://raw.githubusercontent.com/Gimloader/Gimloader/refs/heads/main/package.json"
-        )
-            .then(res => res.json())
-            .then(res => res.version);
+        const res = await fetch(gimloaderPackageUrl);
+        const json = await res.json();
+        const newVersion = json.version;
 
-        localStorage.setItem(
-            "gl-lastVersionFetch",
-            JSON.stringify({
-                lastFetch: now,
-                version: fetchedVersion
-            })
-        );
+        localStorage.setItem("gl-latestVersion", newVersion.toString());
+        localStorage.setItem("gl-lastVersionFetch", Date.now().toString());
 
-        if(shouldUpdate(version, fetchedVersion)) {
-            return fetchedVersion;
-        }
-        return false;
+        if(isVersionGreater(version, newVersion)) return newVersion;
+        return null;
     }
 </script>
 
@@ -62,7 +47,7 @@
                 {#if newVersion}
                     <div>
                         You may need to update Gimloader from v{version} to v{newVersion}. Try uninstalling and
-                        reinstalling the extension.
+                        reinstalling the Gimloader extension.
                     </div>
                 {/if}
             {/await}

@@ -1,6 +1,8 @@
 export const isFirefox = navigator.userAgent.includes("Firefox");
 
 export const officialUrlBase = "https://github.com/Gimloader/client-plugins/tree/main";
+export const officialPluginsUrl = "https://gimloader.github.io/plugins.json";
+export const gimloaderPackageUrl = "https://raw.githubusercontent.com/Gimloader/Gimloader/refs/heads/main/package.json";
 
 export const portCryptoAlgorithm: HmacKeyGenParams = {
     name: "HMAC",
