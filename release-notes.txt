@@ -1,5 +1,2 @@
-Added prefix to Gimloader commands in the command palette
-Added storage commands for interacting with an IndexedDB store
-Added context menu component for plugins
-Fixed overflow issues on custom modals
-Exposed color picker component
+Added message suggesting updating if a plugin errors and Gimloader is out of date
+Allowed plugins to have changelog tags for multiple versions at once
